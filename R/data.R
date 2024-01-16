@@ -6,9 +6,12 @@
 #' @param coords        default "longitude","latitude"
 #' @param crs          default 4326.
 
-#' @note 
+#' @note
 #' For now just a thin wrapper on st_as_sf
-
+#'
+#' @export
+#' @md
+#'
 #' @examples
 #' data(zbird)
 #' x = as_tdbscan(zbird)
@@ -16,7 +19,7 @@
 as_tdbscan <- function(x, coords = c("longitude","latitude"),time = "time", crs = 4326) {
 
   setnames(x, time, "timestamp")
-  setorder(x, timestamp)  
+  setorder(x, timestamp)
 
   st_as_sf(x, coords = coords, crs = crs)
 
