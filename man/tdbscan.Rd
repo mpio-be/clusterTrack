@@ -7,7 +7,7 @@
 tdbscan(track, eps, minPts = 5, borderPoints = FALSE, maxLag = 6, minTenure)
 }
 \arguments{
-\item{track}{A sftrack object.}
+\item{track}{A sf object (for now).}
 
 \item{eps}{size of the epsilon neighborhood (see \code{\link[dbscan:dbscan]{dbscan::dbscan()}}  ).}
 

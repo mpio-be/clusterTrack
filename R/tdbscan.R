@@ -1,7 +1,7 @@
 
 #' tdbscan
 #'
-#' @param track        A sftrack object.
+#' @param track        A sf object (for now).
 #' @param eps          size of the epsilon neighborhood (see [dbscan::dbscan()]  ).
 #' @param minPts       number of minimum points in the eps region (for core points).
 #'                     Default is 5 points (see [dbscan::dbscan()]  ).
