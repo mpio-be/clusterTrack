@@ -1,4 +1,4 @@
 library(testthat)
-library(tdbscan)
+library(dbscanTrack)
 
-test_check("tdbscan")
+test_check("dbscanTrack")

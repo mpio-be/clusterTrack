@@ -1,9 +1,10 @@
 Package: dbscanTrack
 Title: A Dbscan Implementation Applied To Animal Movements. 
-Version: 0.0.2
-Authors@R: c( 
-           person("Mihai", "Valcu",       email = "valcu@orn.mpg.de",     role = c("aut", "cre")),
-Description: TODO
+Version: 0.1.0
+Authors@R: 
+    person("Mihai", "Valcu", , "mvalcu@gwdg.de", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-6907-7802"))
+Description: A Dbscan Implementation Applied To Animal Movements (pre-alpha).
 Depends:
     R (>= 3.5.0)
 Imports:
@@ -14,10 +15,9 @@ Imports:
     data.table
 Suggests:
     ggplot2,
-    ggrepel,
     roxygen2,
     testthat (>= 2.1.0)
 License: GPL(>= 2)
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.0.2
+RoxygenNote: 7.2.3

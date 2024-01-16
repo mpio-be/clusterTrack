@@ -1,11 +1,12 @@
 context('tdbscan')
 
-z = tdbscan(pesa56511, eps = 6600, minPts = 8, maxLag = 6, borderPoints = TRUE)
+data(pesa56511)
+x = as_tdbscan(pesa56511)
 
-# full function is working
-test_that('tdbscan is list', {
+z = tdbscan(x, eps = 6600, minPts = 8, maxLag = 6, borderPoints = TRUE)
 
-  expect_type( z,  'list' )
+test_that('tdbscan is sf', {
+
+  expect_s3_class( z, 'sf' )
 
 })
-

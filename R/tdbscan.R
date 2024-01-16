@@ -1,7 +1,7 @@
 
 #' tdbscan
 #'
-#' @param track        A [projected][sp::is.projected()]  [Track][trajectories::Track()].
+#' @param track        A sftrack object.
 #' @param eps          size of the epsilon neighborhood (see [dbscan::dbscan()]  ).
 #' @param minPts       number of minimum points in the eps region (for core points).
 #'                     Default is 5 points (see [dbscan::dbscan()]  ).
@@ -12,70 +12,45 @@
 #' @note 
 #' When maxLag is set to `maxLag>N` output is the same as for [dbscan][dbscan::dbscan()].
 #'
-# @import trajectories
-#' @importFrom data.table  data.table setnames .N :=
-#' @importFrom dbscan      frNN
-#' @importFrom igraph      groups graph_from_edgelist  components subgraph.edges E set_edge_attr
-#' @importFrom forcats     fct_inorder
-#' @importFrom sp          coordinates is.projected
-#' @importFrom broom       tidy
 #'
 #' @export
 #' @md
 #'
 #' @examples
-#' require(tdbscan)
+#' require(dbscanTrack)
 #' require(data.table)
 #' require(magrittr)
 #' require(ggplot2)
-#' require(ggrepel)
+
 #' 
 #' # Pectoral Sandpiper
 #' data(pesa56511)
-#' z = tdbscan(pesa56511, eps =6600, minPts   = 8, maxLag = 6, borderPoints = TRUE )
+#' x = as_tdbscan(pesa56511)
+#' z = tdbscan(track=x, eps =6600, minPts   = 8, maxLag = 6, borderPoints = TRUE )
 #' 
-#' o = cbind(sp::coordinates(pesa56511), z)
-#' ggplot(o, aes(longitude/10000,latitude/10000,color = factor(clustID))) +
-#' geom_path(aes(color= NULL), col = 'grey', size = .5) + 
-#' geom_point( alpha = .5, size = 2)
+#' ggplot(z ) +geom_sf(aes(color = factor(clustID) )) 
 #' 
 #' 
 #' # Set minTenure
-#' z = tdbscan(pesa56511, eps =6600, minPts   = 8, maxLag = 6, borderPoints = TRUE, minTenure= 24 )
-#' o = cbind(sp::coordinates(pesa56511), z)
-#' ggplot(o, aes(longitude/10000,latitude/10000,color = factor(clustID))) +
-#' geom_path(aes(color= NULL), col = 'grey', size = .5) + 
-#' geom_point( alpha = .5, size = 2)
+#' z = tdbscan(x, eps =6600, minPts   = 8, maxLag = 6, borderPoints = TRUE, minTenure= 24 )
+#' ggplot(z ) +geom_sf(aes(color = factor(clustID) )) 
 #' 
 #' # z bird
 #' data(zbird)
-#' z = tdbscan(zbird, eps =12, minPts   = 5, maxLag = 5, borderPoints = TRUE )
-#' z = z[, clustID := factor(clustID)]
+#' x = as_tdbscan(zbird)
+#' z = tdbscan(x, eps =12, minPts   = 5, maxLag = 5, borderPoints = TRUE )
+#' ggplot(z ) +geom_sf(aes(color = factor(clustID) )) 
 #' 
-#' o = data.frame(zbird) %>% data.table
-#' o = merge(z, o, by.x = 'id', by.y = 'sp.ID')
-#' 
-#' clustLab = o[!is.na(clustID), .(x = mean(x), y = mean(y), 
-#' 	arrival = min(time), departure = max(time)  ), by = clustID]
-#' clustLab[, tenure := difftime(departure, arrival, units = 'hours')]
-#' clustLab[, lab := paste("ID: ", clustID, ",", tenure, "hours")]
-#' 
-#' ggplot(o, aes(y,x, color = clustID ) )+
-#'	 geom_path(aes(color= NULL), col = 'grey', size = .5) + 
-#'	 geom_point( alpha = .5, size = 2) + 
-#'	 geom_label_repel(data = clustLab, aes(y,x, label = lab), alpha = 0.7, size = 3)
 
-
-tdbscan  = function(track, eps, minPts = 5, borderPoints = FALSE , maxLag = 6, minTenure) {
+tdbscan <- function(track, eps, minPts = 5, borderPoints = FALSE , maxLag = 6, minTenure) {
 
 	checkClust=clustID=id=iscore=n=ngb=tc=y=NULL  # due to NSE notes in R CMD check
 	`.` = function(...) NULL
 
 
-	stopifnot( inherits(track, 'Track') )
-	stopifnot( sp::is.projected(track) )
+	stopifnot( inherits(track, 'sf') )
 
-	x = data.table(sp::coordinates(track))
+	x = st_coordinates(track) |> data.table()
 	setnames(x, c('x', 'y') )
 
 
@@ -107,16 +82,16 @@ tdbscan  = function(track, eps, minPts = 5, borderPoints = FALSE , maxLag = 6, m
 	z[, id := as.character(id)] # so it will be  interpreted as symbolic vertex name by graph_from_edgelist
 	z[, ngb := as.character(ngb)]
 
-	g = graph_from_edgelist( z[, .(id, ngb)] %>% as.matrix, directed = FALSE)
+	g = graph_from_edgelist( z[, .(id, ngb)] |> as.matrix(), directed = FALSE)
 
 	# set graph attributes and subset
 	g = set_edge_attr(g, 'tc', value = z$tc)
 
 	g = subgraph.edges(g, E(g)[tc <= maxLag])
 
-	gr = components(g) %>% groups
+	gr = components(g) |> groups()
 
-	ids = sapply(gr, length); ids = rep(names(ids), times = ids)%>% as.integer
+	ids = sapply(gr, length); ids = rep(names(ids), times = ids)|> as.integer()
 	o = data.table(id = unlist(gr), clustID = ids)
 	o[, id := as.numeric(id)]
 
@@ -131,7 +106,7 @@ tdbscan  = function(track, eps, minPts = 5, borderPoints = FALSE , maxLag = 6, m
 
 	# minTenure
 	if(!missing(minTenure)) {
-		o[, datetime := tidy(track@time)$index ]
+		o[, datetime := track$timestamp ]
 
 		o[!is.na(clustID), tenure := difftime(max(datetime), min(datetime), units= 'hours'), by = clustID]
 		o[tenure < minTenure, clustID := NA]
@@ -139,10 +114,11 @@ tdbscan  = function(track, eps, minPts = 5, borderPoints = FALSE , maxLag = 6, m
 
 	# cleanup & re-order clust
 	x[, id := NULL]
-	o[, clustID  := factor(clustID) %>% fct_inorder %>% as.integer]
+	o[, clustID  := factor(clustID) |> fct_inorder() |> as.integer()]
 	o[, .(id, clustID)]
 
+
+	track$clustID = o$clustID
+	track
+
 	}
-
-
-
