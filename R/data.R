@@ -18,10 +18,12 @@
 
 as_tdbscan <- function(x, coords = c("longitude","latitude"),time = "time", crs = 4326) {
 
-  setnames(x, time, "timestamp")
-  setorder(x, timestamp)
+  o=  copy(x)  
 
-  st_as_sf(x, coords = coords, crs = crs)
+  setnames(o, time, "timestamp")
+  setorder(o, timestamp)
+
+  st_as_sf(o, coords = coords, crs = crs)
 
 
   }
