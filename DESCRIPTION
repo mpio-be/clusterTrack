@@ -1,10 +1,10 @@
-Package: dbscanTrack
-Title: A Dbscan Implementation Applied To Animal Movements. 
+Package: clusterTrack
+Title: Clustering Animal Movements. 
 Version: 0.1.0
 Authors@R: 
     person("Mihai", "Valcu", , "mvalcu@gwdg.de", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-6907-7802"))
-Description: A Dbscan Implementation Applied To Animal Movements (pre-alpha).
+Description: Clustering Animal Movements using DDSCAN and other related methods (pre-alpha).
 Depends:
     R (>= 3.5.0)
 Imports:
