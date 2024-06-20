@@ -1,7 +1,7 @@
-# dbscanTrack
-A DBSCAN implementation applied to animal movements. 
+# clusterTrack
+Clustering Animal Movements using DDSCAN and other related methods
 
 
 ```R
-dbscanTrack::install_github('mpio-be/dbscanTrack')
+remotes::install_github('mpio-be/clusterTrack')
 ```
