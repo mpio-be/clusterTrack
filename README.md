@@ -1,5 +1,5 @@
 # clusterTrack
-Clustering Animal Movements using DDSCAN and other related methods
+Clustering Animal Movements using DBSCAN and Related Algorithms
 
 
 ```R
