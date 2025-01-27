@@ -25,5 +25,4 @@ as_tdbscan <- function(x, coords = c("longitude","latitude"),time = "time", crs 
 
   st_as_sf(o, coords = coords, crs = crs)
 
-
   }
