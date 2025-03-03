@@ -17,7 +17,7 @@
 #' @md
 #'
 #' @examples
-#' require(dbscanTrack)
+#' require(clusterTrack)
 #' require(data.table)
 #' require(magrittr)
 #' require(ggplot2)
