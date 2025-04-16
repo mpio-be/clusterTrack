@@ -1,17 +1,8 @@
 
 require(dbo)
-require(tracktools)
+require(sf)
 require(mapview)
 
 
-x = dbq(q = 'SELECT * FROM ARGOS.ARGOS_ALL where tagID = "56511"')
-
-o = as_tdbscan(x, time = "locationClass")
-o$day = as.numeric(o$locationDate) |>
-  scale() |>
-  as.numeric()
-ll = st_lines(o)
-mapview(o, zcol = 'day') + mapview(ll)
-
-
-usethis::use_data(DATASET, overwrite = TRUE)
+pesa56511 = dbq(q = 'SELECT latitude,longitude,locationDate,locationClass FROM ARGOS.ARGOS_ALL where tagID = "56511"')
+usethis::use_data(pesa56511, overwrite = TRUE)
