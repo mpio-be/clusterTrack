@@ -15,9 +15,7 @@
 #' plot(segs)
 #'
 #' @export
-ctdf_to_segments <- function(x) {
-
-  # TODO: slow = TRUE st_distance, else euclidian dist
+track_segments <- function(x) {
 
   x |>
     mutate(
@@ -30,8 +28,12 @@ ctdf_to_segments <- function(x) {
       segment = list(st_linestring(
         rbind(st_coordinates(geometry), st_coordinates(geom_next))
       )),
-      step_duration = as.numeric(difftime(timestamp_next, timestamp, units = "secs")),
-      step_distance = st_distance(geometry, geom_next, by_element = TRUE)
+      step_duration = difftime(timestamp_next, timestamp, units = "hours") |> as.numeric(),
+      step_distance = geodist(
+        geometry |> st_coordinates(), 
+        geom_next|> st_coordinates(), 
+        paired = TRUE, 
+        measure = 'haversine')
     ) |>
     ungroup() |>
     mutate(segment = st_sfc(segment, crs = st_crs(x))) |>

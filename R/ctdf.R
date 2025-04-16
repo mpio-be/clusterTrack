@@ -38,7 +38,7 @@ plot.ctdf <- function(x, ..., col = "black", pch = 16) {
 
 as_ctdf <- function(x, coords = c("longitude","latitude"),time = "time", crs = 4326, ...) {
 
-  o=  copy(x)  
+  o = copy(x)  
 
   setnames(o, time, "timestamp")
   setorder(o, timestamp)
