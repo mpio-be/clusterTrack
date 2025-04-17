@@ -28,8 +28,9 @@ plot.ctdf <- function(x, ..., col = "black", pch = 16) {
 #' @return An object of class `ctdf`, which inherits from `sf`.
 #'
 #' @note
-#' This is currently a thin wrapper around `st_as_sf()`, but standardizes timestamp naming and ordering.
-#'
+#' This is currently a thin wrapper around `st_as_sf()`, but standardizes timestamp naming, ordering,
+#' and geometry column name (`"location"`).
+#' 
 #' @examples
 #' data(zbird)
 #' x <- as_ctdf(zbird)
@@ -44,6 +45,8 @@ as_ctdf <- function(x, coords = c("longitude","latitude"),time = "time", crs = 4
   setorder(o, timestamp)
 
   o_sf = st_as_sf(o, coords = coords, crs = crs)
+
+  st_geometry(o_sf) = "location"
 
   class(o_sf) <- c("ctdf", class(o_sf))
   o_sf

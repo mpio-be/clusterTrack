@@ -2,25 +2,28 @@
 % Please edit documentation in R/sf.R
 \name{track_segments}
 \alias{track_segments}
-\title{Convert `ctdf` point track to step segments as LINESTRINGs}
+\title{Convert a `ctdf` track to movement step segments as LINESTRINGs}
 \usage{
-track_segments(x)
+track_segments(ctdf)
 }
 \arguments{
-\item{ctdf}{A `ctdf` object (or any `sf` POINT object with time-ordered rows).}
+\item{ctdf}{A `ctdf` object (with ordered rows and a `"location"` geometry column).}
 }
 \value{
-An `sf` object with LINESTRING geometry for each step.
+An `sf` object with LINESTRING geometry for each step. Includes additional
+columns for step duration (`step_duration`), step distance (`step_distance` in meters),
+and speed (`speed` in km/h).
 }
 \description{
-Takes a `ctdf` object and returns
-an `sf` object of LINESTRINGs representing the movement steps between
-consecutive locations.
+Takes a `ctdf` object and returns an `sf` object with LINESTRING geometries representing
+the movement steps between consecutive locations. Each segment connects two points,
+starting at the previous location and ending at the current one - i.e., each segment
+ends at the position of the current row.
 }
 \examples{
 data(pesa56511)
-x = as_ctdf(pesa56511, time = 'locationDate')
-segs = ctdf_to_segments(x)
+ctdf = as_ctdf(pesa56511, time = 'locationDate')
+segs = track_segments(ctdf)
 plot(segs)
 
 }

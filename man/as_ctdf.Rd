@@ -26,7 +26,8 @@ Converts a `data.table` with spatial coordinates and a timestamp column
 to a standardized `sf`-based format used internally by the clusterTrack package.
 }
 \note{
-This is currently a thin wrapper around `st_as_sf()`, but standardizes timestamp naming and ordering.
+This is currently a thin wrapper around `st_as_sf()`, but standardizes timestamp naming, ordering,
+and geometry column name (`"location"`).
 }
 \examples{
 data(zbird)

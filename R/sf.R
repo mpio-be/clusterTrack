@@ -1,42 +1,63 @@
-#' Convert `ctdf` point track to step segments as LINESTRINGs
+#' Convert a `ctdf` track to movement step segments as LINESTRINGs
 #'
-#' Takes a `ctdf` object and returns
-#' an `sf` object of LINESTRINGs representing the movement steps between
-#' consecutive locations.
+#' Takes a `ctdf` object and returns an `sf` object with LINESTRING geometries representing
+#' the movement steps between consecutive locations. Each segment connects two points,
+#' starting at the previous location and ending at the current one - i.e., each segment
+#' ends at the position of the current row.
 #'
-#' @param ctdf A `ctdf` object (or any `sf` POINT object with time-ordered rows).
+#' @param ctdf A `ctdf` object (with ordered rows and a `"location"` geometry column).
 #'
-#' @return An `sf` object with LINESTRING geometry for each step.
+#' @return An `sf` object with LINESTRING geometry for each step. Includes additional
+#' columns for step duration (`step_duration`), step distance (`step_distance` in meters),
+#' and speed (`speed` in km/h).
+#'
 #'
 #' @examples
 #' data(pesa56511)
-#' x = as_ctdf(pesa56511, time = 'locationDate')
-#' segs = ctdf_to_segments(x)
-#' plot(segs)
+#' ctdf = as_ctdf(pesa56511, time = 'locationDate')
+#' s = track_segments(ctdf)
+#' plot(s[c('timestamp', 'speed')])
 #'
 #' @export
-track_segments <- function(x) {
+track_segments <- function(ctdf) {
+  
+  if (!inherits(ctdf, "ctdf")) {
+    stop("track_segments() only works on objects of class 'ctdf'")
+  }
 
-  x |>
+  o = ctdf |>
     mutate(
-      geom_next = lead(geometry),
-      timestamp_next = lead(timestamp)
-    ) |>
-    filter(!st_is_empty(geom_next)) |>
+      location_prev  = lag(location),
+      timestamp_prev = lag(timestamp)
+    )
+
+  o = o |> filter(!st_is_empty(location_prev))
+
+  o = o |>
     rowwise() |>
     mutate(
       segment = list(st_linestring(
-        rbind(st_coordinates(geometry), st_coordinates(geom_next))
+        rbind(st_coordinates(location_prev), st_coordinates(location))
       )),
-      step_duration = difftime(timestamp_next, timestamp, units = "hours") |> as.numeric(),
+      step_duration = difftime(timestamp, timestamp_prev, units = "hours") |> as.numeric(),
       step_distance = geodist(
-        geometry |> st_coordinates(), 
-        geom_next|> st_coordinates(), 
-        paired = TRUE, 
-        measure = 'haversine')
+        st_coordinates(location),
+        st_coordinates(location_prev),
+        paired = TRUE,
+        measure = "haversine"
+      )
     ) |>
-    ungroup() |>
-    mutate(segment = st_sfc(segment, crs = st_crs(x))) |>
-    st_as_sf() |>
-    st_set_geometry("segment")
+    ungroup()
+  
+  o = o |>
+    select(-timestamp_prev, -location_prev) |>
+    mutate(
+      segment = st_sfc(segment, crs = st_crs(ctdf)),
+      step_distance = set_units(step_distance, "m"),
+      step_duration = set_units(step_duration, "hours"),
+      speed = set_units(step_distance / step_duration, "km/h")
+    )
+
+  o 
+
 }
