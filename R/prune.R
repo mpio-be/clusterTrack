@@ -4,8 +4,6 @@
 #################################################################################"
 
 
-
-
 #' Prune Delaunay Triangulation and Extract Pruned Edges
 #'
 #' Given a `ctdf`  this function performs:
@@ -102,4 +100,11 @@ prune_delaunay_edges <- function(ctdf,  global_sd_mult = 1, local_sd_mult  = 1) 
 
   out
 
+}
+
+
+
+prune_dirichlet_polygons <- function(ctdf) {
+
+# TODO
 }
