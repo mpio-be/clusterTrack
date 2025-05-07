@@ -22,5 +22,7 @@ Marks segments that are isolated (or isolated within their immediate neighbors).
 library(clusterTrack)
 data(pesa56511)
 ctdf = as_ctdf(pesa56511, time="locationDate")
+ctdf$filter = fsr_intersection(ctdf, strict = FALSE)
+plot(ctdf["filter"])
 
 }
