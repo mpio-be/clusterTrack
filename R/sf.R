@@ -7,9 +7,11 @@
 #'
 #' @param ctdf A `ctdf` object (with ordered rows and a `"location"` geometry column).
 #'
-#' @return An `sf` object with LINESTRING geometry for each step. Includes additional
-#' columns for step duration (`step_duration`), step distance (`step_distance` in meters),
-#' and speed (`speed` in km/h).
+#' @return An `sf` object with LINESTRING geometry for each step.
+#' 
+#' @details  The output includes additional columns for step duration (`step_duration`), 
+#' step distance (`step_distance` in meters), and speed (`speed` in km/h). 
+#' The number of rows is nrow(ctdf) - i, where i = 1 and corresponds to the starting index in ctdf.
 #'
 #'
 #' @examples

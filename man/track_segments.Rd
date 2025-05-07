@@ -23,7 +23,7 @@ ends at the position of the current row.
 \examples{
 data(pesa56511)
 ctdf = as_ctdf(pesa56511, time = 'locationDate')
-segs = track_segments(ctdf)
-plot(segs)
+s = track_segments(ctdf)
+plot(s[c('timestamp', 'speed')])
 
 }
