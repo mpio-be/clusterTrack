@@ -27,10 +27,13 @@ Given a `ctdf`  this function performs:
    side exceeds (mean + local_sd_mult * sd) of remaining edges.
 4. Builds the adjacency edge list of remaining triangles.
 }
+\note{
+TODO: add reference
+}
 \examples{
 library(clusterTrack)
-data(pesa56511)
-ctdf = as_ctdf(pesa56511, time="locationDate")
-
+data(lbdo66867)
+ctdf = as_ctdf(lbdo66867, time="locationDate")
+o = prune_delaunay_edges(ctdf)
 
 }

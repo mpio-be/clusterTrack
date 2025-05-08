@@ -28,6 +28,7 @@ track_segments <- function(ctdf) {
   }
 
   o = ctdf |>
+    st_as_sf() |>  
     mutate(
       location_prev  = lag(location),
       timestamp_prev = lag(timestamp)

@@ -1,38 +1,33 @@
-"#################################################################################
-#                            --- Code Description ---                            #
-#                                    IN WORK                                     #
-#################################################################################"
-
 
 #' Prune Delaunay Triangulation and Extract Pruned Edges
 #'
 #' Given a `ctdf`  this function performs:
 #' 1. Delaunay triangulation via `deldir`.
 #' 2. Global-effect removal: discards triangles whose area or longest side 
-#'    exceeds (mean + global_sd_mult * sd).
+#'    exceeds (mean + global_sd * sd).
 #' 3. Local-effect removal: among survivors, discards triangles whose longest 
-#'    side exceeds (mean + local_sd_mult * sd) of remaining edges.
+#'    side exceeds (mean + local_sd * sd) of remaining edges.
 #' 4. Builds the adjacency edge list of remaining triangles.
 #'
 #' @param ctdf            A `ctdf` data frame.
-#'                        `"location"` of point features and an integer `id`.
-#' @param global_sd_mult  Numeric multiplier for the global threshold (default = 1).
-#' @param local_sd_mult   Numeric multiplier for the local threshold (default = 1).
+#' @param global_sd  Numeric multiplier for the global threshold (default = 1).
+#' @param local_sd   Numeric multiplier for the local threshold (default = 1).
 #'
-#' @return A `data.table` with columns `from` and `to`, giving the pruned 
-#'         undirected edges connecting point `id`s.
+#' @return Invisibly returns the input \code{ctdf} object which got a new \code{neighbors} column.
 #' @note TODO: add reference
 #'
 #' @export
 #' @examples
 #' library(clusterTrack)
-#' data(pesa56511)
-#' ctdf = as_ctdf(pesa56511, time="locationDate")
-#' o = prune_delaunay_edges(ctdf)
+#' data(zbird)
+#' ctdf = as_ctdf(zbird)
+#' filter_intersection(ctdf)
+#' prune_delaunay_edges(ctdf)
+#' plot(ctdf, by = 'filter')
 #' 
-prune_delaunay_edges <- function(ctdf,  global_sd_mult = 1, local_sd_mult  = 1) {
+prune_delaunay_edges <- function(ctdf,  global_sd = 1, local_sd  = 1) {
   
-  dat = data.table(st_coordinates(ctdf))
+  dat = st_as_sf(ctdf) |> st_coordinates() |> data.table()
   
   # Delaunay triangulation
   del = deldir(dat)
@@ -93,12 +88,37 @@ prune_delaunay_edges <- function(ctdf,  global_sd_mult = 1, local_sd_mult  = 1) 
   ), by = .(id1, id2, id3)]
 
   # Output is an 2-column edge dt
-  out = edge_list[, .(
+  edge_dt = edge_list[, .(
       from = pmin(u, v),
       to   = pmax(u, v)
   )] |> unique()
 
   out
+
+  # remove filterded id-s
+  bad_ids   = dat[ctdf$filter, id]
+
+  edge_dt = edge_dt[ 
+    !(from %in% bad_ids | to %in% bad_ids)
+  ]
+
+
+
+  # build graph
+  g_pruned = graph_from_data_frame(
+    d = edge_dt[, .(from, to)],
+    directed = FALSE,
+    vertices = data.frame(name = dat$id)
+  )
+
+  nbrs_vs = igraph::as_adj_list(g_pruned, mode="all")
+  nbrs = lapply(nbrs_vs, as.integer)
+
+  stopifnot(length(nbrs) == nrow(ctdf))
+
+  set(ctdf, j = "neighbors", value = nbrs)
+
+
 
 }
 
@@ -106,5 +126,5 @@ prune_delaunay_edges <- function(ctdf,  global_sd_mult = 1, local_sd_mult  = 1) 
 
 prune_dirichlet_polygons <- function(ctdf) {
 
-# TODO
+
 }

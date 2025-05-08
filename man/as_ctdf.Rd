@@ -2,9 +2,9 @@
 % Please edit documentation in R/ctdf.R
 \name{as_ctdf}
 \alias{as_ctdf}
-\title{Coerce a data.table to clusterTrack data format}
+\title{Coerce an object to clusterTrack data format}
 \usage{
-as_ctdf(x, coords = c("longitude", "latitude"), time = "time", crs = 4326, ...)
+as_ctdf(x, coords = c("longitude", "latitude"), time = "time", crs = NA, ...)
 }
 \arguments{
 \item{x}{A `data.table` object.}
@@ -14,7 +14,8 @@ Defaults to `c("longitude", "latitude")`.}
 
 \item{time}{Name of the time column. Will be renamed to `"timestamp"` internally.}
 
-\item{crs}{Coordinate reference system. Default is EPSG 4326.}
+\item{crs}{Coordinate reference system. Default is NA. Upstream methods will warn when unprojected
+coordinates found (#TODO)}
 
 \item{...}{Currently unused}
 }
@@ -22,15 +23,16 @@ Defaults to `c("longitude", "latitude")`.}
 An object of class `ctdf`, which inherits from `sf`.
 }
 \description{
-Converts a `data.table` with spatial coordinates and a timestamp column
-to a standardized `sf`-based format used internally by the clusterTrack package.
+Converts an object with spatial coordinates and a timestamp column
+to a standardized `sf/data.table`-based format used internally by the clusterTrack package.
 }
 \note{
 This is currently a thin wrapper around `st_as_sf()`, but standardizes timestamp naming, ordering,
-and geometry column name (`"location"`).
+and geometry column name (`"location"`). A colum `filter`, and with all values set to `FALSE` is added as well.
+This column will be updated by upstream methods.
 }
 \examples{
 data(zbird)
-x <- as_ctdf(zbird)
+x = as_ctdf(zbird)
 
 }

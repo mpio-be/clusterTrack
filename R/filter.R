@@ -1,72 +1,27 @@
 
-#' Top-Down Noise Pruning for Tracks
+#' Filter by Segment Intersection
 #'
-#' A generic wrapper which flags segments by cutting out
-#'
-#' @param x   An object of class **ctdf** (from [as_ctdf()])
-#' @param method    Character; which pruning strategy to apply. One of:
-#'                  - `"intersection"` : remove non-intersecting segments (and optionally their neighbors)  
-#'                  - `"speed"`        : a simple speed filter. 
-#' @param ...       Additional arguments passed to the chosen methods:
-#'
-#' @return A  logical vector the same length as x.
-#'
-#' @details  
-#' This function implements a **top-down** noise-pruning step, splitting
-#' away low-density or isolated portions of your track graph before any
-#' downstream clustering.  
-#'
-#' @seealso  
-#' - [as_ctdf()]       for converting `data.table` → `ctdf`  
-#' - [track_segments()] for building an `sf` of segments from a `ctdf`  
-#' - `fsr_intersection()`,  
-#'
-#' @examples
-#' library(clusterTrack)
-#' data(pesa56511)
-#' ctdf = as_ctdf(pesa56511, time="locationDate")
-#'
-#' 
-#' @export
-filter_ctdf <- function(ctdf,method = c("intersection", "density_gap"),...) {
-  
-    if (!inherits(ctdf, "ctdf")) {
-    stop("filter_sparse_regions() only works on objects of class 'ctdf'")
-  }
-
-  
-  method <- match.arg(method)
-  switch(
-    method,
-    intersection   = fsr_intersection(ctdf, ...),
-    density_gap    = fsr_speed(ctdf, ...),
-    stop("Unknown method: ", method)
-  )
-
-  # TODO: it should be by reference and update a filter column in the ctdf
-
-
-}
-
-
-
-#' Top-Down Noise Pruning by Segment Intersection
-#'
-#' Marks segments that are isolated (or isolated within their immediate neighbors).
+#' Flags segments that are isolated (or isolated within their immediate neighbors).
 #'
 #' @param ctdf An sf object whose geometries are line‐segments in sequence.
-#' @param strict  If TRUE, only segments with both neighbors also isolated are kept.
+#' @param strict  If TRUE (the default), only segments with both neighbors also isolated are kept.
 #'                If FALSE, any isolated segment is kept.
-#' @return A  logical vector the same length as ctdf.
+#' #' @param overwrite Logical scalar; if \code{FALSE} (default), new filter flags
+#'                      are updated with any existing \code{filter} column values; if \code{TRUE},
+#'                      the \code{filter} column is replaced entirely.
+#' @return Invisibly returns the input \code{ctdf} object whose \code{filter} was updated by reference.
 #' @export
 #' @examples
-#' library(clusterTrack)
-#' data(pesa56511)
-#' ctdf = as_ctdf(pesa56511, time="locationDate")
-#' ctdf$filter = fsr_intersection(ctdf, strict = FALSE)
-#' plot(ctdf["filter"])
-#'
-fsr_intersection <- function(ctdf, strict = TRUE) {
+#' data(zbird)
+#' ctdf = as_ctdf(zbird)
+#' filter_intersection(ctdf)
+#' plot(ctdf, by = 'filter')
+#' 
+filter_intersection <- function(ctdf, overwrite = FALSE, strict = TRUE) {
+
+  if (!inherits(ctdf, "ctdf")) {
+    stop("fsr_intersection() only works on objects of class 'ctdf'")
+  }
 
 
   segs = ctdf |>
@@ -87,6 +42,25 @@ fsr_intersection <- function(ctdf, strict = TRUE) {
   } else {
     out = d[, nonint]
   }
-  
-  out
+  if(!overwrite) {
+    out = ctdf$filter | out
+  }
+  ctdf[, filter := out]
+
+}
+
+
+
+filter_speed <- function(ctdf, overwrite = FALSE) {
+
+  # TODO
+
+  if (!inherits(ctdf, "ctdf")) {
+    stop("fsr_intersection() only works on objects of class 'ctdf'")
+  }
+
+  segs = ctdf |>
+        track_segments()
+
+
 }

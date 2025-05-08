@@ -1,8 +1,9 @@
 
-#' @import sf data.table  dbscan 
+#' @import sf data.table  dbscan viridisLite
 #' @import deldir  deldir 
 #' @importFrom dplyr      mutate ungroup rowwise lag filter select rename
-#' @importFrom igraph     groups graph_from_edgelist  components subgraph.edges E set_edge_attr
+#' @importFrom igraph     groups cliques E components
+#' @importFrom igraph     graph_from_edgelist  graph_from_data_frame subgraph.edges set_edge_attr
 #' @importFrom forcats    fct_inorder
 #' @importFrom geodist geodist
 #' @importFrom units set_units
@@ -16,7 +17,6 @@ NULL
 
 
 # undocumented functions
-
 
 .tri2lines <- function(x) {
   p = st_coordinates(x)
