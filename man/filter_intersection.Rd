@@ -11,10 +11,12 @@ filter_intersection(ctdf, overwrite = FALSE, strict = TRUE)
 
 \item{strict}{If TRUE (the default), only segments with both neighbors also isolated are kept.
                If FALSE, any isolated segment is kept.
-#' @param overwrite Logical scalar, default FALSE. If FALSE, the existing filter column is updated by marking any new points to filter; if TRUE, the filter column is replaced entirely.}
+#' @param overwrite Logical scalar; if \code{FALSE} (default), new filter flags
+                     are updated with any existing \code{filter} column values; if \code{TRUE},
+                     the \code{filter} column is replaced entirely.}
 }
 \value{
-A  logical vector the same length as ctdf.
+Invisibly returns the input \code{ctdf} object whose \code{filter} was updated by reference.
 }
 \description{
 Flags segments that are isolated (or isolated within their immediate neighbors).
@@ -23,5 +25,6 @@ Flags segments that are isolated (or isolated within their immediate neighbors).
 data(zbird)
 ctdf = as_ctdf(zbird)
 filter_intersection(ctdf)
+plot(ctdf, by = 'filter')
 
 }

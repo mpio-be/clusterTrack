@@ -4,27 +4,25 @@
 \alias{prune_delaunay_edges}
 \title{Prune Delaunay Triangulation and Extract Pruned Edges}
 \usage{
-prune_delaunay_edges(ctdf, global_sd_mult = 1, local_sd_mult = 1)
+prune_delaunay_edges(ctdf, global_sd = 1, local_sd = 1)
 }
 \arguments{
-\item{ctdf}{A `ctdf` data frame.
-`"location"` of point features and an integer `id`.}
+\item{ctdf}{A `ctdf` data frame.}
 
-\item{global_sd_mult}{Numeric multiplier for the global threshold (default = 1).}
+\item{global_sd}{Numeric multiplier for the global threshold (default = 1).}
 
-\item{local_sd_mult}{Numeric multiplier for the local threshold (default = 1).}
+\item{local_sd}{Numeric multiplier for the local threshold (default = 1).}
 }
 \value{
-A `data.table` with columns `from` and `to`, giving the pruned 
-        undirected edges connecting point `id`s.
+Invisibly returns the input \code{ctdf} object which got a new \code{neighbors} column.
 }
 \description{
 Given a `ctdf`  this function performs:
 1. Delaunay triangulation via `deldir`.
 2. Global-effect removal: discards triangles whose area or longest side 
-   exceeds (mean + global_sd_mult * sd).
+   exceeds (mean + global_sd * sd).
 3. Local-effect removal: among survivors, discards triangles whose longest 
-   side exceeds (mean + local_sd_mult * sd) of remaining edges.
+   side exceeds (mean + local_sd * sd) of remaining edges.
 4. Builds the adjacency edge list of remaining triangles.
 }
 \note{
@@ -32,8 +30,10 @@ TODO: add reference
 }
 \examples{
 library(clusterTrack)
-data(lbdo66867)
-ctdf = as_ctdf(lbdo66867, time="locationDate")
-o = prune_delaunay_edges(ctdf)
+data(zbird)
+ctdf = as_ctdf(zbird)
+filter_intersection(ctdf)
+prune_delaunay_edges(ctdf)
+plot(ctdf, by = 'filter')
 
 }

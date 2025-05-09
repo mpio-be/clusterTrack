@@ -9,7 +9,7 @@
 #'    side exceeds (mean + local_sd * sd) of remaining edges.
 #' 4. Builds the adjacency edge list of remaining triangles.
 #'
-#' @param ctdf            A `ctdf` data frame.
+#' @param ctdf       A `ctdf` data frame.
 #' @param global_sd  Numeric multiplier for the global threshold (default = 1).
 #' @param local_sd   Numeric multiplier for the local threshold (default = 1).
 #'
@@ -65,8 +65,8 @@ prune_delaunay_edges <- function(ctdf,  global_sd = 1, local_sd  = 1) {
 
   # Global‐effect removal
   tris[, keep := FALSE]
-  thr_area = tris[, mean(areas) + sd(areas)]
-  thr_len = tris[, mean(max_edge) + sd(max_edge)]
+  thr_area = tris[, mean(areas) + sd(areas) * global_sd]
+  thr_len = tris[, mean(max_edge) + sd(max_edge) * global_sd ]
 
   tris[areas <= thr_area & max_edge <= thr_len, keep := TRUE]
 
@@ -74,7 +74,7 @@ prune_delaunay_edges <- function(ctdf,  global_sd = 1, local_sd  = 1) {
   # Local‐effect removal
   x = tris[(keep), .(local_edges = .tri2lines(triangles) |> st_length()), by = .I]
 
-  local_thr_len = x[, mean(local_edges) + sd(local_edges)]
+  local_thr_len = x[, mean(local_edges) + sd(local_edges) * local_sd]
 
   tris[, keep := FALSE]
   tris[max_edge <= local_thr_len, keep := TRUE]
@@ -93,7 +93,6 @@ prune_delaunay_edges <- function(ctdf,  global_sd = 1, local_sd  = 1) {
       to   = pmax(u, v)
   )] |> unique()
 
-  out
 
   # remove filterded id-s
   bad_ids   = dat[ctdf$filter, id]
@@ -101,7 +100,6 @@ prune_delaunay_edges <- function(ctdf,  global_sd = 1, local_sd  = 1) {
   edge_dt = edge_dt[ 
     !(from %in% bad_ids | to %in% bad_ids)
   ]
-
 
 
   # build graph

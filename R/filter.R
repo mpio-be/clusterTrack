@@ -12,8 +12,8 @@
 #' @return Invisibly returns the input \code{ctdf} object whose \code{filter} was updated by reference.
 #' @export
 #' @examples
-#' data(zbird)
-#' ctdf = as_ctdf(zbird)
+#' data(pesa56511)
+#' ctdf = as_ctdf(pesa56511, time = 'locationDate')
 #' filter_intersection(ctdf)
 #' plot(ctdf, by = 'filter')
 #' 

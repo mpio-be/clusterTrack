@@ -9,26 +9,36 @@ as_ctdf.default <- function(x, ...) {
 }
 
 #' @export
-plot.ctdf <- function(x,  by = c("filter", "cluster"), pch = 16) {
+plot.ctdf <- function(x, by = c("filter", "cluster"), pch = 16) {
+  colpal = function(n) {
+    c("#bebebe67", viridis(n - 1, direction = 1))[seq_len(n)]
+  }
+
 
   tr = track_segments(x)
-  
-  tr2 = st_set_geometry(tr, 'segment')
 
-  plot(st_geometry(tr2), col = '#706b6b' )
+  tr2 = st_set_geometry(tr, "segment")
+
+  plot(st_geometry(tr2), col = "#706b6b")
 
   if (missing(by)) {
     plot(st_geometry(tr), col = col, pch = pch, add = TRUE)
   }
 
-  if (by =='filter') {
+  if (by == "filter") {
     tr$filter = factor(tr$filter)
-    plot(tr["filter"], pal = \(n) viridis(n, direction = 1), pch =pch,add = TRUE)
+    plot(tr["filter"], pal = colpal, pch = pch, add = TRUE)
   }
-  
+
+
+  if (by == "cluster") {
+    tr$cluster_id = factor(tr$cluster_id)
+    plot(tr["cluster_id"], pal = colpal, pch = pch, add = TRUE)
+  }
+
+
+
   plot(x[1, .(location)] |> st_as_sf(), col = "red", size = 3, pch = 16, add = TRUE)
-
-
 }
 
 #' Coerce an object to clusterTrack data format
@@ -42,6 +52,7 @@ plot.ctdf <- function(x,  by = c("filter", "cluster"), pch = 16) {
 #' @param time    Name of the time column. Will be renamed to `"timestamp"` internally.
 #' @param crs     Coordinate reference system. Default is NA. Upstream methods will warn when unprojected
 #'                coordinates found (#TODO)
+#' @param project_to  passed to `st_transform()`. 
 #'                
 #' @param ...     Currently unused
 #' 
@@ -59,7 +70,7 @@ plot.ctdf <- function(x,  by = c("filter", "cluster"), pch = 16) {
 #'
 #' @export
 
-as_ctdf <- function(x, coords = c("longitude","latitude"),time = "time", crs = NA, ...) {
+as_ctdf <- function(x, coords = c("longitude","latitude"),time = "time", crs = NA, project_to, ...) {
 
   reserved = intersect(names(x), c("filter", "neighbors"))
   if (length(reserved) > 0) {
@@ -78,12 +89,17 @@ as_ctdf <- function(x, coords = c("longitude","latitude"),time = "time", crs = N
 
   o = st_as_sf(o, coords = coords, crs = crs)
 
+  if(!missing(project_to)) {
+    o = st_transform(o, project_to)
+  }  
+
   st_geometry(o) = "location"
 
   setDT(o)
   o[, filter := FALSE]
 
-  o[, neighbors := list()]
+  o[, neighbors  := list()]
+  o[, cluster_id := integer()]
 
   class(o) <- c("ctdf", class(o))
   o

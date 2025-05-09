@@ -4,7 +4,14 @@
 \alias{as_ctdf}
 \title{Coerce an object to clusterTrack data format}
 \usage{
-as_ctdf(x, coords = c("longitude", "latitude"), time = "time", crs = NA, ...)
+as_ctdf(
+  x,
+  coords = c("longitude", "latitude"),
+  time = "time",
+  crs = NA,
+  project_to,
+  ...
+)
 }
 \arguments{
 \item{x}{A `data.table` object.}
@@ -16,6 +23,8 @@ Defaults to `c("longitude", "latitude")`.}
 
 \item{crs}{Coordinate reference system. Default is NA. Upstream methods will warn when unprojected
 coordinates found (#TODO)}
+
+\item{project_to}{passed to `st_transform()`.}
 
 \item{...}{Currently unused}
 }
