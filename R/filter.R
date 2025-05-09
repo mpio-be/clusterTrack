@@ -19,6 +19,8 @@
 #' 
 filter_intersection <- function(ctdf, overwrite = FALSE, strict = TRUE) {
 
+  # TODO: do not filter if intersection >= deltaT
+
   if (!inherits(ctdf, "ctdf")) {
     stop("fsr_intersection() only works on objects of class 'ctdf'")
   }
