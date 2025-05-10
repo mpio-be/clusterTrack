@@ -12,8 +12,8 @@
 #' @return Invisibly returns the input \code{ctdf} object whose \code{filter} was updated by reference.
 #' @export
 #' @examples
-#' data(zbird)
-#' ctdf = as_ctdf(zbird )
+#' data(pesa56511)
+#' ctdf = as_ctdf(pesa56511, time = "locationDate",crs = 4326, project_to='+proj=eqearth' )
 #' filter_intersection(ctdf)
 #' plot(ctdf, by = 'filter')
 #' 
@@ -31,7 +31,10 @@ filter_intersection <- function(ctdf, overwrite = FALSE, strict = TRUE) {
         st_set_geometry("segment")
 
   # add one element because segs is missing the first entry.
-  int_list = c(0, st_intersects(segs))
+
+  ints = st_intersects(segs)
+  
+  int_list = c(0, ints)
   
   d = as.data.table(ctdf)
   d[, n_int := lengths(int_list)]
