@@ -6,7 +6,7 @@ Authors@R:
            comment = c(ORCID = "0000-0002-6907-7802"))
 Description: Clustering Animal Movements using DBSCAN and Related Algorithms.
 Depends:
-    R (>= 3.5.0)
+    R (>= 4.1.0)
 Imports:
     dbscan,
     forcats,

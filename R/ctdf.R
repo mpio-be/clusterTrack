@@ -9,11 +9,11 @@ as_ctdf.default <- function(x, ...) {
 }
 
 #' @export
-plot.ctdf <- function(x, by = c("filter", "cluster"), pch = 16) {
+plot.ctdf <- function(x, by = c("filter"), pch = 16) {
+  
   colpal = function(n) {
-    c("#bebebe67", viridis(n - 1, direction = 1))[seq_len(n)]
+    terrain.colors(n)[seq_len(n)]
   }
-
 
   tr = track_segments(x)
 
@@ -22,21 +22,13 @@ plot.ctdf <- function(x, by = c("filter", "cluster"), pch = 16) {
   plot(st_geometry(tr2), col = "#706b6b")
 
   if (missing(by)) {
-    plot(st_geometry(tr), col = col, pch = pch, add = TRUE)
+    plot(st_geometry(tr), pch = pch, add = TRUE)
   }
 
   if (by == "filter") {
-    tr$filter = factor(tr$filter)
-    plot(tr["filter"], pal = colpal, pch = pch, add = TRUE)
+    tr$.filter = factor(tr$.filter)
+    plot(tr[".filter"], pal = colpal, pch = pch, add = TRUE)
   }
-
-
-  if (by == "cluster") {
-    tr$cluster_id = factor(tr$cluster_id)
-    plot(tr["cluster_id"], pal = colpal, pch = pch, add = TRUE)
-  }
-
-
 
   plot(x[1, .(location)] |> st_as_sf(), col = "red", size = 3, pch = 16, add = TRUE)
 }
@@ -67,25 +59,30 @@ plot.ctdf <- function(x, by = c("filter", "cluster"), pch = 16) {
 #' @examples
 #' data(zbird)
 #' x = as_ctdf(zbird)
+#' plot(x)
 #'
 #' @export
 
 as_ctdf <- function(x, coords = c("longitude","latitude"),time = "time", crs = NA, project_to, ...) {
 
-  reserved = intersect(names(x), c("filter", "neighbors"))
+  reserved = intersect(names(x), c(".filter", ".id"))
+  
   if (length(reserved) > 0) {
     warning(
-      "as_ctdf(): input contains reserved column name",
-      if (length(reserved) > 1) "s: " else ": ",
-      paste(reserved, collapse = ", "),
-      "which may be overwritten by upstream methods."
+      sprintf(
+        "as_ctdf(): input contains reserved column name%s: %s which may be overwritten here or by upstream methods.",
+        if (length(reserved) > 1) "s" else "",
+        paste(reserved, collapse = ", ")
+      )
     )
   }
-
 
   o = copy(x)  
   setnames(o, time, "timestamp")
   setorder(o, timestamp)
+  
+  o[, .id := .I]
+  o[, .filter := FALSE]
 
   o = st_as_sf(o, coords = coords, crs = crs)
 
@@ -96,10 +93,7 @@ as_ctdf <- function(x, coords = c("longitude","latitude"),time = "time", crs = N
   st_geometry(o) = "location"
 
   setDT(o)
-  o[, filter := FALSE]
 
-  o[, neighbors  := list()]
-  o[, cluster_id := integer()]
 
   class(o) <- c("ctdf", class(o))
   o

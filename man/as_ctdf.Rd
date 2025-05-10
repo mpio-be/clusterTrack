@@ -43,5 +43,6 @@ This column will be updated by upstream methods.
 \examples{
 data(zbird)
 x = as_ctdf(zbird)
+plot(x)
 
 }

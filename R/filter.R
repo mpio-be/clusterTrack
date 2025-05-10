@@ -12,8 +12,8 @@
 #' @return Invisibly returns the input \code{ctdf} object whose \code{filter} was updated by reference.
 #' @export
 #' @examples
-#' data(pesa56511)
-#' ctdf = as_ctdf(pesa56511, time = 'locationDate')
+#' data(zbird)
+#' ctdf = as_ctdf(zbird )
 #' filter_intersection(ctdf)
 #' plot(ctdf, by = 'filter')
 #' 
@@ -22,7 +22,7 @@ filter_intersection <- function(ctdf, overwrite = FALSE, strict = TRUE) {
   # TODO: do not filter if intersection >= deltaT
 
   if (!inherits(ctdf, "ctdf")) {
-    stop("fsr_intersection() only works on objects of class 'ctdf'")
+    stop("filter_intersection() only works on objects of class 'ctdf'")
   }
 
 
@@ -45,24 +45,8 @@ filter_intersection <- function(ctdf, overwrite = FALSE, strict = TRUE) {
     out = d[, nonint]
   }
   if(!overwrite) {
-    out = ctdf$filter | out
+    out = ctdf$.filter | out
   }
-  ctdf[, filter := out]
-
-}
-
-
-
-filter_speed <- function(ctdf, overwrite = FALSE) {
-
-  # TODO
-
-  if (!inherits(ctdf, "ctdf")) {
-    stop("fsr_intersection() only works on objects of class 'ctdf'")
-  }
-
-  segs = ctdf |>
-        track_segments()
-
+  ctdf[, .filter := out]
 
 }

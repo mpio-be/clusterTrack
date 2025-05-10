@@ -23,7 +23,7 @@ Flags segments that are isolated (or isolated within their immediate neighbors).
 }
 \examples{
 data(zbird)
-ctdf = as_ctdf(zbird)
+ctdf = as_ctdf(zbird )
 filter_intersection(ctdf)
 plot(ctdf, by = 'filter')
 
