@@ -9,10 +9,10 @@ as_ctdf.default <- function(x, ...) {
 }
 
 #' @export
-plot.ctdf <- function(x, by = c("filter"), pch = 16) {
+plot.ctdf <- function(x,y = NULL, by = NULL, pch = 16) {
   
   colpal = function(n) {
-    terrain.colors(n)[seq_len(n)]
+    rainbow(n)[seq_len(n)]
   }
 
   tr = track_segments(x)
@@ -21,11 +21,9 @@ plot.ctdf <- function(x, by = c("filter"), pch = 16) {
 
   plot(st_geometry(tr2), col = "#706b6b")
 
-  if (missing(by)) {
+  if ( is.null(by) ) {
     plot(st_geometry(tr), pch = pch, add = TRUE)
-  }
-
-  if (by == "filter") {
+  } else if (by == "filter") {
     tr$.filter = factor(tr$.filter)
     plot(tr[".filter"], pal = colpal, pch = pch, add = TRUE)
   }
@@ -57,13 +55,30 @@ plot.ctdf <- function(x, by = c("filter"), pch = 16) {
 #' This column will be updated by upstream methods.
 #' 
 #' @examples
-#' data(zbird)
-#' x = as_ctdf(zbird)
+#' data(pesa56511)
+#' x = as_ctdf(pesa56511, time = "locationDate")
 #' plot(x)
 #'
 #' @export
 
 as_ctdf <- function(x, coords = c("longitude","latitude"),time = "time", crs = NA, project_to, ...) {
+
+  
+  dups <- which(duplicated(x[, ..coords]))
+  if (length(dups) > 0) {
+    stop(
+      sprintf(
+        "as_ctdf(): found %d duplicated point%s at row%s: %s",
+        length(dups),
+        if (length(dups) > 1) "s" else "",
+        if (length(dups) > 1) "s" else "",
+        paste(dups, collapse = ", ")
+      ),
+      call. = FALSE
+    )
+  }
+
+
 
   reserved = intersect(names(x), c(".filter", ".id"))
   

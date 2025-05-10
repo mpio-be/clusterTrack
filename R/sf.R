@@ -15,8 +15,8 @@
 #'
 #'
 #' @examples
-#' data(pesa56511)
-#' ctdf = as_ctdf(pesa56511, time = 'locationDate')
+#' data(lbdo66867)
+#' ctdf = as_ctdf(lbdo66867, time = 'locationDate', crs = 4326, project_to='+proj=eqearth')
 #' s = track_segments(ctdf)
 #' plot(s[c('timestamp', 'speed')])
 #'
@@ -28,11 +28,12 @@ track_segments <- function(ctdf) {
   }
 
   o = ctdf |>
-    st_as_sf() |>  
+    st_as_sf() |>
     mutate(
       location_prev  = lag(location),
       timestamp_prev = lag(timestamp)
     )
+  crs = st_crs(o)
 
   o = o |> filter(!st_is_empty(location_prev))
 
@@ -55,12 +56,13 @@ track_segments <- function(ctdf) {
   o = o |>
     select(-timestamp_prev, -location_prev) |>
     mutate(
-      segment = st_sfc(segment, crs = st_crs(ctdf)),
+      segment = st_sfc(segment, crs = crs),
       step_distance = set_units(step_distance, "m"),
       step_duration = set_units(step_duration, "hours"),
       speed = set_units(step_distance / step_duration, "km/h")
     )
 
-  o 
+
+  o
 
 }
