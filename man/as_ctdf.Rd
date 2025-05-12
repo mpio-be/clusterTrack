@@ -41,8 +41,8 @@ and geometry column name (`"location"`). A colum `filter`, and with all values s
 This column will be updated by upstream methods.
 }
 \examples{
-data(zbird)
-x = as_ctdf(zbird)
+data(toy_ctdf_k2)
+x = as_ctdf(toy_ctdf_k2 )
 plot(x)
 
 }

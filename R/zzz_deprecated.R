@@ -49,8 +49,8 @@ as_tdbscan <- function(x, ...) {
 #' ggplot(z ) +geom_sf(aes(color = factor(clustID) )) 
 #' 
 #' # z bird
-#' data(zbird)
-#' x = as_tdbscan(zbird)
+#' data(toy_ctdf_k2)
+#' x = as_tdbscan(toy_ctdf_k2)
 #' z = tdbscan(x, eps =12, minPts   = 5, maxLag = 5, borderPoints = TRUE )
 #' ggplot(z ) +geom_sf(aes(color = factor(clustID) )) 
 #' 

@@ -43,8 +43,8 @@ plot.clusterTrack <- function(x ) {
 #' @export
 #' @examples 
 #' library(clusterTrack)
-#' data(pesa56511)
-#' ctdf = as_ctdf(pesa56511, time = 'locationDate', crs = 4326, project_to='+proj=eqearth')
+#' data(toy_ctdf_k2)
+#' ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to='+proj=eqearth')
 #' filter_intersection(ctdf, overwrite = TRUE)
 
 #' o = cluster_track(ctdf, sd = 1)

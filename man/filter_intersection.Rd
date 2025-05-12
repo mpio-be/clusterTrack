@@ -22,8 +22,8 @@ Invisibly returns the input \code{ctdf} object whose \code{filter} was updated b
 Flags segments that are isolated (or isolated within their immediate neighbors).
 }
 \examples{
-data(zbird)
-ctdf = as_ctdf(zbird )
+data(toy_ctdf_k2)
+ctdf = as_ctdf(toy_ctdf_k2)
 filter_intersection(ctdf)
 plot(ctdf, by = 'filter')
 

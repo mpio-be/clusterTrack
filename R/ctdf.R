@@ -12,20 +12,20 @@ as_ctdf.default <- function(x, ...) {
 plot.ctdf <- function(x,y = NULL, by = NULL, pch = 16) {
   
   colpal = function(n) {
-    rainbow(n)[seq_len(n)]
+    terrain.colors(n)[seq_len(n)]
   }
 
-  tr = track_segments(x)
+  tr = as_ctdf_track(x)
+  xs = st_as_sf(x) 
 
-  tr2 = st_set_geometry(tr, "segment")
+  plot(st_geometry(tr), col = "#706b6b")
 
-  plot(st_geometry(tr2), col = "#706b6b")
 
   if ( is.null(by) ) {
-    plot(st_geometry(tr), pch = pch, add = TRUE)
+    plot(xs |>st_geometry(), pch = pch, add = TRUE)
   } else if (by == "filter") {
     tr$.filter = factor(tr$.filter)
-    plot(tr[".filter"], pal = colpal, pch = pch, add = TRUE)
+    plot(xs[".filter"], pal = colpal, pch = pch, add = TRUE)
   }
 
   plot(x[1, .(location)] |> st_as_sf(), col = "red", size = 3, pch = 16, add = TRUE)
@@ -55,8 +55,8 @@ plot.ctdf <- function(x,y = NULL, by = NULL, pch = 16) {
 #' This column will be updated by upstream methods.
 #' 
 #' @examples
-#' data(pesa56511)
-#' x = as_ctdf(pesa56511, time = "locationDate")
+#' data(toy_ctdf_k2)
+#' x = as_ctdf(toy_ctdf_k2 )
 #' plot(x)
 #'
 #' @export
@@ -77,8 +77,6 @@ as_ctdf <- function(x, coords = c("longitude","latitude"),time = "time", crs = N
       call. = FALSE
     )
   }
-
-
 
   reserved = intersect(names(x), c(".filter", ".id"))
   
@@ -113,5 +111,75 @@ as_ctdf <- function(x, coords = c("longitude","latitude"),time = "time", crs = N
   class(o) <- c("ctdf", class(o))
   o
 
+}
 
+
+#' Convert a `ctdf` track to movement step segments as LINESTRINGs
+#'
+#' Takes a `ctdf` object and returns an `sf` object with LINESTRING geometries representing
+#' the movement steps between consecutive locations. Each segment connects two points,
+#' starting at the previous location and ending at the current one - i.e., each segment
+#' ends at the position of the current row.
+#'
+#' @param ctdf A `ctdf` object (with ordered rows and a `"location"` geometry column).
+#'
+#' @return An `sf` object with LINESTRING geometry for each step.
+#' 
+#' @details  The output includes additional columns for step duration (`step_duration`), 
+#' step distance (`step_distance` in meters), and speed (`speed` in km/h). 
+#' The number of rows is nrow(ctdf) - i, where i = 1 and corresponds to the starting index in ctdf.
+#'
+#'
+#' @examples
+#' data(lbdo66867)
+#' ctdf = as_ctdf(lbdo66867, time = 'locationDate', crs = 4326, project_to='+proj=eqearth')
+#' s = as_ctdf_track(ctdf)
+#' plot(s[c('timestamp', 'speed')])
+#'
+#' @export
+as_ctdf_track <- function(ctdf) {
+  
+  if (!inherits(ctdf, "ctdf")) {
+    stop("as_ctdf_track() only works on objects of class 'ctdf'")
   }
+
+  o = ctdf |>
+    st_as_sf() |>
+    mutate(
+      location_prev  = lag(location),
+      timestamp_prev = lag(timestamp)
+    )
+  crs = st_crs(o)
+
+  o = o |> filter(!st_is_empty(location_prev))
+
+  o = o |>
+    rowwise() |>
+    mutate(
+      segment = list(st_linestring(
+        rbind(st_coordinates(location_prev), st_coordinates(location))
+      )),
+      step_duration = difftime(timestamp, timestamp_prev, units = "hours") |> as.numeric(),
+      step_distance = geodist( # TODO: run on 4326 or change to st_distance!
+        st_coordinates(location),
+        st_coordinates(location_prev),
+        paired = TRUE,
+        measure = "haversine"
+      )
+    ) |>
+    ungroup()
+  
+  o = o |>
+    select(-timestamp_prev, -location_prev) |>
+    mutate(
+      segment = st_sfc(segment, crs = crs),
+      step_distance = set_units(step_distance, "m"),
+      step_duration = set_units(step_duration, "hours"),
+      speed = set_units(step_distance / step_duration, "km/h")
+    ) |>
+    st_set_geometry('segment')
+  
+
+  o
+
+}

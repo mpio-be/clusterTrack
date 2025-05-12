@@ -1,14 +1,16 @@
 
+#' segment ctdf
+#' segment_ctdf
+
 #' @export
 #' @examples
-#' data(zbird)
-#' ctdf = as_ctdf(zbird )
+#' data(toy_ctdf_k2)
+#' ctdf = as_ctdf(toy_ctdf_k2 )
 #' filter_intersection(ctdf)
 #' plot(ctdf, by = 'filter')
 #' 
-segment_track <- function(ctdf ) {
+segment_ctdf <- function(ctdf) {
 
-  # TODO: do not filter if intersection >= deltaT
 
   if (!inherits(ctdf, "ctdf")) {
     stop("filter_intersection() only works on objects of class 'ctdf'")
@@ -16,7 +18,7 @@ segment_track <- function(ctdf ) {
 
 
   segs = ctdf |>
-    track_segments() |>
+    as_ctdf_track() |>
     st_set_geometry("segment")
   
   ints = st_intersects(segs) 

@@ -1,17 +1,31 @@
-
-
+#' Prune Dirichlet polygons based on area
 #'
-#' @param ctdf       A `ctdf` data frame.
-#' @param  sd  Numeric multiplier (default = 1).
+#' This function computes Dirichlet (Voronoi) polygons from a `ctdf` object and removes 
+#' those with unusually small areas (after log-scaling and centering), optionally using 
+#' Queen contiguity to define neighbors.
 #'
-#' @return A named `neighbors` list. Names correspond with the id in the source `ctdf`.
-#' @note TODO: add references
+#' @param ctdf A `ctdf` data frame (typically created with [as_ctdf()]).
+#' @param sd Numeric multiplier controlling the area threshold for pruning (default = 1). 
+#'           Polygons with log-area below this threshold (relative to the mean) are considered for pruning.
+#' @param queen Logical. If `TRUE` (default), uses Queen contiguity in neighbor detection 
+#'   (shared point or edge). If `FALSE`, uses Rook contiguity (shared edge only).
+#'
+#' @return A named list of class `nb` (from the `spdep` package), where each name corresponds 
+#'   to an `.id` in the input `ctdf` and each element is an integer vector of neighbor indices.
+#'
+#' @note Dirichlet polygons are computed via the `deldir` package. Only polygons with 
+#'   `.filter == FALSE` and small log-area (relative to the sample) are retained before 
+#'   neighbor construction. This is typically used to identify spatially isolated or dense 
+#'   regions in tracking data.
+#'
+#' @seealso [as_ctdf()], [filter_intersection()], [spdep::poly2nb()]
+#'
 #'
 #' @export
 #' @examples
 #' library(clusterTrack)
-#' data(zbird)
-#' ctdf = as_ctdf(zbird)
+#' data(toy_ctdf_k2)
+#' ctdf = as_ctdf(toy_ctdf_k2)
 #' filter_intersection(ctdf)
 #' nb = prune_dirichlet_polygons(ctdf, sd = 1)
 #' plot(nb, st_coordinates(ctdf[.id%in%names(nb), location]))

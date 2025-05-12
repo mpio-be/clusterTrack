@@ -27,10 +27,11 @@ Perform clustering on a `ctdf` object to identify use-sites. Uses a hybrid appro
 }
 \examples{
 library(clusterTrack)
-data(zbird)
-ctdf = as_ctdf(zbird )
+data(toy_ctdf_k2)
+ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to='+proj=eqearth')
 filter_intersection(ctdf, overwrite = TRUE)
 o = cluster_track(ctdf, sd = 1)
 plot(o)
+plot(st_as_sf(ctdf)|>st_geometry(), add = TRUE)
 
 }

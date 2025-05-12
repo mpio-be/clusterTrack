@@ -12,8 +12,8 @@
 #' @return Invisibly returns the input \code{ctdf} object whose \code{filter} was updated by reference.
 #' @export
 #' @examples
-#' data(pesa56511)
-#' ctdf = as_ctdf(pesa56511, time = "locationDate",crs = 4326, project_to='+proj=eqearth' )
+#' data(toy_ctdf_k2)
+#' ctdf = as_ctdf(toy_ctdf_k2)
 #' filter_intersection(ctdf)
 #' plot(ctdf, by = 'filter')
 #' 
@@ -27,7 +27,7 @@ filter_intersection <- function(ctdf, overwrite = FALSE, strict = TRUE) {
 
 
   segs = ctdf |>
-        track_segments() |> 
+        as_ctdf_track() |> 
         st_set_geometry("segment")
 
   # add one element because segs is missing the first entry.
