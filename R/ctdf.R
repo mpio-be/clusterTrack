@@ -12,7 +12,7 @@ as_ctdf.default <- function(x, ...) {
 plot.ctdf <- function(x,y = NULL, by = NULL, pch = 16) {
   
   colpal = function(n) {
-    terrain.colors(n)[seq_len(n)]
+    palette.colors(n, palette = "Tableau", alpha = 1, recycle = TRUE)
   }
 
   tr = as_ctdf_track(x)
@@ -42,10 +42,10 @@ plot.ctdf <- function(x,y = NULL, by = NULL, pch = 16) {
 #' @param time    Name of the time column. Will be renamed to `"timestamp"` internally.
 #' @param crs     Coordinate reference system. Default is NA. Upstream methods will warn when unprojected
 #'                coordinates found (#TODO)
-#' @param project_to  passed to `st_transform()`. 
-#'                
+#' @param project_to  passed to `st_transform()`.
+#'
 #' @param ...     Currently unused
-#' 
+#'
 
 #' @return An object of class `ctdf`, which inherits from `sf`.
 #'
@@ -53,17 +53,15 @@ plot.ctdf <- function(x,y = NULL, by = NULL, pch = 16) {
 #' This is currently a thin wrapper around `st_as_sf()`, but standardizes timestamp naming, ordering,
 #' and geometry column name (`"location"`). A colum `filter`, and with all values set to `FALSE` is added as well.
 #' This column will be updated by upstream methods.
-#' 
+#'
 #' @examples
 #' data(toy_ctdf_k2)
-#' x = as_ctdf(toy_ctdf_k2 )
+#' x = as_ctdf(toy_ctdf_k2)
 #' plot(x)
 #'
 #' @export
 
-as_ctdf <- function(x, coords = c("longitude","latitude"),time = "time", crs = NA, project_to, ...) {
-
-  
+as_ctdf <- function(x, coords = c("longitude", "latitude"), time = "time", crs = NA, project_to, ...) {
   dups <- which(duplicated(x[, ..coords]))
   if (length(dups) > 0) {
     stop(
@@ -79,7 +77,7 @@ as_ctdf <- function(x, coords = c("longitude","latitude"),time = "time", crs = N
   }
 
   reserved = intersect(names(x), c(".filter", ".id"))
-  
+
   if (length(reserved) > 0) {
     warning(
       sprintf(
@@ -90,18 +88,18 @@ as_ctdf <- function(x, coords = c("longitude","latitude"),time = "time", crs = N
     )
   }
 
-  o = copy(x)  
+  o = copy(x)
   setnames(o, time, "timestamp")
   setorder(o, timestamp)
-  
+
   o[, .id := .I]
   o[, .filter := FALSE]
 
   o = st_as_sf(o, coords = coords, crs = crs)
 
-  if(!missing(project_to)) {
+  if (!missing(project_to)) {
     o = st_transform(o, project_to)
-  }  
+  }
 
   st_geometry(o) = "location"
 
@@ -110,7 +108,6 @@ as_ctdf <- function(x, coords = c("longitude","latitude"),time = "time", crs = N
 
   class(o) <- c("ctdf", class(o))
   o
-
 }
 
 
@@ -124,17 +121,15 @@ as_ctdf <- function(x, coords = c("longitude","latitude"),time = "time", crs = N
 #' @param ctdf A `ctdf` object (with ordered rows and a `"location"` geometry column).
 #'
 #' @return An `sf` object with LINESTRING geometry for each step.
-#' 
-#' @details  The output includes additional columns for step duration (`step_duration`), 
-#' step distance (`step_distance` in meters), and speed (`speed` in km/h). 
-#' The number of rows is nrow(ctdf) - i, where i = 1 and corresponds to the starting index in ctdf.
+#'
+#' @details The number of rows is nrow(ctdf) - i, where i = 1 and corresponds to the starting index in ctdf.
 #'
 #'
 #' @examples
-#' data(lbdo66867)
-#' ctdf = as_ctdf(lbdo66867, time = 'locationDate', crs = 4326, project_to='+proj=eqearth')
+#' data(toy_ctdf_k2)
+#' ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to = "+proj=eqearth")
 #' s = as_ctdf_track(ctdf)
-#' plot(s[c('timestamp', 'speed')])
+#' plot(s['.id'])
 #'
 #' @export
 as_ctdf_track <- function(ctdf) {
@@ -147,39 +142,22 @@ as_ctdf_track <- function(ctdf) {
     st_as_sf() |>
     mutate(
       location_prev  = lag(location),
-      timestamp_prev = lag(timestamp)
+      start          = lag(timestamp), 
+      stop           = timestamp
     )
   crs = st_crs(o)
 
   o = o |> filter(!st_is_empty(location_prev))
 
-  o = o |>
+  o |>
     rowwise() |>
     mutate(
-      segment = list(st_linestring(
-        rbind(st_coordinates(location_prev), st_coordinates(location))
-      )),
-      step_duration = difftime(timestamp, timestamp_prev, units = "hours") |> as.numeric(),
-      step_distance = geodist( # TODO: run on 4326 or change to st_distance!
-        st_coordinates(location),
-        st_coordinates(location_prev),
-        paired = TRUE,
-        measure = "haversine"
-      )
+      segment = rbind(st_coordinates(location_prev), st_coordinates(location)) |> st_linestring()|>list()
     ) |>
-    ungroup()
-  
-  o = o |>
-    select(-timestamp_prev, -location_prev) |>
-    mutate(
-      segment = st_sfc(segment, crs = crs),
-      step_distance = set_units(step_distance, "m"),
-      step_duration = set_units(step_duration, "hours"),
-      speed = set_units(step_distance / step_duration, "km/h")
-    ) |>
-    st_set_geometry('segment')
-  
+    ungroup() |>
+    st_set_geometry("segment") |>
+    select(.id, start, stop, segment)|>
+    st_set_crs(crs)
 
-  o
 
 }

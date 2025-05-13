@@ -19,14 +19,12 @@ starting at the previous location and ending at the current one - i.e., each seg
 ends at the position of the current row.
 }
 \details{
-The output includes additional columns for step duration (`step_duration`), 
-step distance (`step_distance` in meters), and speed (`speed` in km/h). 
 The number of rows is nrow(ctdf) - i, where i = 1 and corresponds to the starting index in ctdf.
 }
 \examples{
-data(lbdo66867)
-ctdf = as_ctdf(lbdo66867, time = 'locationDate', crs = 4326, project_to='+proj=eqearth')
+data(toy_ctdf_k2)
+ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to = "+proj=eqearth")
 s = as_ctdf_track(ctdf)
-plot(s[c('timestamp', 'speed')])
+plot(s['.id'])
 
 }

@@ -14,7 +14,6 @@ segment_ctdf
 \examples{
 data(toy_ctdf_k2)
 ctdf = as_ctdf(toy_ctdf_k2 )
-filter_intersection(ctdf)
-plot(ctdf, by = 'filter')
+plot(ctdf)
 
 }

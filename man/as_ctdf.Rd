@@ -42,7 +42,7 @@ This column will be updated by upstream methods.
 }
 \examples{
 data(toy_ctdf_k2)
-x = as_ctdf(toy_ctdf_k2 )
+x = as_ctdf(toy_ctdf_k2)
 plot(x)
 
 }
