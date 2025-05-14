@@ -21,10 +21,36 @@ plot.clusterTrack <- function(x ) {
   pal = topo.colors(n = uniqueN(x$cluster) )
   cols = pal[match(x$cluster, sort(unique(x$cluster)))]
 
-  plot(x$nb, st_coordinates(x$location), col = cols)
+  plot(st_geometry(x$location), col = cols)
 
 }
 
+
+dbscan_ctdf <- function(ctdf, sd = 1, transform = log, minPts = 5, borderPoints = TRUE) {
+
+  nb = prune_dirichlet_polygons(ctdf, sd = sd, transform = transform)
+
+
+  frnn = list(id = nb, eps = 0) # eps is ignored when id is supplied
+  class(frnn) = c("frNN","NN")
+
+  o = dbscan::dbscan(x = frnn, minPts = minPts, borderPoints = borderPoints)
+  
+  nam_nb = names(nb) # subset.nb does not work on a named list
+  names(nb) = NULL
+  nbs = subset(nb, o$cluster > 0)
+  nam_nbs = nam_nb[o$cluster > 0]
+  names(nbs) = nam_nbs
+
+  clusters = o$cluster[o$cluster > 0]
+
+
+  o = data.table(.id = names(nbs) |> as.integer(), cluster = clusters, nb = nbs)
+  
+
+  merge(o, ctdf[,.(.id, timestamp, location)])
+
+}
 
 
 #' Cluster movement tracks
@@ -46,35 +72,18 @@ plot.clusterTrack <- function(x ) {
 #' data(toy_ctdf_k2)
 #' ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to='+proj=eqearth')
 #' filter_intersection(ctdf, overwrite = TRUE)
+#' segment_ctdf(ctdf, deltaT = 12, min_n_segments = 3)
 
-#' o = cluster_track(ctdf, sd = 1)
+#' o = cluster_track(ctdf, sd = 1, log = FALSE)
 #' plot(o)
 #' plot(st_as_sf(ctdf)|>st_geometry(), add = TRUE)
+#' s = st_as_sf(o)
+#' mapview(s, zcol = "cluster")
 #' 
-cluster_track <- function(ctdf, sd = 1, minPts = 5, borderPoints = TRUE) {
+cluster_track <- function(ctdf, sd = 1, transform = log, minPts = 5, borderPoints = TRUE) {
 
-  nb = prune_dirichlet_polygons(ctdf, sd = sd)
-
-
-  frnn = list(id = nb, eps = 0) # eps is ignored when id is supplied
-  class(frnn) = c("frNN","NN")
-
-  o = dbscan::dbscan(x = frnn, minPts = minPts, borderPoints = borderPoints)
-  
-  nam_nb = names(nb) # subset.nb does not work on a named list
-  names(nb) = NULL
-  nbs = subset(nb, o$cluster > 0)
-  nam_nbs = nam_nb[o$cluster > 0]
-  names(nbs) = nam_nbs
-
-  clusters = o$cluster[o$cluster > 0]
-
-
-  o = data.table(.id = names(nbs) |> as.integer(), cluster = clusters, nb = nbs)
-  
- 
-  o = merge(o, ctdf[,.(.id, timestamp, location)])
-
+  o = ctdf[, dbscan_ctdf(ctdf = .SD, sd = sd, transform = transform, minPts = minPts, borderPoints = borderPoints), by = .segment]
+  o[, cluster := paste(.segment, cluster) |> as.factor() |> as.integer()]
 
   # sanity check
   ncl = nrow(o[cluster>0, .N, cluster])

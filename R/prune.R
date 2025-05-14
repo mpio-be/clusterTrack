@@ -27,10 +27,10 @@
 #' data(toy_ctdf_k2)
 #' ctdf = as_ctdf(toy_ctdf_k2)
 #' filter_intersection(ctdf)
-#' nb = prune_dirichlet_polygons(ctdf, sd = 1)
+#' nb = prune_dirichlet_polygons(ctdf, sd = 1, transform = sqrt)
 #' plot(nb, st_coordinates(ctdf[.id%in%names(nb), location]))
 #' 
-prune_dirichlet_polygons <- function(ctdf, sd = 1, queen = TRUE) {
+prune_dirichlet_polygons <- function(ctdf, sd = 1, queen = TRUE, transform = log) {
 
   dat = data.table(st_as_sf(ctdf) |> st_coordinates() )
   
@@ -45,7 +45,9 @@ prune_dirichlet_polygons <- function(ctdf, sd = 1, queen = TRUE) {
   }) |> rbindlist()
 
   dip = cbind(dip, ctdf[, .(.id, .filter)])
-  dip[, A := scale(st_area(geometry) |> log())]
+  dip[, A := st_area(geometry)]
+  dip[, A := transform(A)]
+  dip[, A := scale(A)]
 
   dips = dip[A < sd & (!.filter)]
 

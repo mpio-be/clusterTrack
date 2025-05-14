@@ -15,11 +15,11 @@
 #' data(toy_ctdf_k2)
 #' ctdf = as_ctdf(toy_ctdf_k2)
 #' filter_intersection(ctdf)
-#' plot(ctdf, by = 'filter')
+#' plot(ctdf, by = '.filter')
 #' 
 filter_intersection <- function(ctdf, overwrite = FALSE, strict = TRUE) {
 
-  # TODO: do not filter if intersection >= deltaT
+  # TODO: refactor, see segment!
 
   if (!inherits(ctdf, "ctdf")) {
     stop("filter_intersection() only works on objects of class 'ctdf'")

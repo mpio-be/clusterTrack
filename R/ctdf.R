@@ -76,7 +76,7 @@ as_ctdf <- function(x, coords = c("longitude", "latitude"), time = "time", crs =
     )
   }
 
-  reserved = intersect(names(x), c(".filter", ".id"))
+  reserved = intersect(names(x), c(".filter",".segment", ".id"))
 
   if (length(reserved) > 0) {
     warning(
@@ -94,6 +94,7 @@ as_ctdf <- function(x, coords = c("longitude", "latitude"), time = "time", crs =
 
   o[, .id := .I]
   o[, .filter := FALSE]
+  o[, .segment := 0L]
 
   o = st_as_sf(o, coords = coords, crs = crs)
 

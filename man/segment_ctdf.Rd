@@ -5,7 +5,7 @@
 \title{segment ctdf
 segment_ctdf}
 \usage{
-segment_ctdf(ctdf)
+segment_ctdf(ctdf, deltaT = 12, min_n_segments = 5, bout_length)
 }
 \description{
 segment ctdf
@@ -14,6 +14,7 @@ segment_ctdf
 \examples{
 data(toy_ctdf_k2)
 ctdf = as_ctdf(toy_ctdf_k2 )
-plot(ctdf)
+se = segment_ctdf(ctdf, deltaT = 12) 
+mapview(se, zcol = "bout_id")
 
 }
