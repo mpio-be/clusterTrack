@@ -71,10 +71,9 @@ dbscan_ctdf <- function(ctdf, sd = 1, transform = log, minPts = 5, borderPoints 
 #' library(clusterTrack)
 #' data(toy_ctdf_k2)
 #' ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to='+proj=eqearth')
-#' filter_intersection(ctdf, overwrite = TRUE)
-#' segment_ctdf(ctdf, deltaT = 12, min_n_segments = 3)
+#' slice_ctdf(ctdf)
 
-#' o = cluster_track(ctdf, sd = 1, log = FALSE)
+#' o = cluster_track(ctdf)
 #' plot(o)
 #' plot(st_as_sf(ctdf)|>st_geometry(), add = TRUE)
 #' s = st_as_sf(o)
@@ -82,7 +81,15 @@ dbscan_ctdf <- function(ctdf, sd = 1, transform = log, minPts = 5, borderPoints 
 #' 
 cluster_track <- function(ctdf, sd = 1, transform = log, minPts = 5, borderPoints = TRUE) {
 
-  o = ctdf[, dbscan_ctdf(ctdf = .SD, sd = sd, transform = transform, minPts = minPts, borderPoints = borderPoints), by = .segment]
+  o = ctdf[, dbscan_ctdf(
+            ctdf = .SD,
+            sd = sd, 
+            transform = transform, 
+            minPts = minPts, 
+            borderPoints = borderPoints
+            ),
+              by = .segment
+            ]
   o[, cluster := paste(.segment, cluster) |> as.factor() |> as.integer()]
 
   # sanity check

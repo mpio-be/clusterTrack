@@ -4,7 +4,7 @@
 \alias{prune_dirichlet_polygons}
 \title{Prune Dirichlet polygons based on area}
 \usage{
-prune_dirichlet_polygons(ctdf, sd = 1, queen = TRUE)
+prune_dirichlet_polygons(ctdf, sd = 1, queen = TRUE, transform = log)
 }
 \arguments{
 \item{ctdf}{A `ctdf` data frame (typically created with [as_ctdf()]).}
@@ -35,7 +35,7 @@ library(clusterTrack)
 data(toy_ctdf_k2)
 ctdf = as_ctdf(toy_ctdf_k2)
 filter_intersection(ctdf)
-nb = prune_dirichlet_polygons(ctdf, sd = 1)
+nb = prune_dirichlet_polygons(ctdf, sd = 1, transform = sqrt)
 plot(nb, st_coordinates(ctdf[.id\%in\%names(nb), location]))
 
 }

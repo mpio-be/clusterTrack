@@ -7,7 +7,7 @@
 \usage{
 \method{print}{clusterTrack}(x, ...)
 
-cluster_track(ctdf, sd = 1, minPts = 5, borderPoints = TRUE)
+cluster_track(ctdf, sd = 1, transform = log, minPts = 5, borderPoints = TRUE)
 }
 \arguments{
 \item{ctdf}{A `ctdf` object (from [as_ctdf()]), representing sequential movement points with timestamps and locations.}
@@ -30,8 +30,11 @@ library(clusterTrack)
 data(toy_ctdf_k2)
 ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to='+proj=eqearth')
 filter_intersection(ctdf, overwrite = TRUE)
-o = cluster_track(ctdf, sd = 1)
+slice_ctdf(ctdf, deltaT = 12, min_n_segments = 3)
+o = cluster_track(ctdf, sd = 1, log = FALSE)
 plot(o)
 plot(st_as_sf(ctdf)|>st_geometry(), add = TRUE)
+s = st_as_sf(o)
+mapview(s, zcol = "cluster")
 
 }

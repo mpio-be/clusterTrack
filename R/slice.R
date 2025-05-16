@@ -1,23 +1,19 @@
 
-#' segment ctdf
-#' segment_ctdf
+#' segment and filter a ctdf
+#' slice_ctdf
 
 #' @export
 #' @examples
 #' data(toy_ctdf_k2)
 #' ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to = "+proj=eqearth")
-#' segment_ctdf(ctdf, deltaT = 12, min_n_segments = 3)
+#' slice_ctdf(ctdf )
 #' se = st_as_sf(ctdf)
+#' mapviewOptions(fgb = FALSE)
 #' mapview(se, zcol = ".segment")
+#' mapview(se, zcol = ".filter")
 #' 
-segment_ctdf <- function(ctdf, deltaT = 12, min_n_segments = 5, min_bout_length) {
+slice_ctdf <- function(ctdf, deltaT = 12, slice_min_n_segments = 5, slice_min_bout_length, filter_min_n_segments = 5) {
 
-  #TODO min_bout_length
-  #TODO allow for mid segments timestamps as argument
-  #TODO allow for guessing min_n_segments from data
-  #TODO segment by season/year. 
-  # Alternatively return a new object (ctdf subset for movement only) to be used
-  #  for both segment and filter!
 
   if (!inherits(ctdf, "ctdf")) {
     stop("filter_intersection() only works on objects of class 'ctdf'")
@@ -48,13 +44,20 @@ segment_ctdf <- function(ctdf, deltaT = 12, min_n_segments = 5, min_bout_length)
 
   segs[, bout_id := rleid(cross)]
   segs[, N_bout_id := .N, bout_id]
-  segs = segs[(!cross) & N_bout_id > min_n_segments]
-  segs[, bout_id := factor(bout_id) |> as.integer()]
 
-  # mid segments timestamps
-  midseg = ctdf[ segs[, round(median(.id) ), by = bout_id]$V1 ]$timestamp
+  # segmentation
+    doseg = segs[(!cross) & N_bout_id > slice_min_n_segments]
+    doseg[, bout_id := factor(bout_id) |> as.integer()]
+    # mid segments timestamps
+    midseg = ctdf[ doseg[, round(median(.id) ), by = bout_id]$V1 ]$timestamp
 
-  ctdf[, .segment := findInterval(timestamp, midseg)]
+  # filter
+    dofill = segs[N_bout_id >=filter_min_n_segments,]$.id
+
+  # set
+    ctdf[, .segment := findInterval(timestamp, midseg)]
+    ctdf[.id %in% dofill, .filter := TRUE]
+
 
 
 
