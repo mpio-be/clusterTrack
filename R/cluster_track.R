@@ -14,7 +14,6 @@ print.clusterTrack <- function(x, ...) {
 
 }
 
-
 #' @export
 plot.clusterTrack <- function(x ) {
   

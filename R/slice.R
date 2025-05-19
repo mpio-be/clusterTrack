@@ -6,11 +6,11 @@
 #' @examples
 #' data(toy_ctdf_k2)
 #' ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to = "+proj=eqearth")
-#' slice_ctdf(ctdf )
+#' slice_ctdf(ctdf)
 #' se = st_as_sf(ctdf)
 #' mapviewOptions(fgb = FALSE)
-#' mapview(se, zcol = ".segment")
 #' mapview(se, zcol = ".filter")
+#' mapview(se, zcol = ".segment")
 #' 
 slice_ctdf <- function(ctdf, deltaT = 12, slice_min_n_segments = 5, slice_min_bout_length, filter_min_n_segments = 5) {
 
@@ -44,6 +44,7 @@ slice_ctdf <- function(ctdf, deltaT = 12, slice_min_n_segments = 5, slice_min_bo
 
   segs[, bout_id := rleid(cross)]
   segs[, N_bout_id := .N, bout_id]
+  segs[, len := st_length(segment)]
 
   # segmentation
     doseg = segs[(!cross) & N_bout_id > slice_min_n_segments]
