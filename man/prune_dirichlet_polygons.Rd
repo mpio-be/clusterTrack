@@ -34,11 +34,10 @@ Dirichlet polygons are computed via the `deldir` package. Only polygons with
 library(clusterTrack)
 data(toy_ctdf_k2)
 ctdf = as_ctdf(toy_ctdf_k2)
-filter_intersection(ctdf)
 nb = prune_dirichlet_polygons(ctdf, sd = 1, transform = sqrt)
 plot(nb, st_coordinates(ctdf[.id\%in\%names(nb), location]))
 
 }
 \seealso{
-[as_ctdf()], [filter_intersection()], [spdep::poly2nb()]
+[as_ctdf()],  [spdep::poly2nb()]
 }

@@ -59,8 +59,6 @@ require(tracktools)
 
   ctdf = as_ctdf(x, time = 'datetime', coords = c("X", "Y"), crs = 4326, project_to='+proj=eqearth')
 
-  filter_intersection(ctdf, overwrite = TRUE)
-
   plot(ctdf, by = 'filter')
 
   o = cluster_track(ctdf, sd = 1)

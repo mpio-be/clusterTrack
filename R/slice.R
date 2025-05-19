@@ -16,7 +16,7 @@ slice_ctdf <- function(ctdf, deltaT = 12, slice_min_n_segments = 5, slice_min_bo
 
 
   if (!inherits(ctdf, "ctdf")) {
-    stop("filter_intersection() only works on objects of class 'ctdf'")
+    stop("slice_ctdf() only works on objects of class 'ctdf'")
   }
 
   segs = ctdf |>
