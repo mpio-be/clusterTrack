@@ -1,14 +1,17 @@
 
-#' @title Deprecated: use as_ctdf instead
-#' @description Please use [as_ctdf()] in new code.
-#' @keywords internal
 
 #' @export
-as_tdbscan <- function(x, ...) {
-  .Deprecated("as_ctdf", package = "clusterTrack")
-  as_ctdf(x, ...)
-}
+as_tdbscan <- function(x, coords = c("longitude","latitude"),time = "time", crs = 4326) {
 
+  o=  copy(x)  
+
+  setnames(o, time, "timestamp")
+  setorder(o, timestamp)
+
+  st_as_sf(o, coords = coords, crs = crs)
+
+
+  }
 
 
 
@@ -38,7 +41,8 @@ as_tdbscan <- function(x, ...) {
 #' 
 #' # Pectoral Sandpiper
 #' data(pesa56511)
-#' x = as_tdbscan(pesa56511, time = "locationDate", crs = 4326, project_to='+proj=eqearth')
+#' x = as_tdbscan(pesa56511, time = "locationDate", crs = 4326)
+#' x = st_transform(x, '+proj=eqearth')
 #' z = tdbscan(track=x, eps =6600 , minPts   = 8, maxLag = 6, borderPoints = TRUE )
 #' 
 #' ggplot(z ) +geom_sf(aes(color = factor(clustID) )) 
@@ -52,7 +56,6 @@ as_tdbscan <- function(x, ...) {
 
 tdbscan <- function(track, eps, minPts = 5, borderPoints = FALSE , maxLag = 6, minTenure) {
 
-	track = st_as_sf(track)
 
 	checkClust=clustID=id=iscore=n=ngb=tc=y=NULL  # due to NSE notes in R CMD check
 	`.` = function(...) NULL
