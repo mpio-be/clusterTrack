@@ -35,7 +35,8 @@ require(ggplot2)
 
 # Pectoral Sandpiper
 data(pesa56511)
-x = as_tdbscan(pesa56511, time = "locationDate", crs = 4326, project_to='+proj=eqearth')
+x = as_tdbscan(pesa56511, time = "locationDate", crs = 4326)
+x = st_transform(x, '+proj=eqearth')
 z = tdbscan(track=x, eps =6600 , minPts   = 8, maxLag = 6, borderPoints = TRUE )
 
 ggplot(z ) +geom_sf(aes(color = factor(clustID) )) 

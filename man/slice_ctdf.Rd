@@ -8,9 +8,9 @@ slice_ctdf}
 slice_ctdf(
   ctdf,
   deltaT = 12,
-  slice_min_n_segments = 5,
-  slice_min_bout_length,
-  filter_min_n_segments = 5
+  slice_by_segments = 5,
+  slice_by_distance = 0,
+  filter_by_segments = 5
 )
 }
 \description{
@@ -20,7 +20,7 @@ slice_ctdf
 \examples{
 data(toy_ctdf_k2)
 ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to = "+proj=eqearth")
-slice_ctdf(ctdf)
+slice_ctdf(ctdf, slice_by_distance = 4000)
 se = st_as_sf(ctdf)
 mapviewOptions(fgb = FALSE)
 mapview(se, zcol = ".filter")

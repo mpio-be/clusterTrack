@@ -80,16 +80,32 @@ dbscan_ctdf <- function(ctdf, sd = 1, transform = log, minPts = 5, borderPoints 
 #' 
 cluster_track <- function(ctdf, sd = 1, transform = log, minPts = 5, borderPoints = TRUE) {
 
-  o = ctdf[, dbscan_ctdf(
-            ctdf = .SD,
-            sd = sd, 
-            transform = transform, 
-            minPts = minPts, 
-            borderPoints = borderPoints
-            ),
-              by = .segment
-            ]
-  o[, cluster := paste(.segment, cluster) |> as.factor() |> as.integer()]
+  segs = ctdf$.segment |> unique()
+
+  o = foreach(si = segs, .errorhandling = 'pass') %do% {
+    x = ctdf[.segment == si]
+    oi = dbscan_ctdf(
+      ctdf         = x,
+      sd           = sd,
+      transform    = transform,
+      minPts       = minPts,
+      borderPoints = borderPoints
+    )
+    oi[, cluster := paste(si, cluster)]
+    oi
+  }
+
+  e = sapply(o, FUN = inherits, what = "error")
+  
+  if (length(segs[e]) > 0) {
+    warning("segments ", paste(segs[e], collapse = ", "), " did not return a cluster!")
+  }
+
+  o = o[!e]
+
+  o = rbindlist(o)
+
+  o[, cluster := as.factor(cluster) |> as.integer()]
 
   # sanity check
   ncl = nrow(o[cluster>0, .N, cluster])
