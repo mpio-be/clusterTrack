@@ -13,15 +13,19 @@
 #' @return A named list of class `nb` (from the `spdep` package), where each name corresponds 
 #'   to an `.id` in the input `ctdf` and each element is an integer vector of neighbor indices.
 #'
-#' @seealso [as_ctdf()], [filter_intersection()], [spdep::poly2nb()]
+#' @note Dirichlet polygons are computed via the `deldir` package. Only polygons with 
+#'   `.filter == FALSE` and small log-area (relative to the sample) are retained before 
+#'   neighbor construction. This is typically used to identify spatially isolated or dense 
+#'   regions in tracking data.
+#'
+#' @seealso [as_ctdf()],  [spdep::poly2nb()]
 #'
 #'
 #' @export
 #' @examples
 #' library(clusterTrack)
 #' data(toy_ctdf_k2)
-#' ctdf = as_ctdf(toy_ctdf_k2)
-#' filter_intersection(ctdf)
+#' ctdf = as_ctdf(toy_ctdf_k2,crs = 4326, project_to = "+proj=eqearth")
 #' nb = prune_dirichlet_polygons(ctdf, sd = 1, transform = sqrt)
 #' plot(nb, st_coordinates(ctdf[.id%in%names(nb), location]))
 #' 
@@ -41,6 +45,7 @@ prune_dirichlet_polygons <- function(ctdf, sd = 1, queen = TRUE, transform = log
 
   dip = cbind(dip, ctdf[, .(.id)])
   dip[, A := st_area(geometry)]
+  all_areas = dip$A
   dip[, A := transform(A)]
   dip[, A := scale(A)]
 
@@ -53,6 +58,8 @@ prune_dirichlet_polygons <- function(ctdf, sd = 1, queen = TRUE, transform = log
     poly2nb(queen = queen)
   
   names(nb) <- dips$.id
+
+  attr(nb, 'Area') <- all_areas
 
   nb
 

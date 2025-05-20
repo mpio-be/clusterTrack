@@ -1,14 +1,17 @@
 
-#' @title Deprecated: use as_ctdf instead
-#' @description Please use [as_ctdf()] in new code.
-#' @keywords internal
 
 #' @export
-as_tdbscan <- function(x, ...) {
-  .Deprecated("as_ctdf", package = "clusterTrack")
-  as_ctdf(x, ...)
-}
+as_tdbscan <- function(x, coords = c("longitude","latitude"),time = "time", crs = 4326) {
 
+  o=  copy(x)  
+
+  setnames(o, time, "timestamp")
+  setorder(o, timestamp)
+
+  st_as_sf(o, coords = coords, crs = crs)
+
+
+  }
 
 
 
@@ -38,8 +41,9 @@ as_tdbscan <- function(x, ...) {
 #' 
 #' # Pectoral Sandpiper
 #' data(pesa56511)
-#' x = as_tdbscan(pesa56511)
-#' z = tdbscan(track=x, eps =6600, minPts   = 8, maxLag = 6, borderPoints = TRUE )
+#' x = as_tdbscan(pesa56511, time = "locationDate", crs = 4326)
+#' x = st_transform(x, '+proj=eqearth')
+#' z = tdbscan(track=x, eps =6600 , minPts   = 8, maxLag = 6, borderPoints = TRUE )
 #' 
 #' ggplot(z ) +geom_sf(aes(color = factor(clustID) )) 
 #' 
@@ -48,14 +52,10 @@ as_tdbscan <- function(x, ...) {
 #' z = tdbscan(x, eps =6600, minPts   = 8, maxLag = 6, borderPoints = TRUE, minTenure= 24 )
 #' ggplot(z ) +geom_sf(aes(color = factor(clustID) )) 
 #' 
-#' # z bird
-#' data(toy_ctdf_k2)
-#' x = as_tdbscan(toy_ctdf_k2)
-#' z = tdbscan(x, eps =12, minPts   = 5, maxLag = 5, borderPoints = TRUE )
-#' ggplot(z ) +geom_sf(aes(color = factor(clustID) )) 
-#' 
+
 
 tdbscan <- function(track, eps, minPts = 5, borderPoints = FALSE , maxLag = 6, minTenure) {
+
 
 	checkClust=clustID=id=iscore=n=ngb=tc=y=NULL  # due to NSE notes in R CMD check
 	`.` = function(...) NULL
