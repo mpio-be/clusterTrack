@@ -62,7 +62,9 @@ plot.ctdf <- function(x,y = NULL, by = NULL, pch = 16) {
 #' @export
 
 as_ctdf <- function(x, coords = c("longitude", "latitude"), time = "time", crs = NA, project_to, ...) {
-  dups <- which(duplicated(x[, ..coords]))
+  
+  v = c(coords,time)
+  dups = which(duplicated(x[, ..v]))
   if (length(dups) > 0) {
     stop(
       sprintf(
@@ -76,7 +78,7 @@ as_ctdf <- function(x, coords = c("longitude", "latitude"), time = "time", crs =
     )
   }
 
-  reserved = intersect(names(x), c(".filter",".segment", ".id"))
+  reserved = intersect(names(x), c(".filter",".segment", ".id", "cluster"))
 
   if (length(reserved) > 0) {
     warning(
@@ -148,16 +150,17 @@ as_ctdf_track <- function(ctdf) {
     )
   crs = st_crs(o)
 
-  o = o |> filter(!st_is_empty(location_prev))
+  o = o |>
+    dplyr::filter(!st_is_empty(location_prev))
 
   o |>
     rowwise() |>
     mutate(
-      segment = rbind(st_coordinates(location_prev), st_coordinates(location)) |> st_linestring()|>list()
+      track = rbind(st_coordinates(location_prev), st_coordinates(location)) |> st_linestring()|>list()
     ) |>
     ungroup() |>
-    st_set_geometry("segment") |>
-    select(.id, .filter, .segment, start, stop, segment)|>
+    st_set_geometry("track") |>
+    select(.id, .filter, .segment, start, stop, track)|>
     st_set_crs(crs)
 
 

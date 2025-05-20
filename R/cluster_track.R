@@ -74,8 +74,6 @@ dbscan_ctdf <- function(ctdf, sd = 1, transform = log, minPts = 5, borderPoints 
 
 #' o = cluster_track(ctdf)
 #' plot(o)
-#' s = st_as_sf(o)
-#' mapview(s, zcol = "cluster")
 #' 
 cluster_track <- function(ctdf, sd = 1, transform = log, minPts = 5, borderPoints = TRUE) {
 
@@ -114,8 +112,13 @@ cluster_track <- function(ctdf, sd = 1, transform = log, minPts = 5, borderPoint
     message(sprintf("%d cluster%s detected!", ncl, if (ncl > 1L) "s" else ""))
   }
 
+  o = merge(ctdf, o[, .(.id, cluster)], by = ".id", suffixes = c("", "temp"), all.x = TRUE, sort = FALSE)
+
   class(o) <- c("clusterTrack", class(o))
 
   o
+
+
+  
 
 }

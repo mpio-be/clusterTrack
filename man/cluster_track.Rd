@@ -32,8 +32,5 @@ ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to='+proj=eqearth')
 slice_ctdf(ctdf)
 o = cluster_track(ctdf)
 plot(o)
-plot(st_as_sf(ctdf)|>st_geometry(), add = TRUE)
-s = st_as_sf(o)
-mapview(s, zcol = "cluster")
 
 }

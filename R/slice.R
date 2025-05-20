@@ -43,7 +43,7 @@ slice_ctdf <- function(ctdf, deltaT = 12, slice_by_segments = 5, slice_by_distan
 
   segs[, bout_id := rleid(cross)]
   segs[, N_bout_id := .N, bout_id]
-  segs[, len := st_length(segment) |> set_units("meters") |> as.numeric()]
+  segs[, len := st_length(track) |> set_units("meters") |> as.numeric()]
   segs[, len := sum(len), bout_id]
 
   # segmentation
