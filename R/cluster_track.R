@@ -48,7 +48,7 @@ dbscan_ctdf <- function(ctdf, sd = 1, transform = log, minPts = 5, borderPoints 
   o = data.table(.id = names(nbs) |> as.integer(), cluster = clusters, nb = nbs)
   
 
-  merge(o, ctdf[,.(.id, timestamp, location)])
+  merge(o, ctdf[,.(.id)])
 
 }
 
@@ -75,22 +75,32 @@ dbscan_ctdf <- function(ctdf, sd = 1, transform = log, minPts = 5, borderPoints 
 
 #' o = cluster_track(ctdf)
 #' plot(o)
-#' plot(st_as_sf(ctdf)|>st_geometry(), add = TRUE)
 #' s = st_as_sf(o)
 #' mapview(s, zcol = "cluster")
 #' 
 cluster_track <- function(ctdf, sd = 1, transform = log, minPts = 5, borderPoints = TRUE) {
 
-  o = ctdf[, dbscan_ctdf(
-            ctdf = .SD,
-            sd = sd, 
-            transform = transform, 
-            minPts = minPts, 
-            borderPoints = borderPoints
-            ),
-              by = .segment
-            ]
+  x = ctdf[(!.filter)]
+  x[, .n := .N, by = .segment]
+  x = x[.n > minPts*1.5]
+
+
+  o = 
+  x[ ,
+        dbscan_ctdf(
+          ctdf         = .SD,
+          sd           = sd,
+          transform    = transform,
+          minPts       = minPts,
+          borderPoints = borderPoints
+        ),
+    by = .segment
+  ]
+  
   o[, cluster := paste(.segment, cluster) |> as.factor() |> as.integer()]
+
+  o = merge(ctdf, o[, .(.id, cluster)], all.x = TRUE, sort = FALSE)
+  o[is.na(cluster), cluster := 0]
 
   # sanity check
   ncl = nrow(o[cluster>0, .N, cluster])
