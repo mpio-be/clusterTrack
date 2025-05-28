@@ -26,15 +26,14 @@ plot.clusterTrack <- function(x ) {
 
 
 dbscan_ctdf <- function(ctdf, sd = 1, transform = log, minPts = 5, borderPoints = TRUE) {
-
   nb = prune_dirichlet_polygons(ctdf, sd = sd, transform = transform)
 
 
   frnn = list(id = nb, eps = 0) # eps is ignored when id is supplied
-  class(frnn) = c("frNN","NN")
+  class(frnn) = c("frNN", "NN")
 
   o = dbscan::dbscan(x = frnn, minPts = minPts, borderPoints = borderPoints)
-  
+
   nam_nb = names(nb) # subset.nb does not work on a named list
   names(nb) = NULL
   nbs = subset(nb, o$cluster > 0)
@@ -45,10 +44,9 @@ dbscan_ctdf <- function(ctdf, sd = 1, transform = log, minPts = 5, borderPoints 
 
 
   o = data.table(.id = names(nbs) |> as.integer(), cluster = clusters, nb = nbs)
-  
 
-  merge(o, ctdf[,.(.id)])
 
+  merge(o, ctdf[, .(.id)])
 }
 
 
@@ -66,21 +64,27 @@ dbscan_ctdf <- function(ctdf, sd = 1, transform = log, minPts = 5, borderPoints 
 #'
 #'
 #' @export
-#' @examples 
-#' library(clusterTrack)
+#' @examples
 #' data(toy_ctdf_k2)
-#' ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to='+proj=eqearth')
-#' slice_ctdf(ctdf)
-
+#' ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to = "+proj=eqearth")
+#' slice_ctdf(ctdf, deltaT = 12, slice_method = function(x) {quantile(x, 0.7)})
 #' o = cluster_track(ctdf)
 #' plot(o)
+#'
+#' data(lbdo66867)
+#' ctdf = as_ctdf(lbdo66867, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")
+#' slice_ctdf(ctdf, 72, slice_method = function(x) {quantile(x, 0.8)})
+#' clust = cluster_track(ctdf)
+#' map(clust)
 #' 
 cluster_track <- function(ctdf, sd = 1, transform = log, minPts = 5, borderPoints = TRUE) {
 
-  segs = ctdf$.segment |> unique()
+  s = ctdf[ (!.filter)]
+  segs = s$.segment |> unique()
+
 
   o = foreach(si = segs, .errorhandling = 'pass') %do% {
-    x = ctdf[.segment == si]
+    x = ctdf[.segment == si & !.filter]
     oi = dbscan_ctdf(
       ctdf         = x,
       sd           = sd,
@@ -95,7 +99,7 @@ cluster_track <- function(ctdf, sd = 1, transform = log, minPts = 5, borderPoint
   e = sapply(o, FUN = inherits, what = "error")
   
   if (length(segs[e]) > 0) {
-    warning("segments ", paste(segs[e], collapse = ", "), " did not return a cluster!")
+    message("segments ", paste(segs[e], collapse = ", "), " did not return a cluster!")
   }
 
   o = o[!e]
@@ -116,6 +120,7 @@ cluster_track <- function(ctdf, sd = 1, transform = log, minPts = 5, borderPoint
 
   class(o) <- c("clusterTrack", class(o))
 
+  o[is.na(cluster), cluster := 0]
   o
 
 

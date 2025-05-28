@@ -26,11 +26,16 @@ A `ctdf` object containing only points assigned to clusters, with an additional 
 Perform clustering on a `ctdf` object to identify use-sites. Uses a hybrid approach combining Dirichlet-based polygon pruning and DBSCAN clustering to detect spatially and temporally coherent movement clusters ("use-sites").
 }
 \examples{
-library(clusterTrack)
 data(toy_ctdf_k2)
-ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to='+proj=eqearth')
+ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to = "+proj=eqearth")
 slice_ctdf(ctdf)
 o = cluster_track(ctdf)
 plot(o)
+
+data(lbdo66867)
+ctdf = as_ctdf(lbdo66867, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")
+slice_ctdf(ctdf, 72)
+clust = cluster_track(ctdf)
+map(clust)
 
 }

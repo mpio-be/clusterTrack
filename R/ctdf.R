@@ -165,3 +165,27 @@ as_ctdf_track <- function(ctdf) {
 
 
 }
+
+
+
+#' @export
+smooth_ctdf <- function(ctdf, ...) {
+
+  x = st_as_sf(ctdf$location)
+  crs = st_crs(x)
+  x = st_coordinates(x) |> data.table() |> data.table()
+
+  x[, let(
+    X  = sgolayfilt(X, ...),
+    Y  = sgolayfilt(Y, ...)
+  )]
+
+  x = st_as_sf(x, coords = c("X", "Y"), crs = crs)
+
+  o = copy(ctdf)
+  o[, location := st_geometry(x)]
+  o
+  
+
+
+}

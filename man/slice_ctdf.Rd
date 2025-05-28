@@ -5,13 +5,7 @@
 \title{segment and filter a ctdf
 slice_ctdf}
 \usage{
-slice_ctdf(
-  ctdf,
-  deltaT = 12,
-  slice_by_segments = 5,
-  slice_by_distance = 0,
-  filter_by_segments = 5
-)
+slice_ctdf(ctdf, deltaT = 12, slice_method = mean)
 }
 \description{
 segment and filter a ctdf
