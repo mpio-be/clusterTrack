@@ -9,7 +9,7 @@
 #' @importFrom units set_units
 #' @importFrom dplyr      mutate ungroup rowwise lag filter select rename
 #' @importFrom signal sgolayfilt
-
+#' @importFrom mclust  Mclust
 NULL
 
 

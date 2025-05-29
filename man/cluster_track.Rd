@@ -7,15 +7,10 @@
 \usage{
 \method{print}{clusterTrack}(x, ...)
 
-cluster_track(ctdf, sd = 1, transform = log, minPts = 5, borderPoints = TRUE)
+cluster_track(ctdf, borderPoints = TRUE)
 }
 \arguments{
 \item{ctdf}{A `ctdf` object (from [as_ctdf()]), representing sequential movement points with timestamps and locations.}
-
-\item{sd}{Numeric; threshold on the scaled log-area of Dirichlet polygons. Polygons with scaled log-area below this threshold are retained for neighbor calculation; expressed in standard deviations from the mean of the log-area.
-Default = 1.}
-
-\item{minPts}{Integer; minimum number of neighbors (including self) to form a core point in DBSCAN. Default = 5.}
 
 \item{borderPoints}{Logical; if `FALSE`, treat all border points as noise (DBSCAN*). Default = TRUE.}
 }
@@ -34,8 +29,14 @@ plot(o)
 
 data(lbdo66867)
 ctdf = as_ctdf(lbdo66867, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")
-slice_ctdf(ctdf, 72)
+slice_ctdf(ctdf)
 clust = cluster_track(ctdf)
-map(clust)
+clusterTrack.Vis::map(clust)
+
+data(pesa56511)
+ctdf = as_ctdf(pesa56511, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")
+slice_ctdf(ctdf, deltaT = 48)
+clust = cluster_track(ctdf)
+clusterTrack.Vis::map(clust)
 
 }

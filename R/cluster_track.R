@@ -25,14 +25,17 @@ plot.clusterTrack <- function(x ) {
 }
 
 
-dbscan_ctdf <- function(ctdf, sd = 1, transform = log, minPts = 5, borderPoints = TRUE) {
-  nb = prune_dirichlet_polygons(ctdf, sd = sd, transform = transform)
+dbscan_ctdf <- function(ctdf, borderPoints = TRUE) {
+  nb = prune_dirichlet_polygons(ctdf)
 
+  min_pts = sapply(nb, length) |>
+    median() |>
+    round()
 
   frnn = list(id = nb, eps = 0) # eps is ignored when id is supplied
   class(frnn) = c("frNN", "NN")
 
-  o = dbscan::dbscan(x = frnn, minPts = minPts, borderPoints = borderPoints)
+  o = dbscan::dbscan(x = frnn, minPts = min_pts, borderPoints = borderPoints)
 
   nam_nb = names(nb) # subset.nb does not work on a named list
   names(nb) = NULL
@@ -55,9 +58,6 @@ dbscan_ctdf <- function(ctdf, sd = 1, transform = log, minPts = 5, borderPoints 
 #' Perform clustering on a `ctdf` object to identify use-sites. Uses a hybrid approach combining Dirichlet-based polygon pruning and DBSCAN clustering to detect spatially and temporally coherent movement clusters ("use-sites").
 #'
 #' @param ctdf A `ctdf` object (from [as_ctdf()]), representing sequential movement points with timestamps and locations.
-#' @param sd Numeric; threshold on the scaled log-area of Dirichlet polygons. Polygons with scaled log-area below this threshold are retained for neighbor calculation; expressed in standard deviations from the mean of the log-area.
-#' Default = 1.
-#' @param minPts Integer; minimum number of neighbors (including self) to form a core point in DBSCAN. Default = 5.
 #' @param borderPoints Logical; if `FALSE`, treat all border points as noise (DBSCAN*). Default = TRUE.
 #'
 #' @return A `ctdf` object containing only points assigned to clusters, with an additional integer column `cluster` indicating the cluster ID for each point (consecutive values starting from 1). Cluster membership reflects spatial-temporal groupings of points.
@@ -67,17 +67,23 @@ dbscan_ctdf <- function(ctdf, sd = 1, transform = log, minPts = 5, borderPoints 
 #' @examples
 #' data(toy_ctdf_k2)
 #' ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to = "+proj=eqearth")
-#' slice_ctdf(ctdf, deltaT = 12, slice_method = function(x) {quantile(x, 0.7)})
+#' slice_ctdf(ctdf)
 #' o = cluster_track(ctdf)
 #' plot(o)
 #'
 #' data(lbdo66867)
 #' ctdf = as_ctdf(lbdo66867, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")
-#' slice_ctdf(ctdf, 72, slice_method = function(x) {quantile(x, 0.8)})
+#' slice_ctdf(ctdf)
 #' clust = cluster_track(ctdf)
-#' map(clust)
+#' clusterTrack.Vis::map(clust)
+#'
+#' data(pesa56511)
+#' ctdf = as_ctdf(pesa56511, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")
+#' slice_ctdf(ctdf, deltaT = 48)
+#' clust = cluster_track(ctdf)
+#' clusterTrack.Vis::map(clust)
 #' 
-cluster_track <- function(ctdf, sd = 1, transform = log, minPts = 5, borderPoints = TRUE) {
+cluster_track <- function(ctdf, borderPoints = TRUE) {
 
   s = ctdf[ (!.filter)]
   segs = s$.segment |> unique()
@@ -87,9 +93,6 @@ cluster_track <- function(ctdf, sd = 1, transform = log, minPts = 5, borderPoint
     x = ctdf[.segment == si & !.filter]
     oi = dbscan_ctdf(
       ctdf         = x,
-      sd           = sd,
-      transform    = transform,
-      minPts       = minPts,
       borderPoints = borderPoints
     )
     oi[, cluster := paste(si, cluster)]

@@ -4,13 +4,10 @@
 \alias{prune_dirichlet_polygons}
 \title{Prune Dirichlet polygons based on area}
 \usage{
-prune_dirichlet_polygons(ctdf, sd = 1, queen = TRUE, transform = log)
+prune_dirichlet_polygons(ctdf, queen = TRUE)
 }
 \arguments{
 \item{ctdf}{A `ctdf` data frame (typically created with [as_ctdf()]).}
-
-\item{sd}{Numeric multiplier controlling the area threshold for pruning (default = 1). 
-Polygons with log-area below this threshold (relative to the mean) are considered for pruning.}
 
 \item{queen}{Logical. If `TRUE` (default), uses Queen contiguity in neighbor detection 
 (shared point or edge). If `FALSE`, uses Rook contiguity (shared edge only).}
@@ -34,8 +31,7 @@ Dirichlet polygons are computed via the `deldir` package. Only polygons with
 library(clusterTrack)
 data(toy_ctdf_k2)
 ctdf = as_ctdf(toy_ctdf_k2,crs = 4326, project_to = "+proj=eqearth")
-nb = prune_dirichlet_polygons(ctdf, sd = 1, transform = sqrt)
-plot(nb, st_coordinates(ctdf[.id\%in\%names(nb), location]))
+nb = prune_dirichlet_polygons(ctdf )
 
 }
 \seealso{

@@ -14,10 +14,6 @@ slice_ctdf
 \examples{
 data(toy_ctdf_k2)
 ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to = "+proj=eqearth")
-slice_ctdf(ctdf, slice_by_distance = 4000)
-se = st_as_sf(ctdf)
-mapviewOptions(fgb = FALSE)
-mapview(se, zcol = ".filter")
-mapview(se, zcol = ".segment")
+slice_ctdf(ctdf )
 
 }

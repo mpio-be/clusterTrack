@@ -1,3 +1,37 @@
+
+#' Find the cutoff that maximizes expected classification into component 1
+.cutoff_by_mixfit <- function(v) {
+
+  x <- v
+
+  fm = try(mixR::mixfit(x, ncomp = 2, family = "lnorm"), silent = TRUE)
+  print(fm)
+  
+  if(inherits(fm, "try-error")) o = Inf else {
+
+  prop     = fm$pi       
+  mean_log = fm$mulog    
+  sd_log   = fm$sdlog   
+
+
+  post1 <- function(x) {
+    p1 = prop[1] * stats::dlnorm(x, meanlog = mean_log[1], sdlog = sd_log[1])
+    p2 = prop[2] * stats::dlnorm(x, meanlog = mean_log[2], sdlog = sd_log[2])
+    p1 / (p1 + p2)
+  }
+
+  o = uniroot(function(x) post1(x) - 0.5, lower = min(v), upper = max(v) )$root
+
+  }
+
+  o
+
+}
+
+
+
+
+
 #' Prune Dirichlet polygons based on area
 #'
 #' This function computes Dirichlet (Voronoi) polygons from a `ctdf` object and removes 
@@ -5,8 +39,6 @@
 #' Queen contiguity to define neighbors.
 #'
 #' @param ctdf A `ctdf` data frame (typically created with [as_ctdf()]).
-#' @param sd Numeric multiplier controlling the area threshold for pruning (default = 1). 
-#'           Polygons with log-area below this threshold (relative to the mean) are considered for pruning.
 #' @param queen Logical. If `TRUE` (default), uses Queen contiguity in neighbor detection 
 #'   (shared point or edge). If `FALSE`, uses Rook contiguity (shared edge only).
 #'
@@ -26,10 +58,9 @@
 #' library(clusterTrack)
 #' data(toy_ctdf_k2)
 #' ctdf = as_ctdf(toy_ctdf_k2,crs = 4326, project_to = "+proj=eqearth")
-#' nb = prune_dirichlet_polygons(ctdf, sd = 1, transform = sqrt)
-#' plot(nb, st_coordinates(ctdf[.id%in%names(nb), location]))
+#' nb = prune_dirichlet_polygons(ctdf )
 #' 
-prune_dirichlet_polygons <- function(ctdf, sd = 1, queen = TRUE, transform = log) {
+prune_dirichlet_polygons <- function(ctdf,  queen = TRUE) {
 
   dat = data.table(st_as_sf(ctdf) |> st_coordinates() )
   
@@ -45,11 +76,12 @@ prune_dirichlet_polygons <- function(ctdf, sd = 1, queen = TRUE, transform = log
 
   dip = cbind(dip, ctdf[, .(.id)])
   dip[, A := st_area(geometry)]
-  all_areas = dip$A
-  dip[, A := transform(A)]
-  dip[, A := scale(A)]
+  
+  cutoff = .cutoff_by_mixfit(dip$A)
 
-  dips = dip[A < sd ]
+  dips = dip[A <= cutoff]
+
+
 
   nb = 
     dips |>  
@@ -59,7 +91,6 @@ prune_dirichlet_polygons <- function(ctdf, sd = 1, queen = TRUE, transform = log
   
   names(nb) <- dips$.id
 
-  attr(nb, 'Area') <- all_areas
 
   nb
 

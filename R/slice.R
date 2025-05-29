@@ -6,7 +6,7 @@
 #' @examples
 #' data(toy_ctdf_k2)
 #' ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to = "+proj=eqearth")
-#' slice_ctdf(ctdf, slice_method  = function(x) {quantile(x, 0.8)} )
+#' slice_ctdf(ctdf )
 #' 
 slice_ctdf <- function(ctdf, deltaT = 12, slice_method = mean) {
 
