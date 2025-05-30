@@ -24,8 +24,8 @@ Perform clustering on a `ctdf` object to identify use-sites. Uses a hybrid appro
 data(toy_ctdf_k2)
 ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to = "+proj=eqearth")
 slice_ctdf(ctdf)
-o = cluster_track(ctdf)
-plot(o)
+clust = cluster_track(ctdf)
+clusterTrack.Vis::map(clust)
 
 data(lbdo66867)
 ctdf = as_ctdf(lbdo66867, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")
@@ -35,7 +35,7 @@ clusterTrack.Vis::map(clust)
 
 data(pesa56511)
 ctdf = as_ctdf(pesa56511, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")
-slice_ctdf(ctdf, deltaT = 48)
+slice_ctdf(ctdf, deltaT = 72, slice_method = function(x) quantile(x, 0.99))
 clust = cluster_track(ctdf)
 clusterTrack.Vis::map(clust)
 

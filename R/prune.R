@@ -1,30 +1,11 @@
 
-#' Find the cutoff that maximizes expected classification into component 1
-.cutoff_by_mixfit <- function(v) {
+#' Find the prune cutoff 
+.cutoff <- function(v, q = 0.90) {
 
-  x <- v
-
-  fm = try(mixR::mixfit(x, ncomp = 2, family = "lnorm"), silent = TRUE)
-  print(fm)
-  
-  if(inherits(fm, "try-error")) o = Inf else {
-
-  prop     = fm$pi       
-  mean_log = fm$mulog    
-  sd_log   = fm$sdlog   
-
-
-  post1 <- function(x) {
-    p1 = prop[1] * stats::dlnorm(x, meanlog = mean_log[1], sdlog = sd_log[1])
-    p2 = prop[2] * stats::dlnorm(x, meanlog = mean_log[2], sdlog = sd_log[2])
-    p1 / (p1 + p2)
-  }
-
-  o = uniroot(function(x) post1(x) - 0.5, lower = min(v), upper = max(v) )$root
-
-  }
+  o = v < quantile(v, q)
 
   o
+
 
 }
 
@@ -74,12 +55,15 @@ prune_dirichlet_polygons <- function(ctdf,  queen = TRUE) {
     data.table(geometry = st_polygon(list(o)) |> st_sfc() )
   }) |> rbindlist()
 
+  if (nrow(dip) != nrow(ctdf)) {
+    stop(paste("deldir::deldir() dropped", nrow(ctdf) - nrow(dip), "rows due to identical coordinates!"))
+  }
+
   dip = cbind(dip, ctdf[, .(.id)])
   dip[, A := st_area(geometry)]
   
-  cutoff = .cutoff_by_mixfit(dip$A)
 
-  dips = dip[A <= cutoff]
+  dips = dip[.cutoff(dip$A)]
 
 
 

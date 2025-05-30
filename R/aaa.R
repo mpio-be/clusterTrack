@@ -1,6 +1,6 @@
 
 #' @import sf data.table  dbscan
-#' @import foreach
+#' @import foreach progressr
 #' @import deldir  deldir 
 #' @importFrom spdep poly2nb plot.nb subset.nb
 #' @importFrom igraph     groups cliques E components
@@ -9,7 +9,6 @@
 #' @importFrom units set_units
 #' @importFrom dplyr      mutate ungroup rowwise lag filter select rename
 #' @importFrom signal sgolayfilt
-#' @importFrom mclust  Mclust
 NULL
 
 
