@@ -167,7 +167,6 @@ as_ctdf_track <- function(ctdf) {
 }
 
 
-
 #' @export
 smooth_ctdf <- function(ctdf, ...) {
 

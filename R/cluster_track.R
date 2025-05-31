@@ -24,56 +24,42 @@ plot.clusterTrack <- function(x ) {
 
 }
 
-ct_dbscan_Dirichlet <- function(ctdf, borderPoints = TRUE) {
-  nb = prune_dirichlet_polygons(ctdf)
+dbscan_tessellation <- function(x, nmin = 5) {
+  
+  tess = tessellate_ctdf(x) |>
+    prune_tesselation( q = 0.9)
+  
+
+  nb = poly2nb(tess, queen = TRUE)
 
   min_pts = sapply(nb, length) |>
     median() |>
     round()
-  if (min_pts < 3) min_pts = 5 # back to default
+  if (min_pts < 2) min_pts = min_pts + 1
+
+  if(nrow(tess) > max(c(5, min_pts)) ) { # dbscan crushes otherwise
+    
+    frnn = list(id = nb, eps = 0) # eps is ignored when id is supplied
+    class(frnn) = c("frNN", "NN")
+
+    cl = dbscan::dbscan(
+      x            = frnn,
+      minPts       = min_pts,
+      borderPoints = FALSE
+    )$cluster
+
+  } else cl = 0
 
 
-  frnn = list(id = nb, eps = 0) # eps is ignored when id is supplied
-  class(frnn) = c("frNN", "NN")
 
-  o = dbscan::dbscan(x = frnn, minPts = min_pts, borderPoints = borderPoints)
+  o = mutate(tess, cluster = cl)
 
-  if (!all(o$cluster == 0)) {
-    nam_nb = names(nb) # subset.nb does not work on a named list
-    names(nb) = NULL
-    nbs = subset(nb, o$cluster > 0)
-    nam_nbs = nam_nb[o$cluster > 0]
-    names(nbs) = nam_nbs
-    clusters = o$cluster[o$cluster > 0]
-    o = data.table(.id = names(nbs) |> as.integer(), cluster = clusters)
-    o = merge(o, ctdf[, .(.id)])
-  } else {
-    o = data.table(.id = integer(0), cluster = integer(0))
-  }
+  #' print(min_pts)
+  #' mapview::mapview(o['cluster'])
 
-  o
+  data.table(o)[, .(.id, cluster)]
+
 }
-
-ct_hdbscan <- function(ctdf, borderPoints = TRUE) {
-  x = st_coordinates(ctdf$location)
-  cl = hdbscan(x, minPts = 5)
-
-  o = data.table(.id = ctdf$.id, cluster = cl$cluster)
-  o
-}
-
-ct_dtscan <- function(ctdf, borderPoints = TRUE) {
-
-
-  x = st_coordinates(ctdf$location)
-  cl = dtscan::dtscan(x, min_pts = 5, max_closeness = 5000)
-
-  o = data.table(.id = ctdf$.id, cluster = cl)
-  o
-}
-
-
-
 
 
 
@@ -82,8 +68,6 @@ ct_dtscan <- function(ctdf, borderPoints = TRUE) {
 #' Perform clustering on a `ctdf` object to identify use-sites. Uses a hybrid approach combining Dirichlet-based polygon pruning and DBSCAN clustering to detect spatially and temporally coherent movement clusters ("use-sites").
 #'
 #' @param ctdf A `ctdf` object (from [as_ctdf()]), representing sequential movement points with timestamps and locations.
-#' @param borderPoints Logical; if `FALSE`, treat all border points as noise (DBSCAN*). Default = TRUE.
-#'
 #' @return A `ctdf` object containing only points assigned to clusters, with an additional integer column `cluster` indicating the cluster ID for each point (consecutive values starting from 1). Cluster membership reflects spatial-temporal groupings of points.
 #'
 #'
@@ -103,13 +87,16 @@ ct_dtscan <- function(ctdf, borderPoints = TRUE) {
 #'
 #' data(pesa56511)
 #' ctdf = as_ctdf(pesa56511, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")
-#' slice_ctdf(ctdf, deltaT = 72, slice_method = function(x) quantile(x, 0.99))
+#' slice_ctdf(ctdf, deltaT = 48, slice_method = function(x)(quantile(x, .99)))
 #' clust = cluster_track(ctdf)
 #' clusterTrack.Vis::map(clust)
 #' 
-cluster_track <- function(ctdf, borderPoints = TRUE) {
+cluster_track <- function(ctdf, nmin = 5) {
 
-  s = ctdf[ (!.filter)]
+  s = ctdf[(!.filter)]
+  s[, n := .N, by = .segment]
+  s = s[n>= nmin]
+
   segs = s$.segment |> unique()
 
   handlers(global = TRUE)
@@ -117,11 +104,12 @@ cluster_track <- function(ctdf, borderPoints = TRUE) {
 
   o = foreach(si = segs, .errorhandling = 'pass') %do% {
     p()
-    x = ctdf[.segment == si & !.filter]
-    
-    # oi = ct_dbscan_Dirichlet(ctdf = x, borderPoints = borderPoints)
-    oi = ct_dtscan(x)
-    
+    x = s[.segment == si]
+
+    saveRDS(x, '~/Desktop/temp.rds')  
+
+    oi = dbscan_tessellation(x)
+    oi = oi[cluster > 0]
     oi[, cluster := paste(si, cluster)]
     oi
   }

@@ -8,7 +8,7 @@
 #' ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to = "+proj=eqearth")
 #' slice_ctdf(ctdf )
 #' 
-slice_ctdf <- function(ctdf, deltaT = 12, slice_method = mean) {
+slice_ctdf <- function(ctdf, deltaT = 12, slice_method = mean, nmin = 5) {
 
   if (!inherits(ctdf, "ctdf")) {
     stop("slice_ctdf() only works on objects of class 'ctdf'")
@@ -48,6 +48,7 @@ slice_ctdf <- function(ctdf, deltaT = 12, slice_method = mean) {
   segs[, .segment  := rleid(.filter)  ]
 
   o = rbind(segs[1, .(.filter, .segment)], segs[, .(.filter, .segment)])
+
 
   # set
   ctdf[, let(.segment = o$.segment, .filter = o$.filter)]

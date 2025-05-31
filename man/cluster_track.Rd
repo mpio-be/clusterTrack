@@ -7,12 +7,10 @@
 \usage{
 \method{print}{clusterTrack}(x, ...)
 
-cluster_track(ctdf, borderPoints = TRUE)
+cluster_track(ctdf)
 }
 \arguments{
 \item{ctdf}{A `ctdf` object (from [as_ctdf()]), representing sequential movement points with timestamps and locations.}
-
-\item{borderPoints}{Logical; if `FALSE`, treat all border points as noise (DBSCAN*). Default = TRUE.}
 }
 \value{
 A `ctdf` object containing only points assigned to clusters, with an additional integer column `cluster` indicating the cluster ID for each point (consecutive values starting from 1). Cluster membership reflects spatial-temporal groupings of points.
