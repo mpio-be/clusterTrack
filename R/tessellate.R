@@ -50,7 +50,7 @@ tessellate_ctdf <- function(ctdf) {
 
 
 #' @export
-prune_tesselation <- function(x, q = 0.90) {
+prune_tesselation <- function(x, q = 0.95) {
 
 
   dplyr::filter(

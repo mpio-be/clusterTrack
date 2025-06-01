@@ -6,9 +6,9 @@
 #' @examples
 #' data(toy_ctdf_k2)
 #' ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to = "+proj=eqearth")
-#' slice_ctdf(ctdf )
+#' slice_ctdf(ctdf, deltaT = 6) |> m('.filter')
 #' 
-slice_ctdf <- function(ctdf, deltaT = 12, slice_method = mean, nmin = 5) {
+slice_ctdf <- function(ctdf, deltaT = 24, slice_method = mean ) {
 
   if (!inherits(ctdf, "ctdf")) {
     stop("slice_ctdf() only works on objects of class 'ctdf'")
@@ -37,13 +37,13 @@ slice_ctdf <- function(ctdf, deltaT = 12, slice_method = mean, nmin = 5) {
   segs[, cross := n_ints > 0]
 
   segs[, bout_id := rleid(cross)]
-  segs[, N_bout_id := .N, bout_id]
   segs[, len := st_length(track) |> set_units("km") |> as.numeric()]
   segs[, len := sum(len), bout_id]
 
   # slice
   segs[, .filter := FALSE]
-  segs[len > slice_method(len), .filter := TRUE]
+  segs[, can_be_sliced := fifelse(len > slice_method(len), TRUE, FALSE)]
+  segs[(can_be_sliced & !cross), .filter := TRUE]
 
   segs[, .segment  := rleid(.filter)  ]
 
