@@ -2,10 +2,12 @@
 % Please edit documentation in R/cluster_track.R
 \name{dbscan_tessellation}
 \alias{dbscan_tessellation}
-\title{plot(o)}
+\title{print(min_pts)
+mapview::mapview(o['cluster'])}
 \usage{
-dbscan_tessellation(ctdf)
+dbscan_tessellation(x, nmin = 5)
 }
 \description{
-plot(o)
+print(min_pts)
+mapview::mapview(o['cluster'])
 }

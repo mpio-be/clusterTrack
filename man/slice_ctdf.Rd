@@ -5,7 +5,7 @@
 \title{segment and filter a ctdf
 slice_ctdf}
 \usage{
-slice_ctdf(ctdf, deltaT = 12, slice_method = mean)
+slice_ctdf(ctdf, deltaT = 24, slice_method = median, minN = 5)
 }
 \description{
 segment and filter a ctdf
@@ -14,6 +14,9 @@ slice_ctdf
 \examples{
 data(toy_ctdf_k2)
 ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to = "+proj=eqearth")
-slice_ctdf(ctdf )
+slice_ctdf(ctdf, deltaT = 6)  
 
+data(pesa56511)
+ctdf = as_ctdf(pesa56511, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")
+slice_ctdf(ctdf )   
 }

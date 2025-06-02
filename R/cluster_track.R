@@ -27,7 +27,7 @@ plot.clusterTrack <- function(x ) {
 dbscan_tessellation <- function(x, nmin = 5) {
  
   tess = tessellate_ctdf(x) |>
-    prune_tesselation(q = 0.9)
+    prune_tesselation(q = 0.95)
 
   nb = poly2nb(tess, queen = TRUE)
 
@@ -36,21 +36,19 @@ dbscan_tessellation <- function(x, nmin = 5) {
     round()
   if (min_pts < 2) min_pts = min_pts + 1
 
-  if (nrow(tess) > max(c(5, min_pts))) { # dbscan crashes otherwise
+  if (nrow(tess) >  max(c(5, min_pts))) { # dbscan crashes otherwise
 
     frnn = list(id = nb, eps = 0) # eps is ignored when id is supplied
     class(frnn) = c("frNN", "NN")
 
     cl = dbscan::dbscan(
       x            = frnn,
-      minPts       = min_pts,
+      minPts       = 5,
       borderPoints = FALSE
     )$cluster
   } else {
     cl = 0
   }
-
-
 
   o = mutate(tess, cluster = cl)
 
@@ -58,63 +56,6 @@ dbscan_tessellation <- function(x, nmin = 5) {
   #' mapview::mapview(o['cluster'])
 
   data.table(o)[, .(.id, cluster)]
-}
-
-dbscan_tessellation2 <- function(x, nmin = 5) {
-  
-  tess = tessellate_ctdf(x) # |> prune_tesselation(q = 0.5)
-  
-  dd = st_centroid(tess) |> st_distance()
-  
-  #  find its 4th‐smallest nonzero distance (kNN distance for k = 4)
-  dd[diag(TRUE, nrow(dd))] = Inf
-  knn4 = apply(dd, 1, function(z) sort(z, partial = 4)[4])  
-
-  knn_sort = sort(knn4)  
-
-  detect_elbow = function(x_vec) {
-    n = length(x_vec)
-    # endpoints A=(1, x_vec[1]) and B=(n, x_vec[n])
-    A = c(1,     x_vec[1])
-    B = c(n,     x_vec[n])
-    # line coefficients for "a*x + b*y + c = 0"
-    a = B[2] - A[2]
-    b = A[1] - B[1]
-    c = B[1]*A[2] - A[1]*B[2]
-    idx = seq_len(n)
-    # perpendicular distance from each (idx[i], x_vec[i]) to line AB
-    d = abs(a * idx + b * x_vec + c) / sqrt(a^2 + b^2)
-    list(
-      eps_value = x_vec[which.max(d)],
-      eps_index = which.max(d)
-    )
-  }
-
-  elbow = detect_elbow(knn_sort)
-
-
-
-  # dd = st_centroid(tess) |> st_distance()
-  # dd =dd[dd>0]
-
-  # eps = quantile(dd[dd>0], probs = 0.3)
-  # eps = quantile(dd, probs = 0.95)
-
-  cl = dbscan::dbscan(
-    x            =  st_centroid(tess) |> st_coordinates(),
-    eps          = elbow$eps_value,
-    minPts       = 5,
-    borderPoints = TRUE
-  )$cluster
-
-  # if(all(cl == 0)) cl = 1
-  
-
-  o = mutate(tess, cluster = cl)
-
-
-  data.table(o)[, .(.id, cluster)]
-
 }
 
 
@@ -133,19 +74,20 @@ dbscan_tessellation2 <- function(x, nmin = 5) {
 #' ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to = "+proj=eqearth")
 #' slice_ctdf(ctdf, 12)
 #' clust = cluster_track(ctdf)
-#' clusterTrack.Vis::map(clust)
+#' map(clust)
 #'
 #' data(lbdo66867)
 #' ctdf = as_ctdf(lbdo66867, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")
-#' slice_ctdf(ctdf)
+#' slice_ctdf(ctdf, slice_method = mean)
 #' clust = cluster_track(ctdf)
-#' clusterTrack.Vis::map(clust)
+#' map(clust)
 #'
 #' data(pesa56511)
 #' ctdf = as_ctdf(pesa56511, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")
-#' slice_ctdf(ctdf,  slice_method = function(x)(quantile(x, .5))) 
-#' clust = cluster_track(ctdf)
-#' clusterTrack.Vis::map(clust)
+#' # slice_ctdf(ctdf) 
+#' ctdf  = slice_by_max_len(ctdf) 
+#' clust = cluster_track(ctdf) 
+#' map(clust)
 #' 
 cluster_track <- function(ctdf, nmin = 5) {
 
@@ -159,10 +101,10 @@ cluster_track <- function(ctdf, nmin = 5) {
   p = progressor(steps = length(segs))
 
   o = foreach(si = segs, .errorhandling = 'pass') %do% {
-    p()
+    # p()
     x = s[.segment == si]
-
-    oi = dbscan_tessellation2(x)
+    print(si)
+    oi = dbscan_tessellation(x)
     oi = oi[cluster > 0]
     oi[, cluster := paste(si, cluster)]
     oi
