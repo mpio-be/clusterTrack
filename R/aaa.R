@@ -10,6 +10,7 @@
 #' @importFrom forcats    fct_inorder
 #' @importFrom units set_units
 #' @importFrom dplyr      mutate ungroup rowwise lag filter select rename
+#' @importFrom forcats      fct_inorder
 #' @importFrom signal sgolayfilt
 NULL
 

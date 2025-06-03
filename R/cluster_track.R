@@ -72,28 +72,25 @@ dbscan_tessellation <- function(x, nmin = 5) {
 #' @examples
 #' data(toy_ctdf_k2)
 #' ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to = "+proj=eqearth")
-#' slice_ctdf(ctdf, 12)
-#' clust = cluster_track(ctdf)
+#' ctdf = slice_ctdf(ctdf, 24, 2)
+#' clust = cluster_track(ctdf )
 #' map(clust)
 #'
 #' data(lbdo66867)
 #' ctdf = as_ctdf(lbdo66867, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")
-#' slice_ctdf(ctdf, slice_method = mean)
+#'  ctdf = slice_ctdf(ctdf)
 #' clust = cluster_track(ctdf)
 #' map(clust)
 #'
 #' data(pesa56511)
 #' ctdf = as_ctdf(pesa56511, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")
-#' # slice_ctdf(ctdf) 
-#' ctdf  = slice_by_max_len(ctdf) 
+#' ctdf = slice_ctdf(ctdf) 
 #' clust = cluster_track(ctdf) 
 #' map(clust)
 #' 
-cluster_track <- function(ctdf, nmin = 5) {
+cluster_track <- function(ctdf ) {
 
-  s = ctdf[(!.filter)]
-  s[, n := .N, by = .segment]
-  s = s[n>= nmin]
+  s = ctdf[!is.na(.segment)] 
 
   segs = s$.segment |> unique()
 
