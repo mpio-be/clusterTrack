@@ -1,6 +1,6 @@
 
 
-.has_clusters <- function(s,minN) {
+.has_clusters <- function(s,minN = 5) {
   if (nrow(s) < minN) {
     return(FALSE)
   } else {
@@ -12,13 +12,12 @@
 
 
 
-.split_by_maxlen <- function(ctdf, deltaT  , minN ) {
+.split_by_maxlen <- function(ctdf, deltaT) {
 
 
   # make segments
   segs =
     ctdf |>
-    smooth_ctdf() |>
     as_ctdf_track() |>
     mutate(duration = difftime(stop, start, units = "hours") |> as.numeric())
     
@@ -47,7 +46,7 @@
   segs[, n       := .N, .segment]
 
   # slice
-  good_segs = segs[(!cross) & n >= minN] # & Time >= deltaT
+  good_segs = segs[(!cross)  ] 
 
   if (nrow(good_segs) > 0) {
     max_good_len = good_segs[, max(len)]
@@ -74,7 +73,7 @@
 #' @examples
 #' data(toy_ctdf_k2)
 #' ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to = "+proj=eqearth")
-#' ctdf = slice_ctdf(ctdf, deltaT = 6, minN = 10)  
+#' ctdf = slice_ctdf(ctdf)  
 #' 
 #' data(pesa56511)
 #' ctdf = as_ctdf(pesa56511, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")
@@ -83,7 +82,7 @@
 
 
 
-slice_ctdf <- function(ctdf, deltaT = 24*7, minN = 20) {
+slice_ctdf <- function(ctdf, deltaT = 24*7 ) {
 
   if (!inherits(ctdf, "ctdf")) {
     stop("slice_ctdf() only works on objects of class 'ctdf'")
@@ -93,7 +92,7 @@ slice_ctdf <- function(ctdf, deltaT = 24*7, minN = 20) {
 
   # Initialize
   result = list()
-  queue = .split_by_maxlen(ctdf, deltaT = deltaT, minN = minN)
+  queue = .split_by_maxlen(ctdf, deltaT = deltaT)
   total_n = nrow(ctdf)
   i = 1
   processed_n = 0
@@ -105,9 +104,9 @@ slice_ctdf <- function(ctdf, deltaT = 24*7, minN = 20) {
 
     current = queue[[i]]
 
-    if (current |> .has_clusters(minN = minN)) {
+    if (current |> .has_clusters()) {
       # If 'current' still has clusters, append its splits to the end of 'queue'
-      new_chunks = .split_by_maxlen(current, deltaT = deltaT, minN = minN)
+      new_chunks = .split_by_maxlen(current, deltaT = deltaT)
       queue = c(queue, new_chunks)
     } else {
       # Otherwise, move 'current' into 'result' 

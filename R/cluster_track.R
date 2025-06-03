@@ -24,17 +24,19 @@ plot.clusterTrack <- function(x ) {
 
 }
 
-dbscan_tessellation <- function(x, nmin = 5) {
+dbscan_tessellation <- function(x ) {
+    
+  # TODO: use nb directly to define clusters. 
 
-  tess = tessellate_ctdf(x) |>
-    prune_tesselation(q = 0.90)
+  tess = tessellate_ctdf(x)  |>
+    prune_tesselation(SD = 0.5) 
 
   nb = poly2nb(tess, queen = TRUE)
 
   min_pts = sapply(nb, length) |>
     median() |>
     round()
-  if (min_pts < 2) min_pts = min_pts + 1
+  if (min_pts <= 2) min_pts = min_pts+1
 
   if (nrow(tess) >  max(c(5, min_pts))) { # dbscan crashes otherwise
 
@@ -43,8 +45,8 @@ dbscan_tessellation <- function(x, nmin = 5) {
 
     cl = dbscan::dbscan(
       x            = frnn,
-      minPts       = 5,
-      borderPoints = FALSE
+      minPts       = min_pts,
+      borderPoints = TRUE
     )$cluster
   } else {
     cl = 0
@@ -52,8 +54,8 @@ dbscan_tessellation <- function(x, nmin = 5) {
 
   o = mutate(tess, cluster = cl)
 
-  #' print(min_pts)
-  #' mapview::mapview(o['cluster'])
+  ggplot(o)+geom_sf(aes(fill=factor(cluster)))+geom_sf_text(aes(label=.id), size = 2)+ggtitle(x$.segment[1])
+  ggsave(glue("~/Desktop/temp/{paste(range(tess$.id), collapse='_')}.png"))
 
   data.table(o)[, .(.id, cluster)]
 }
@@ -72,30 +74,32 @@ dbscan_tessellation <- function(x, nmin = 5) {
 #' @examples
 #' data(toy_ctdf_k2)
 #' ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to = "+proj=eqearth")
-#' ctdf = slice_ctdf(ctdf)
+#' slice_ctdf(ctdf)
 #' clust = cluster_track(ctdf )
 #' map(clust)
 #'
 #' data(lbdo66867)
 #' ctdf = as_ctdf(lbdo66867, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")
-#'  ctdf = slice_ctdf(ctdf)
+#' slice_ctdf(ctdf)
 #' clust = cluster_track(ctdf)
 #' map(clust)
 #'
 #' data(pesa56511)
 #' ctdf  = as_ctdf(pesa56511, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")
-#' ctdf  = slice_ctdf(ctdf) 
+#' slice_ctdf(ctdf) 
 #' clust = cluster_track(ctdf) 
 #' map(clust)
 #' 
-cluster_track <- function(ctdf, nmin = 5) {
+cluster_track <- function(ctdf, minN = 2) {
 
   s = ctdf[!is.na(.segment)]
-
+  s[, n := .N, .segment]
+  s = s[n>minN]
 
   segs = s$.segment |> unique()
   
-  o = foreach(si = segs, .errorhandling = 'pass') %do% {
+  o = foreach(si = segs) %do% {
+    print(si)
     x = s[.segment == si]
     oi = dbscan_tessellation(x)
     oi = oi[cluster > 0]
@@ -103,19 +107,9 @@ cluster_track <- function(ctdf, nmin = 5) {
     oi
   }
 
-  e = sapply(o, FUN = inherits, what = "error")
-  
-  if (length(segs[e]) > 0) {
-    message("segments ", paste(segs[e], collapse = ", "), " did not return a cluster!")
-  }
-
-  o = o[!e]
-
   o = rbindlist(o)
 
   o[, n := .N, cluster]
-  o = o[n>nmin]
-
 
   o[, cluster := as.factor(cluster) |> as.integer()]
 

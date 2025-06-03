@@ -5,7 +5,7 @@
 \title{print(min_pts)
 mapview::mapview(o['cluster'])}
 \usage{
-dbscan_tessellation(x, nmin = 5)
+dbscan_tessellation(x)
 }
 \description{
 print(min_pts)

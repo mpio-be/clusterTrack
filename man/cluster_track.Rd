@@ -21,7 +21,7 @@ Perform clustering on a `ctdf` object to identify use-sites. Uses a hybrid appro
 \examples{
 data(toy_ctdf_k2)
 ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to = "+proj=eqearth")
-ctdf = slice_ctdf(ctdf, 4, 2)
+ctdf = slice_ctdf(ctdf)
 clust = cluster_track(ctdf )
 map(clust)
 

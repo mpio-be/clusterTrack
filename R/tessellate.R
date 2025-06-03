@@ -50,14 +50,16 @@ tessellate_ctdf <- function(ctdf) {
 
 
 #' @export
-prune_tesselation <- function(x, q = 0.95) {
+prune_tesselation <- function(x, q = 0.90, SD = 1, by = 'sd') {
 
+  if(by == 'q'){
+    dplyr::filter(x,A < quantile(A, probs = q)) 
 
-  dplyr::filter(
-    x,
-    A < quantile(A, probs = q)
-  )
+  }
 
+  if (by == "sd") {
+    dplyr::filter(x, log(A) <= mean(log(A) + SD * sd(log(A))))  
+  }
 
 
 }
