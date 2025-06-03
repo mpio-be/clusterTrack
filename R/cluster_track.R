@@ -25,9 +25,9 @@ plot.clusterTrack <- function(x ) {
 }
 
 dbscan_tessellation <- function(x, nmin = 5) {
- 
+
   tess = tessellate_ctdf(x) |>
-    prune_tesselation(q = 0.95)
+    prune_tesselation(q = 0.90)
 
   nb = poly2nb(tess, queen = TRUE)
 
@@ -72,7 +72,7 @@ dbscan_tessellation <- function(x, nmin = 5) {
 #' @examples
 #' data(toy_ctdf_k2)
 #' ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to = "+proj=eqearth")
-#' ctdf = slice_ctdf(ctdf, 24, 2)
+#' ctdf = slice_ctdf(ctdf)
 #' clust = cluster_track(ctdf )
 #' map(clust)
 #'
@@ -83,24 +83,20 @@ dbscan_tessellation <- function(x, nmin = 5) {
 #' map(clust)
 #'
 #' data(pesa56511)
-#' ctdf = as_ctdf(pesa56511, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")
-#' ctdf = slice_ctdf(ctdf) 
+#' ctdf  = as_ctdf(pesa56511, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")
+#' ctdf  = slice_ctdf(ctdf) 
 #' clust = cluster_track(ctdf) 
 #' map(clust)
 #' 
-cluster_track <- function(ctdf ) {
+cluster_track <- function(ctdf, nmin = 5) {
 
-  s = ctdf[!is.na(.segment)] 
+  s = ctdf[!is.na(.segment)]
+
 
   segs = s$.segment |> unique()
-
-  handlers(global = TRUE)
-  p = progressor(steps = length(segs))
-
+  
   o = foreach(si = segs, .errorhandling = 'pass') %do% {
-    # p()
     x = s[.segment == si]
-    print(si)
     oi = dbscan_tessellation(x)
     oi = oi[cluster > 0]
     oi[, cluster := paste(si, cluster)]
@@ -116,6 +112,10 @@ cluster_track <- function(ctdf ) {
   o = o[!e]
 
   o = rbindlist(o)
+
+  o[, n := .N, cluster]
+  o = o[n>nmin]
+
 
   o[, cluster := as.factor(cluster) |> as.integer()]
 

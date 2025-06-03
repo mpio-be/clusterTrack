@@ -2,7 +2,7 @@
 
 #' 
 #' @import sf data.table  dbscan
-#' @import foreach progressr
+#' @import foreach 
 #' @import deldir  deldir 
 #' @importFrom spdep poly2nb plot.nb subset.nb
 #' @importFrom igraph     groups cliques E components

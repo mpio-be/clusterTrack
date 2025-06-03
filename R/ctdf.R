@@ -9,26 +9,18 @@ as_ctdf.default <- function(x, ...) {
 }
 
 #' @export
-plot.ctdf <- function(x,y = NULL, by = NULL, pch = 16) {
+plot.ctdf <- function(x,y = NULL,  pch = 16) {
   
-  colpal = function(n) {
-    palette.colors(n, palette = "Tableau", alpha = 1, recycle = TRUE)
-  }
-
   tr = as_ctdf_track(x)
   xs = st_as_sf(x) 
 
   plot(st_geometry(tr), col = "#706b6b")
 
 
-  if ( is.null(by) ) {
-    plot(xs |>st_geometry(), pch = pch, add = TRUE)
-  } else if (by == "filter") {
-    tr$.filter = factor(tr$.filter)
-    plot(xs[".filter"], pal = colpal, pch = pch, add = TRUE)
-  }
+  plot(xs |>st_geometry(), pch = pch, add = TRUE)
 
-  plot(x[1, .(location)] |> st_as_sf(), col = "red", size = 3, pch = 16, add = TRUE)
+  plot(x[1, .(location)] |> st_as_sf(), col = "#1900ff", size = 3, pch = 16, add = TRUE)
+  plot(x[nrow(x), .(location)] |> st_as_sf(), col = "#ff0000", size = 3, pch = 16, add = TRUE)
 }
 
 #' Coerce an object to clusterTrack data format
@@ -78,7 +70,7 @@ as_ctdf <- function(x, coords = c("longitude", "latitude"), time = "time", crs =
     )
   }
 
-  reserved = intersect(names(x), c(".filter",".segment", ".id", "cluster"))
+  reserved = intersect(names(x), c(".segment", ".id", "cluster"))
 
   if (length(reserved) > 0) {
     warning(
@@ -95,8 +87,7 @@ as_ctdf <- function(x, coords = c("longitude", "latitude"), time = "time", crs =
   setorder(o, timestamp)
 
   o[, .id := .I]
-  o[, .filter := FALSE]
-  o[, .segment := 0L]
+  o[, .segment := NA_integer_]
 
   o = st_as_sf(o, coords = coords, crs = crs)
 
@@ -107,7 +98,7 @@ as_ctdf <- function(x, coords = c("longitude", "latitude"), time = "time", crs =
   st_geometry(o) = "location"
 
   setDT(o)
-
+  setcolorder(o, c(".id", ".segment", "location", "timestamp"))
 
   class(o) <- c("ctdf", class(o))
   o
@@ -160,7 +151,7 @@ as_ctdf_track <- function(ctdf) {
     ) |>
     ungroup() |>
     st_set_geometry("track") |>
-    select(.id, .filter, .segment, start, stop, track)|>
+    select(.id, .segment, start, stop, track)|>
     st_set_crs(crs)
 
 

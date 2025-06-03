@@ -14,7 +14,7 @@ slice_ctdf
 \examples{
 data(toy_ctdf_k2)
 ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to = "+proj=eqearth")
-slice_ctdf(ctdf, deltaT = 6)  
+ctdf = slice_ctdf(ctdf, deltaT = 6)  
 
 data(pesa56511)
 ctdf = as_ctdf(pesa56511, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")
