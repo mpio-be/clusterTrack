@@ -7,7 +7,7 @@
 \usage{
 \method{print}{clusterTrack}(x, ...)
 
-cluster_track(ctdf, minN = 2)
+cluster_track(ctdf)
 }
 \arguments{
 \item{ctdf}{A `ctdf` object (from [as_ctdf()]), representing sequential movement points with timestamps and locations.}

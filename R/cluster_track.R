@@ -24,44 +24,6 @@ plot.clusterTrack <- function(x ) {
 
 }
 
-dbscan_tessellation <- function(x ) {
-    
-  # TODO: use nb directly to define clusters. 
-
-  tess = tessellate_ctdf(x)  |>
-    prune_tesselation(SD = 0.5) 
-
-  nb = poly2nb(tess, queen = TRUE)
-
-  min_pts = sapply(nb, length) |>
-    median() |>
-    round()
-  if (min_pts <= 2) min_pts = min_pts+1
-
-  if (nrow(tess) >  max(c(5, min_pts))) { # dbscan crashes otherwise
-
-    frnn = list(id = nb, eps = 0) # eps is ignored when id is supplied
-    class(frnn) = c("frNN", "NN")
-
-    cl = dbscan::dbscan(
-      x            = frnn,
-      minPts       = min_pts,
-      borderPoints = TRUE
-    )$cluster
-  } else {
-    cl = 0
-  }
-
-  o = mutate(tess, cluster = cl)
-
-  ggplot(o)+geom_sf(aes(fill=factor(cluster)))+geom_sf_text(aes(label=.id), size = 2)+ggtitle(x$.segment[1])
-  ggsave(glue("~/Desktop/temp/{paste(range(tess$.id), collapse='_')}.png"))
-
-  data.table(o)[, .(.id, cluster)]
-}
-
-
-
 #' Cluster movement tracks
 #'
 #' Perform clustering on a `ctdf` object to identify use-sites. Uses a hybrid approach combining Dirichlet-based polygon pruning and DBSCAN clustering to detect spatially and temporally coherent movement clusters ("use-sites").
@@ -90,18 +52,18 @@ dbscan_tessellation <- function(x ) {
 #' clust = cluster_track(ctdf) 
 #' map(clust)
 #' 
-cluster_track <- function(ctdf, minN = 2) {
+cluster_track <- function(ctdf) {
 
   s = ctdf[!is.na(.segment)]
   s[, n := .N, .segment]
-  s = s[n>minN]
+
 
   segs = s$.segment |> unique()
   
   o = foreach(si = segs) %do% {
     print(si)
     x = s[.segment == si]
-    oi = dbscan_tessellation(x)
+    cluster_tessellation(x, threshold = 0.5, method = 'sd')
     oi = oi[cluster > 0]
     oi[, cluster := paste(si, cluster)]
     oi

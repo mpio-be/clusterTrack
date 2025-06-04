@@ -50,16 +50,40 @@ tessellate_ctdf <- function(ctdf) {
 
 
 #' @export
-prune_tesselation <- function(x, q = 0.90, SD = 1, by = 'sd') {
+prune_tesselation <- function(x, threshold = 1, method = c("sd", "quantile")) {
+  method = match.arg(method)
+  logA = if (method == "sd") log(x$A) else NULL
 
-  if(by == 'q'){
-    dplyr::filter(x,A < quantile(A, probs = q)) 
+  dplyr::filter(x, switch(
+    method,
+    quantile = A < quantile(x$A, probs = threshold),
+    sd       = logA <= (mean(logA) + threshold * sd(logA)),
+    stop("Unknown method: ", method)
+  ))
+}
 
-  }
+#' @export
+cluster_tessellation <- function(x, nmin = 3,...) {
 
-  if (by == "sd") {
-    dplyr::filter(x, log(A) <= mean(log(A) + SD * sd(log(A))))  
-  }
+  onull = data.table(.id = integer(), cluster = integer())
+  if (nrow(x) < nmin) return(onull)
+
+  tess = tessellate_ctdf(x) |> prune_tesselation(...)
+  if (nrow(tess) < nmin) return(onull)
+
+  nb = poly2nb(tess, queen = TRUE) |> suppressWarnings()
+  g = igraph::graph_from_adj_list(nb, mode = "all") |> igraph::as.undirected()
+  tess$cluster = igraph::components(g)$membership
+  
+  # ggplot(tess)+geom_sf(aes(fill=factor(cluster)))+geom_sf_text(aes(label=.id), size = 2)+ggtitle(x$.segment[1])
+  # ggsave(glue("~/Desktop/temp/{paste(range(tess$.id), collapse='_')}.png"))
+
+  dt = data.table(tess)
+  dt[, n := .N, by = cluster]
+  res = dt[n > nmin, .(.id, cluster)]
+  if (nrow(res) < nmin) return(onull)
+  return(res)
+  
 
 
 }

@@ -42,11 +42,9 @@
   segs[, bout_id := rleid(cross)]
   segs[, len     := st_length(track) |> set_units("km") |> as.numeric()]
   segs[, len     := sum(len), bout_id]
-  segs[, Time    := sum(duration), bout_id]
-  segs[, n       := .N, .segment]
 
   # slice
-  good_segs = segs[(!cross)  ] 
+  good_segs = segs[(!cross)] 
 
   if (nrow(good_segs) > 0) {
     max_good_len = good_segs[, max(len)]
