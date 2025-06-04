@@ -7,7 +7,7 @@
 \usage{
 \method{print}{clusterTrack}(x, ...)
 
-cluster_track(ctdf)
+cluster_track(ctdf, minN = 2)
 }
 \arguments{
 \item{ctdf}{A `ctdf` object (from [as_ctdf()]), representing sequential movement points with timestamps and locations.}
@@ -21,19 +21,19 @@ Perform clustering on a `ctdf` object to identify use-sites. Uses a hybrid appro
 \examples{
 data(toy_ctdf_k2)
 ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to = "+proj=eqearth")
-ctdf = slice_ctdf(ctdf)
+slice_ctdf(ctdf)
 clust = cluster_track(ctdf )
 map(clust)
 
 data(lbdo66867)
 ctdf = as_ctdf(lbdo66867, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")
- ctdf = slice_ctdf(ctdf)
+slice_ctdf(ctdf)
 clust = cluster_track(ctdf)
 map(clust)
 
 data(pesa56511)
 ctdf  = as_ctdf(pesa56511, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")
-ctdf  = slice_ctdf(ctdf) 
+slice_ctdf(ctdf) 
 clust = cluster_track(ctdf) 
 map(clust)
 
