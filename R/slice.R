@@ -4,7 +4,7 @@
   if (nrow(s) < minN)
     return(FALSE)
   
-  o = hdbscan(st_coordinates(s$location), minPts = ceiling(sqrt(nrow(s))*1.5 ))
+  o = hdbscan(st_coordinates(s$location), minPts = ceiling(sqrt(nrow(s)) ))
   return(length(o$cluster_scores) > 1)
   
  
