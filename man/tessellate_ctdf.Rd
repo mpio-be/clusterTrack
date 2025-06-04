@@ -23,8 +23,7 @@ library(clusterTrack)
 data(toy_ctdf_k2)
 ctdf = as_ctdf(toy_ctdf_k2,crs = 4326, project_to = "+proj=eqearth")
 x = tessellate_ctdf(ctdf)
-s = prune_tesselation(x, q = 0.90)
-poly2nb(s, queen = TRUE)
+s = prune_tesselation(x, threshold = 1, method = 'sd')
 
 }
 \seealso{

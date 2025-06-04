@@ -63,7 +63,7 @@ cluster_track <- function(ctdf) {
   o = foreach(si = segs) %do% {
     print(si)
     x = s[.segment == si]
-    cluster_tessellation(x, threshold = 0.5, method = 'sd')
+    oi = cluster_tessellation(x, threshold = 0.75, method = 'quantile')
     oi = oi[cluster > 0]
     oi[, cluster := paste(si, cluster)]
     oi

@@ -19,8 +19,7 @@
 #' data(toy_ctdf_k2)
 #' ctdf = as_ctdf(toy_ctdf_k2,crs = 4326, project_to = "+proj=eqearth")
 #' x = tessellate_ctdf(ctdf)
-#' s = prune_tesselation(x, q = 0.90)
-#' poly2nb(s, queen = TRUE)
+#' s = prune_tesselation(x, threshold = 1, method = 'sd')
 #' 
 tessellate_ctdf <- function(ctdf) {
 
@@ -51,24 +50,26 @@ tessellate_ctdf <- function(ctdf) {
 
 #' @export
 prune_tesselation <- function(x, threshold = 1, method = c("sd", "quantile")) {
-  method = match.arg(method)
-  logA = if (method == "sd") log(x$A) else NULL
+  
+  
+  prune =
+    if (method == "sd")       x$A < quantile(x$A, probs = threshold) else
+    if (method == "quantile") {
+      logA = log(x$A)
+      logA <= (mean(logA) + threshold * sd(logA))
+    }      
 
-  dplyr::filter(x, switch(
-    method,
-    quantile = A < quantile(x$A, probs = threshold),
-    sd       = logA <= (mean(logA) + threshold * sd(logA)),
-    stop("Unknown method: ", method)
-  ))
+  dplyr::filter(x, prune)
+  
 }
 
 #' @export
-cluster_tessellation <- function(x, nmin = 3,...) {
+cluster_tessellation <- function(x, nmin = 3,threshold = 1, method = "sd") {
 
   onull = data.table(.id = integer(), cluster = integer())
   if (nrow(x) < nmin) return(onull)
 
-  tess = tessellate_ctdf(x) |> prune_tesselation(...)
+  tess = tessellate_ctdf(x) |> prune_tesselation(threshold = threshold, method = method)
   if (nrow(tess) < nmin) return(onull)
 
   nb = poly2nb(tess, queen = TRUE) |> suppressWarnings()

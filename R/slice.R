@@ -1,13 +1,13 @@
 
 
 .has_clusters <- function(s,minN = 5) {
-  if (nrow(s) < minN) {
+  if (nrow(s) < minN)
     return(FALSE)
-  } else {
-    o = hdbscan(st_coordinates(s$location), minPts = ceiling(sqrt(nrow(s))))
-    ans = length(o$cluster_scores) > 1
-  }
-  ans
+  
+  o = hdbscan(st_coordinates(s$location), minPts = ceiling(sqrt(nrow(s))*1.5 ))
+  return(length(o$cluster_scores) > 1)
+  
+ 
 }
 
 
@@ -80,7 +80,7 @@
 
 
 
-slice_ctdf <- function(ctdf, deltaT = 24*7 ) {
+slice_ctdf <- function(ctdf, deltaT = 24*30 ) {
 
   if (!inherits(ctdf, "ctdf")) {
     stop("slice_ctdf() only works on objects of class 'ctdf'")
