@@ -50,8 +50,7 @@ tessellate_ctdf <- function(ctdf) {
 
 #' @export
 prune_tesselation <- function(x, threshold = 1, method = c("sd", "quantile")) {
-  
-  
+    
   prune =
     if (method == "sd")       x$A < quantile(x$A, probs = threshold) else
     if (method == "quantile") {

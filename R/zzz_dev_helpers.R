@@ -1,8 +1,8 @@
   
 # ! remove before release
   
-  m = function(x,z) {
-
+  m = function(x,z,nam) {
+    if(missing(nam)) nam = "-"
     mapview::mapviewOptions(fgb = FALSE)
 
     if(!missing(z)){
@@ -11,7 +11,7 @@
     x= st_as_sf(x)
     mapview::mapview(x, zcol = z, lwd = 4)
 
-    }  else mapview::mapview(st_as_sf(x))
+    }  else mapview::mapview(st_as_sf(x), layer.name = nam)
   }
 
 #+ in-work

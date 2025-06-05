@@ -60,14 +60,17 @@ cluster_track <- function(ctdf) {
 
   segs = s$.segment |> unique()
   
+  pb = txtProgressBar(min =  min(segs), max = max(segs), style = 1, char = "█")
   o = foreach(si = segs) %do% {
-    print(si)
+    setTxtProgressBar(pb, si)
+
     x = s[.segment == si]
-    oi = cluster_tessellation(x, threshold = 0.75, method = 'quantile')
+    oi = cluster_tessellation(x, threshold = 0.75, method = "quantile")
     oi = oi[cluster > 0]
     oi[, cluster := paste(si, cluster)]
     oi
   }
+  close(pb)
 
   o = rbindlist(o)
 

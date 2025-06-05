@@ -1,10 +1,15 @@
 
 
-.has_clusters <- function(s,minN = 5) {
-  if (nrow(s) < minN)
+.has_clusters <- function(s ) {
+
+
+  if (nrow(s) < 3 )  
     return(FALSE)
   
-  o = hdbscan(st_coordinates(s$location), minPts = ceiling(sqrt(nrow(s)) ))
+
+  o = hdbscan(st_coordinates(s$location), minPts = ceiling(sqrt(nrow(s))))
+  m(s, nam = length(o$cluster_scores) ) |>print()
+
   return(length(o$cluster_scores) > 1)
   
  
@@ -97,23 +102,21 @@ slice_ctdf <- function(ctdf, deltaT = 24*30 ) {
   pb = txtProgressBar(min = 0, max = 0.9, style = 1, char = "█")
 
   while (i <= length(queue)) {
-
     setTxtProgressBar(pb, processed_n / total_n)
 
     current = queue[[i]]
 
     if (current |> .has_clusters()) {
-
       new_chunks = .split_by_maxlen(current, deltaT = deltaT)
       queue = c(queue, new_chunks)
     } else {
-
       result = c(result, list(current))
       processed_n = processed_n + nrow(current)
     }
 
     i = i + 1
   }
+  close(pb)
   
 
   sids = 1:length(result)
