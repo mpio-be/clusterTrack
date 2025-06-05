@@ -94,7 +94,7 @@ slice_ctdf <- function(ctdf, deltaT = 24*30 ) {
   total_n = nrow(ctdf)
   i = 1
   processed_n = 0
-  pb = txtProgressBar(min = 0, max = 1, style = 3)
+  pb = txtProgressBar(min = 0, max = 0.9, style = 1, char = "█")
 
   while (i <= length(queue)) {
 
@@ -103,11 +103,11 @@ slice_ctdf <- function(ctdf, deltaT = 24*30 ) {
     current = queue[[i]]
 
     if (current |> .has_clusters()) {
-      # If 'current' still has clusters, append its splits to the end of 'queue'
+
       new_chunks = .split_by_maxlen(current, deltaT = deltaT)
       queue = c(queue, new_chunks)
     } else {
-      # Otherwise, move 'current' into 'result' 
+
       result = c(result, list(current))
       processed_n = processed_n + nrow(current)
     }
