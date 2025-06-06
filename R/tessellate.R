@@ -1,5 +1,4 @@
 
-
 #' Tesselate a ctdf
 #'
 #' This function computes Dirichlet (Voronoi) polygons from a `ctdf` object 

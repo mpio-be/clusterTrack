@@ -3,9 +3,9 @@
 #' @import sf data.table  
 #' @import ggplot2 glue
 
-#' @importFrom igraph     graph_from_adj_list clusters
-#' @importFrom igraph     groups cliques E components
-#' @importFrom igraph     graph_from_edgelist  graph_from_data_frame subgraph.edges set_edge_attr
+#' @import igraph
+# @importFrom igraph   TODO
+
 #' @importFrom dbscan     hdbscan
 #' @importFrom deldir     deldir tile.list
 #' @importFrom spdep      poly2nb 

@@ -7,9 +7,6 @@
     return(FALSE)
   }
 
-  # In hierarchical clustering a common rule of thumb is to stop keep merging/splitting once clusters are smaller than √N.
-  # In graph-based community detection or k-NN graphs √N is selected as a compromise between “too sparse” and “too dense”.
-
   MIN_PTS =  ceiling(sqrt(nrow(s)))
 
   o = hdbscan(st_coordinates(s$location), minPts = MIN_PTS )
@@ -18,7 +15,6 @@
   
 
 }
-
 
 
 .split_by_maxlen <- function(ctdf, deltaT) {

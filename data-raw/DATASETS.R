@@ -61,7 +61,7 @@ require(tracktools)
 
   plot(ctdf, by = 'filter')
 
-  o = cluster_track(ctdf, sd = 1)
+  o = cluster_segments(ctdf, sd = 1)
 
   cc = st_as_sf(o)
   tt = as_ctdf_track(ctdf)
