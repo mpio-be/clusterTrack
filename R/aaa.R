@@ -1,10 +1,8 @@
 
 #' @import foreach 
 #' @import sf data.table  
-#' @import ggplot2 glue
 
-#' @import igraph
-# @importFrom igraph   TODO
+#' @import ggplot2 glue
 
 #' @importFrom dbscan     hdbscan
 #' @importFrom deldir     deldir tile.list
@@ -23,3 +21,12 @@ NULL
 
 
 # undocumented functions
+
+.st_area_overlap_ratio <- function(i, j) {
+  ai = st_area(i) |> as.numeric()
+  aj = st_area(j) |> as.numeric()
+  aij = st_intersection(i,j) |> st_area() |> as.numeric()
+  if (length(aij) == 0) aij = 0  
+
+  as.numeric(aij / pmin(ai, aj))
+}

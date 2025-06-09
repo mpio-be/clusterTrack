@@ -7,55 +7,53 @@
 #' ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to = "+proj=eqearth")
 #' slice_ctdf(ctdf)
 #' clust = cluster_segments(ctdf )
+#' map(clust)
 
 #' data(pesa56511)
 #' ctdf  = as_ctdf(pesa56511, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")
 #' slice_ctdf(ctdf) 
-#' clust = cluster_segments(ctdf) 
+#' clust = cluster_segments(ctdf)
+#' clust = stitch_cluster(clust)
+#' map(clust)
+#' 
+#' data(lbdo66867)
+#' ctdf = as_ctdf(lbdo66867, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")
+#' slice_ctdf(ctdf)
+#' clust = cluster_segments(ctdf)
+#' clust =  stitch_cluster(clust)
 #' map(clust)
 
 
 
-stitch_cluster <- function(clust,  overlap_threshold = 0.1) {
+stitch_cluster <- function(clust,  overlap_threshold = 0) {
+  stopifnot(!is.unsorted(clust$timestamp))
 
-  x = dat[!is.na(.segment), .(hull = st_union(location) |> st_convex_hull()), by = .segment]
+  o = clust[cluster>0, .(hull = st_union(location) |> st_convex_hull()), by = cluster] |> setDT()
+  
+  o[, next_hull := hull[c(2:.N, NA_integer_)] ]
+  
+  o[, overlap := .st_area_overlap_ratio(hull, next_hull), by = cluster]
+  o[.N, overlap:= 0]
+  o[, is_overlap := overlap > overlap_threshold]
 
-  go_stitch <- function(i,j){
-    ai  = st_area(x[i, hull])  
-    aj  = st_area(x[j, hull])
-    aij = st_intersection(x[i, hull], x[j, hull]) |> st_area()
-    aij = if(length(aij)==0) aij = 0
+  o[ , stitch_id := rleid(is_overlap)]
+  o[(!is_overlap), stitch_id := NA]
+  
+  o[, stitch_id := fcoalesce(stitch_id, shift(stitch_id))]
 
-    overlap_ratio = as.numeric(aij / pmin(ai, aj))
-    overlap_ratio >= overlap_threshold
-  }
+  o[, grp_key := fifelse(
+      !is.na(stitch_id),
+      paste0("s", stitch_id),  
+      paste0("c", cluster)       
+  )]
 
-  repeat {
-    segs = x$.segment
-    if (length(segs) < 2) break
-    merged = FALSE
-    
-    for (k in seq_len(length(segs) - 1) ) {
-      if ( go_stitch(k, k + 1) ) {
-        
-        si = segs[k]
-        sj = segs[k + 1]
-        clust[.segment == sj, .segment := si]
-        merged_hull = clust[.segment == si,st_union(location) |> st_convex_hull()]
-        x = rbind(
-          x[.segment != sj],
-          data.table::data.table(
-            .segment = si,
-            hull = merged_hull
-          )
-        )
-        merged = TRUE; break
-      }
-    }
-    if (!merged) break
-  }
+  o[, cluster_stitched := .GRP, by = grp_key]
 
+  o = merge(clust, o[, .(cluster, cluster_stitched)], by = "cluster", all.x = TRUE, sort = FALSE)
 
+  o[, cluster := cluster_stitched]
+  o[, cluster_stitched := NULL]
 
-
+  o[is.na(cluster), cluster := 0]
+  o
 }

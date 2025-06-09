@@ -1,6 +1,6 @@
 Package: clusterTrack
 Title: Clustering Animal Movements. 
-Version: 0.1.0
+Version: 0.1.0.1
 Authors@R: 
     person("Mihai", "Valcu", , "mvalcu@gwdg.de", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-6907-7802"))

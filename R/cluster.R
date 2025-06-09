@@ -43,16 +43,15 @@ cluster_segments <- function(ctdf) {
     x = s[.segment == si]
     oi = cluster_tessellation(x, threshold = 0.75, method = "quantile")
     oi = oi[cluster > 0]
-    oi[, cluster := paste(si, cluster)]
+    oi[, .segment := si]
     oi
   }
   close(pb)
 
   o = rbindlist(o)
+  o[, cluster := .GRP, by = .(.segment, cluster) ]
+  o[, cluster := as.integer(cluster)]
 
-  o[, n := .N, cluster]
-
-  o[, cluster := as.factor(cluster) |> as.integer()]
 
   o = merge(ctdf, o[, .(.id, cluster)], by = ".id", suffixes = c("", "temp"), all.x = TRUE, sort = FALSE)
 
@@ -60,15 +59,7 @@ cluster_segments <- function(ctdf) {
 
   o[is.na(cluster), cluster := 0]
   
-  return(o)
-
-  # feedback
-  ncl = nrow(o[cluster>0, .N, cluster])
-  if (ncl == 0) {warning("No clusters found!")} 
-  
-  message(sprintf("%d cluster%s detected!", ncl, if (ncl > 1L) "s" else ""))
-  
-
+  o
   
 
 }
