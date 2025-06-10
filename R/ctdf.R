@@ -88,6 +88,7 @@ as_ctdf <- function(x, coords = c("longitude", "latitude"), time = "time", crs =
 
   o[, .id := .I]
   o[, .segment := NA_integer_]
+  o[, cluster  := NA_integer_]
 
   o = st_as_sf(o, coords = coords, crs = crs)
 
@@ -98,7 +99,7 @@ as_ctdf <- function(x, coords = c("longitude", "latitude"), time = "time", crs =
   st_geometry(o) = "location"
 
   setDT(o)
-  setcolorder(o, c(".id", ".segment", "location", "timestamp"))
+  setcolorder(o, c(".id", ".segment", "cluster", "location", "timestamp"))
 
   class(o) <- c("ctdf", class(o))
   o
@@ -153,29 +154,6 @@ as_ctdf_track <- function(ctdf) {
     st_set_geometry("track") |>
     select(.id, .segment, start, stop, track)|>
     st_set_crs(crs)
-
-
-}
-
-
-#' @export
-smooth_ctdf <- function(ctdf, ...) {
-
-  x = st_as_sf(ctdf$location)
-  crs = st_crs(x)
-  x = st_coordinates(x) |> data.table() |> data.table()
-
-  x[, let(
-    X  = sgolayfilt(X, ...),
-    Y  = sgolayfilt(Y, ...)
-  )]
-
-  x = st_as_sf(x, coords = c("X", "Y"), crs = crs)
-
-  o = copy(ctdf)
-  o[, location := st_geometry(x)]
-  o
-  
 
 
 }

@@ -37,12 +37,12 @@ plot.clusterTrack <- function(x ) {
 #' data(lbdo66867)
 #' x = as_ctdf(lbdo66867, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")|>cluster_track()
 #' map(x)
-cluster_track <- function(ctdf) {
+cluster_track <- function(ctdf,deltaT = 30, segmentize = FALSE, threshold = 0.75, method = "quantile", overlap_threshold = 0) {
 
   ctdf |>
-  slice_ctdf() |>
-  cluster_segments() |>
-  stitch_cluster()
+  slice_ctdf(deltaT = deltaT, segmentize = segmentize) |>
+  cluster_segments(threshold = threshold, method = method) |>
+  stitch_cluster(overlap_threshold = overlap_threshold)
 
 
 

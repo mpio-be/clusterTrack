@@ -4,7 +4,7 @@
 
 #' @import ggplot2 glue
 #' 
-#' @importFrom igraph graph_from_edgelist set_edge_attr subgraph.edges E groups
+#' @importFrom igraph graph_from_edgelist set_edge_attr subgraph_from_edges E groups
 #' @importFrom igraph graph_from_adj_list as_undirected components
 #' 
 #' @importFrom dbscan     hdbscan

@@ -13,22 +13,22 @@
 #' data(toy_ctdf_k2)
 #' ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to = "+proj=eqearth")
 #' slice_ctdf(ctdf)
-#' clust = cluster_segments(ctdf )
-#' map(clust)
+#' cluster_segments(ctdf )
+#' map(ctdf)
 #'
 #' data(lbdo66867)
 #' ctdf = as_ctdf(lbdo66867, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")
 #' slice_ctdf(ctdf)
-#' clust = cluster_segments(ctdf)
-#' map(clust)
+#' cluster_segments(ctdf)
+#' map(ctdf)
 #'
 #' data(pesa56511)
 #' ctdf  = as_ctdf(pesa56511, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")
 #' slice_ctdf(ctdf) 
-#' clust = cluster_segments(ctdf) 
-#' map(clust)
+#' cluster_segments(ctdf) 
+#' map(ctdf)
 #' 
-cluster_segments <- function(ctdf) {
+cluster_segments <- function(ctdf, threshold = 0.75, method = "quantile") {
 
   s = ctdf[!is.na(.segment)]
   s[, n := .N, .segment]
@@ -36,12 +36,12 @@ cluster_segments <- function(ctdf) {
 
   segs = s$.segment |> unique()
   
-  pb = txtProgressBar(min =  min(segs), max = max(segs), style = 1, char = "█")
+  pb = txtProgressBar(min =  min(segs), max = max(segs), style = 1, char = "░")
   o = foreach(si = segs) %do% {
     setTxtProgressBar(pb, si)
 
     x = s[.segment == si]
-    oi = cluster_tessellation(x, threshold = 0.75, method = "quantile")
+    oi = cluster_tessellation(x, threshold = threshold, method = method)
     oi = oi[cluster > 0]
     oi[, .segment := si]
     oi
@@ -53,13 +53,10 @@ cluster_segments <- function(ctdf) {
   o[, cluster := as.integer(cluster)]
 
 
-  o = merge(ctdf, o[, .(.id, cluster)], by = ".id", suffixes = c("", "temp"), all.x = TRUE, sort = FALSE)
-
-  class(o) <- c("clusterTrack", class(o))
-
+  o = merge(ctdf[, .(.id)], o[, .(.id, cluster)], by = ".id",  all.x = TRUE, sort = FALSE)
   o[is.na(cluster), cluster := 0]
-  
-  o
+
+  set(ctdf, j = "cluster", value = o$cluster)
   
 
 }

@@ -17,14 +17,23 @@
 }
 
 
-.split_by_maxlen <- function(ctdf, deltaT) {
+.split_by_maxlen <- function(ctdf, deltaT, segmentize) {
 
 
   # make segments
   segs =
     ctdf |>
-    as_ctdf_track() 
+    as_ctdf_track() |>
+    mutate(len = st_length(track) |> set_units("km") |> as.numeric())
     
+  # segmentize track segments
+  if(segmentize) {
+    segs = data.table(segs)
+    v = quantile(segs$len, probs = 0.5)
+    segs[, track := list(st_segmentize(track, dfMaxLength = v)) ]
+    segs = st_as_sf(segs)  
+  }
+
 
   crs = st_crs(segs)
 
@@ -35,7 +44,7 @@
   pruned_ints = lapply(seq_along(ints), function(i) {
     j = ints[[i]]
 
-    dfs = difftime(segs$start[j], segs$stop[i], units = "hours") |> abs()
+    dfs = difftime(segs$start[j], segs$stop[i], units = "days") |> abs()
 
     j[dfs <= deltaT]
   })
@@ -44,7 +53,6 @@
   segs[, cross   := n_ints > 0]
 
   segs[, bout_id := rleid(cross)]
-  segs[, len     := st_length(track) |> set_units("km") |> as.numeric()]
   segs[, len     := sum(len), bout_id]
 
   # slice
@@ -84,21 +92,22 @@
 
 
 
-slice_ctdf <- function(ctdf, deltaT = 24*30 ) {
+slice_ctdf <- function(ctdf, deltaT = 30, segmentize = FALSE) {
 
   if (!inherits(ctdf, "ctdf")) {
     stop("slice_ctdf() only works on objects of class 'ctdf'")
   }
 
-  ctdf[, .segment := NA]
+  X = copy(ctdf)
+  X[, .segment := NA]
 
   # Initialize
   result = list()
-  queue = .split_by_maxlen(ctdf, deltaT = deltaT)
-  total_n = nrow(ctdf)
+  queue = .split_by_maxlen(X, deltaT = deltaT, segmentize = segmentize)
+  total_n = nrow(X)
   i = 1
   processed_n = 0
-  pb = txtProgressBar(min = 0, max = 0.9, style = 1, char = "█")
+  pb = txtProgressBar(min = 0, max = 0.9, style = 1, char = "░")
 
   while (i <= length(queue)) {
     setTxtProgressBar(pb, processed_n / total_n)
@@ -106,7 +115,7 @@ slice_ctdf <- function(ctdf, deltaT = 24*30 ) {
     current = queue[[i]]
 
     if (current |> .has_clusters()) {
-      new_chunks = .split_by_maxlen(current, deltaT = deltaT)
+      new_chunks = .split_by_maxlen(current, deltaT = deltaT, segmentize = segmentize)
       queue = c(queue, new_chunks)
     } else {
       result = c(result, list(current))
@@ -129,6 +138,6 @@ slice_ctdf <- function(ctdf, deltaT = 24*30 ) {
   o[, .segment := factor(.segment) |> fct_inorder() |> as.numeric()]
   o = merge(ctdf[, .(.id)], o[, .(.id, .segment)], all.x = TRUE, sort = FALSE)
 
-  ctdf[, .segment := o$.segment]
+  set(ctdf, j = ".segment", value = o$.segment)
 
 }

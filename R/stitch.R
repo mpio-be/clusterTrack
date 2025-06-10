@@ -6,29 +6,30 @@
 #' data(toy_ctdf_k2)
 #' ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to = "+proj=eqearth")
 #' slice_ctdf(ctdf)
-#' clust = cluster_segments(ctdf )
-#' map(clust)
+#' cluster_segments(ctdf)
+#' stitch_cluster(ctdf)
+#' map(ctdf)
 
 #' data(pesa56511)
 #' ctdf  = as_ctdf(pesa56511, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")
 #' slice_ctdf(ctdf) 
-#' clust = cluster_segments(ctdf)
-#' clust = stitch_cluster(clust)
-#' map(clust)
+#' cluster_segments(ctdf)
+#' stitch_cluster(ctdf)
+#' map(ctdf)
 #' 
 #' data(lbdo66867)
 #' ctdf = as_ctdf(lbdo66867, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")
 #' slice_ctdf(ctdf)
-#' clust = cluster_segments(ctdf)
-#' clust =  stitch_cluster(clust)
-#' map(clust)
+#' cluster_segments(ctdf)
+#' stitch_cluster(ctdf)
+#' map(ctdf)
 
 
 
-stitch_cluster <- function(clust,  overlap_threshold = 0) {
-  stopifnot(!is.unsorted(clust$timestamp))
+stitch_cluster <- function(ctdf,  overlap_threshold = 0) {
+  stopifnot(!is.unsorted(ctdf$timestamp))
 
-  o = clust[cluster>0, .(hull = st_union(location) |> st_convex_hull()), by = cluster] |> setDT()
+  o = ctdf[cluster > 0, .(hull = st_union(location) |> st_convex_hull()), by = cluster] |> setDT()
   
   o[, next_hull := hull[c(2:.N, NA_integer_)] ]
   
@@ -49,11 +50,10 @@ stitch_cluster <- function(clust,  overlap_threshold = 0) {
 
   o[, cluster_stitched := .GRP, by = grp_key]
 
-  o = merge(clust, o[, .(cluster, cluster_stitched)], by = "cluster", all.x = TRUE, sort = FALSE)
-
+  o = merge(ctdf[, .(.id, cluster)], o[, .(cluster, cluster_stitched)], by = "cluster", all.x = TRUE, sort = FALSE)
   o[, cluster := cluster_stitched]
   o[, cluster_stitched := NULL]
-
   o[is.na(cluster), cluster := 0]
-  o
+
+  set(ctdf, j = "cluster", value = o$cluster)
 }

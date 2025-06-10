@@ -5,7 +5,7 @@
 \title{stitch_cluster
 stitch a cluster}
 \usage{
-stitch_cluster(clust, overlap_threshold = 0)
+stitch_cluster(ctdf, overlap_threshold = 0)
 }
 \description{
 stitch_cluster
@@ -15,19 +15,20 @@ stitch a cluster
 data(toy_ctdf_k2)
 ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to = "+proj=eqearth")
 slice_ctdf(ctdf)
-clust = cluster_segments(ctdf )
-map(clust)
+cluster_segments(ctdf)
+stitch_cluster(ctdf)
+map(ctdf)
 data(pesa56511)
 ctdf  = as_ctdf(pesa56511, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")
 slice_ctdf(ctdf) 
-clust = cluster_segments(ctdf)
-clust = stitch_cluster(clust)
-map(clust)
+cluster_segments(ctdf)
+stitch_cluster(ctdf)
+map(ctdf)
 
 data(lbdo66867)
 ctdf = as_ctdf(lbdo66867, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")
 slice_ctdf(ctdf)
-clust = cluster_segments(ctdf)
-clust =  stitch_cluster(clust)
-map(clust)
+cluster_segments(ctdf)
+stitch_cluster(ctdf)
+map(ctdf)
 }

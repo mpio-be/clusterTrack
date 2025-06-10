@@ -101,7 +101,7 @@ tdbscan <- function(track, eps, minPts = 5, borderPoints = FALSE , maxLag = 6, m
 	# set graph attributes and subset
 	g = set_edge_attr(g, 'tc', value = z$tc)
 
-	g = subgraph.edges(g, E(g)[tc <= maxLag])
+	g = subgraph_from_edges(g, E(g)[tc <= maxLag])
 
 	gr = components(g) |> groups()
 
