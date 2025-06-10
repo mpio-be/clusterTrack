@@ -26,21 +26,21 @@ plot.clusterTrack <- function(x ) {
 #' @export
 #' @examples
 #' data(toy_ctdf_k2)
-#' x = as_ctdf(toy_ctdf_k2, crs = 4326, project_to = "+proj=eqearth") |>cluster_track()
-#' map(x)
+#' ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to = "+proj=eqearth") |>cluster_track()
+#' map(ctdf)
 
 
 #' data(pesa56511)
-#' x  = as_ctdf(pesa56511, time = "locationDate", crs = 4326, project_to = "+proj=eqearth") |>cluster_track()
-#' map(x)
+#' ctdf  = as_ctdf(pesa56511, time = "locationDate", crs = 4326, project_to = "+proj=eqearth") |>cluster_track()
+#' map(ctdf)
 #' 
 #' data(lbdo66867)
-#' x = as_ctdf(lbdo66867, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")|>cluster_track()
-#' map(x)
-cluster_track <- function(ctdf,deltaT = 30, segmentize = FALSE, threshold = 0.75, method = "quantile", overlap_threshold = 0) {
+#' ctdf = as_ctdf(lbdo66867, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")|>cluster_track()
+#' map(ctdf)
+cluster_track <- function(ctdf,deltaT = 30, threshold = 0.75, method = "quantile", overlap_threshold = 0) {
 
   ctdf |>
-  slice_ctdf(deltaT = deltaT, segmentize = segmentize) |>
+  slice_ctdf(deltaT = deltaT) |>
   cluster_segments(threshold = threshold, method = method) |>
   stitch_cluster(overlap_threshold = overlap_threshold)
 

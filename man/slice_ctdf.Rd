@@ -5,7 +5,7 @@
 \title{segment and filter a ctdf
 slice_ctdf}
 \usage{
-slice_ctdf(ctdf, deltaT = 30, segmentize = FALSE)
+slice_ctdf(ctdf, deltaT = 30)
 }
 \description{
 segment and filter a ctdf

@@ -17,7 +17,7 @@
 }
 
 
-.split_by_maxlen <- function(ctdf, deltaT, segmentize) {
+.split_by_maxlen <- function(ctdf, deltaT) {
 
 
   # make segments
@@ -26,15 +26,6 @@
     as_ctdf_track() |>
     mutate(len = st_length(track) |> set_units("km") |> as.numeric())
     
-  # segmentize track segments
-  if(segmentize) {
-    segs = data.table(segs)
-    v = quantile(segs$len, probs = 0.5)
-    segs[, track := list(st_segmentize(track, dfMaxLength = v)) ]
-    segs = st_as_sf(segs)  
-  }
-
-
   crs = st_crs(segs)
 
   ints = st_crosses(segs) 
@@ -92,7 +83,7 @@
 
 
 
-slice_ctdf <- function(ctdf, deltaT = 30, segmentize = FALSE) {
+slice_ctdf <- function(ctdf, deltaT = 30) {
 
   if (!inherits(ctdf, "ctdf")) {
     stop("slice_ctdf() only works on objects of class 'ctdf'")
@@ -103,7 +94,7 @@ slice_ctdf <- function(ctdf, deltaT = 30, segmentize = FALSE) {
 
   # Initialize
   result = list()
-  queue = .split_by_maxlen(X, deltaT = deltaT, segmentize = segmentize)
+  queue = .split_by_maxlen(X, deltaT = deltaT)
   total_n = nrow(X)
   i = 1
   processed_n = 0
@@ -115,7 +106,7 @@ slice_ctdf <- function(ctdf, deltaT = 30, segmentize = FALSE) {
     current = queue[[i]]
 
     if (current |> .has_clusters()) {
-      new_chunks = .split_by_maxlen(current, deltaT = deltaT, segmentize = segmentize)
+      new_chunks = .split_by_maxlen(current, deltaT = deltaT)
       queue = c(queue, new_chunks)
     } else {
       result = c(result, list(current))

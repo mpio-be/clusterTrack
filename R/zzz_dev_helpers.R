@@ -112,7 +112,7 @@ p2 = function(ctdf) {
 
 }
 
-map <- function(clust) {
+map <- function(ctdf) {
 
   require(mapview)
   require(leaflet)
@@ -122,16 +122,16 @@ map <- function(clust) {
 
   if (Sys.info()[["sysname"]] == "Linux")  mapviewOptions(fgb = FALSE)
 
-  x = copy(clust)
-  clus   = st_as_sf(x[cluster>0])  
-  nonclus = st_as_sf(x[cluster ==0])  
+  x            = copy(ctdf)
+  clus         = st_as_sf(x[cluster>0])  
+  nonclus      = st_as_sf(x[cluster ==0])  
   x[, cluster := factor(cluster)]
 
   cluster_centroids = data.table(clus)
   cluster_centroids =
     cluster_centroids[, .(
-      start = min(timestamp),
-      stop  = max(timestamp),
+      start    = min(timestamp),
+      stop     = max(timestamp),
       tenure   = difftime(max(timestamp), min(timestamp), units = "days"),
       geometry = st_union(location) |> st_convex_hull() |> st_centroid(),
       segment  = unique(.segment),
@@ -152,20 +152,20 @@ map <- function(clust) {
     st_as_sf() |>
     st_transform(4326)
     
-    
-
 
   tr = as_ctdf_track(x) |> setDT()
   tr[, let(segement = factor(.segment) )]
   tr = st_as_sf(tr)
 
-
+  polys = ctdf[cluster > 0, .(hull = st_union(location) |> st_convex_hull()), by = cluster] |>
+    st_as_sf()
 
 
   o = 
     mapview(map.types = c("CartoDB", "Esri.WorldImagery")) +
     mapview(nonclus, color = "#7e7f81cc", cex = 3,  legend = FALSE) +
     mapview(tr, legend = FALSE, color = "#7e7f81cc") +
+    mapview(polys, zcol = "cluster", layer.name = "cluster", alpha = 0.2) +
     mapview(clus, zcol = "cluster", layer.name = "cluster")
 
   clust_ico = awesomeIcons(
