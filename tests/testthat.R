@@ -1,4 +1,4 @@
 library(testthat)
-library(dbscanTrack)
+library(clusterTrack)
 
-test_check("dbscanTrack")
+test_check("clusterTrack")

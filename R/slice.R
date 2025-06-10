@@ -23,8 +23,7 @@
   # make segments
   segs =
     ctdf |>
-    as_ctdf_track() |>
-    mutate(duration = difftime(stop, start, units = "hours") |> as.numeric())
+    as_ctdf_track() 
     
 
   crs = st_crs(segs)
