@@ -10,7 +10,7 @@ require(tracktools)
   d = tracktools::argos_prepare(d)
   d = unique(d, by = c("latitude", "longitude"))
   
-  pesa56511 = copy(d)
+  pesa56511 = copy(d)[, let( tagID = NULL)]
   usethis::use_data(pesa56511, overwrite = TRUE)
 
 # lbdo66867
@@ -19,12 +19,26 @@ require(tracktools)
   d = tracktools::argos_prepare(d)
   d = unique(d, by = c("latitude", "longitude"))
 
-  # check
-  x = st_as_sf(d, coords = c("longitude", "latitude"), crs = 4326)
-  mapview(x, zcol = "i")
+  # check tracktools::flagpts(d)
 
-  lbdo66867 = copy(d)[, i := NULL]
+  lbdo66867 = copy(d)[, let(i = NULL, tagID = NULL)]
   usethis::use_data(lbdo66867, overwrite = TRUE)
+
+# lbdo66862
+  d = dbq(q = 'SELECT distinct tagID, latitude,longitude,locationDate,locationClass FROM ARGOS.ARGOS_ALL where tagID = "66862"')[, pk := .I]
+  d = d[!pk%in% c(97,174,626,690,1004,1087,1105,1464,2074)]
+  d = tracktools::argos_prepare(d)
+  d = unique(d, by = c("latitude", "longitude"))
+
+  # check tracktools::flagpts(d)
+
+  lbdo66862 = copy(d)[, let(pk = NULL, tagID = NULL)]
+  usethis::use_data(lbdo66862, overwrite = TRUE)
+
+
+
+
+
 
 
 # toy_ctdf_k2: 2 simple clusters, movement from a to b and back.

@@ -54,6 +54,13 @@ cluster_segments <- function(ctdf, threshold = 0.75, method = "quantile") {
 
 
   o = merge(ctdf[, .(.id)], o[, .(.id, cluster)], by = ".id",  all.x = TRUE, sort = FALSE)
+
+  o[, cluster := {
+    f = nafill(cluster,    type = "locf")   
+    b = nafill(cluster,    type = "nocb")   
+    fifelse(f == b,f, cluster)                        
+  }]
+
   o[is.na(cluster), cluster := 0]
 
   set(ctdf, j = "cluster", value = o$cluster)

@@ -33,3 +33,12 @@ NULL
 
   as.numeric(aij / pmin(ai, aj))
 }
+
+
+
+
+.mcp <- function(x, p = 0.95) {
+  d = st_distance(x, st_union(x) |>st_centroid())
+  st_union(x[d <= quantile(d, p), ]) |>
+    st_convex_hull()
+}

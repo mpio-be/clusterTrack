@@ -37,6 +37,14 @@ plot.clusterTrack <- function(x ) {
 #' data(lbdo66867)
 #' ctdf = as_ctdf(lbdo66867, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")|>cluster_track()
 #' map(ctdf)
+#' 
+#' data(lbdo66862)
+#' ctdf = as_ctdf(lbdo66862, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")|>cluster_track()
+#' map(ctdf)
+#' 
+#' 
+
+
 cluster_track <- function(ctdf,deltaT = 30, threshold = 0.75, method = "quantile", overlap_threshold = 0) {
 
   ctdf |>
