@@ -23,6 +23,12 @@ plot.clusterTrack <- function(x ) {
 
 }
 
+
+#' Cluster movement tracks
+#'
+#' Perform clustering on a `ctdf` object to identify use-sites.
+#' @param ctdf A `ctdf` object (from [as_ctdf()]), representing sequential movement points with timestamps and locations.
+#' @return NULL.  The `ctdf` object is updated in place. 
 #' @export
 #' @examples
 #' data(toy_ctdf_k2)

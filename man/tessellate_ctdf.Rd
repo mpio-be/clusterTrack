@@ -7,7 +7,7 @@
 tessellate_ctdf(ctdf)
 }
 \arguments{
-\item{ctdf}{A `ctdf` data frame (typically created with [as_ctdf()]).}
+\item{ctdf}{A `ctdf` data frame.}
 }
 \value{
 A sf object.
@@ -25,7 +25,4 @@ ctdf = as_ctdf(toy_ctdf_k2,crs = 4326, project_to = "+proj=eqearth")
 x = tessellate_ctdf(ctdf)
 s = prune_tesselation(x, threshold = 1, method = 'sd')
 
-}
-\seealso{
-[as_ctdf()]
 }

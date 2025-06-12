@@ -1,5 +1,5 @@
 
-# TODO: deprecate before new majot release!
+# TODO: deprecate before new major release!
 
 #' @export
 as_tdbscan <- function(x, coords = c("longitude","latitude"),time = "time", crs = 4326) {

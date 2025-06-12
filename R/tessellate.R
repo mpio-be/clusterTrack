@@ -3,13 +3,12 @@
 #'
 #' This function computes Dirichlet (Voronoi) polygons from a `ctdf` object 
 #'
-#' @param ctdf A `ctdf` data frame (typically created with [as_ctdf()]).
+#' @param ctdf A `ctdf` data frame.
 #'
 #' @return A sf object.
 #'
 #' @note Dirichlet polygons are computed via the `deldir` package.
 #'
-#' @seealso [as_ctdf()] 
 #'
 #'
 #' @export

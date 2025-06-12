@@ -7,13 +7,13 @@
 cluster_segments(ctdf, threshold = 0.75, method = "quantile")
 }
 \arguments{
-\item{ctdf}{A `ctdf` object (from [as_ctdf()]), representing sequential movement points with timestamps and locations.}
+\item{ctdf}{A `ctdf`.}
 }
 \value{
-A `ctdf` object containing only points assigned to clusters, with an additional integer column `cluster` indicating the cluster ID for each point (consecutive values starting from 1). Cluster membership reflects spatial-temporal groupings of points.
+NULL.  The `ctdf` object is updated in place.
 }
 \description{
-Perform clustering on a `ctdf` object to identify use-sites. Uses a hybrid approach combining Dirichlet-based polygon pruning and DBSCAN clustering to detect spatially and temporally coherent movement clusters ("use-sites").
+Cluster movement tracks
 }
 \examples{
 data(toy_ctdf_k2)
