@@ -23,18 +23,21 @@ Perform clustering on a `ctdf` object to identify use-sites.
 }
 \examples{
 data(toy_ctdf_k2)
-ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to = "+proj=eqearth") |>cluster_track()
+ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to = "+proj=eqearth")
+cluster_track(ctdf)
 map(ctdf)
 data(pesa56511)
 ctdf  = as_ctdf(pesa56511, time = "locationDate", crs = 4326, project_to = "+proj=eqearth") |>cluster_track()
 map(ctdf)
 
 data(lbdo66867)
-ctdf = as_ctdf(lbdo66867, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")|>cluster_track()
+ctdf = as_ctdf(lbdo66867, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")
+cluster_track(ctdf)
 map(ctdf)
 
 data(lbdo66862)
-ctdf = as_ctdf(lbdo66862, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")|>cluster_track()
+ctdf = as_ctdf(lbdo66862, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")
+cluster_track(ctdf)
 map(ctdf)
 
 

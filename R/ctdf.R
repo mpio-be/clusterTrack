@@ -157,3 +157,26 @@ as_ctdf_track <- function(ctdf) {
 
 
 }
+
+
+#' Summarise a ctdf by cluster
+#'
+#' Returns one row per `cluster` with start/stop times, tenure (days),
+#' convex‐hull centroid and row‐count.
+#'
+#' @param object A `ctdf` (inherits `data.table`).
+#' @param ...  Currently ignored.
+#' @return A `data.table` (and `data.frame`) of class c("summary_ctdf","data.table","data.frame").
+#' @export
+summary.ctdf = function(object, ...) {
+  tbl = object[, .(
+    start    = min(timestamp),
+    stop     = max(timestamp),
+    tenure   = difftime(max(timestamp), min(timestamp), units = "days") ,
+    geometry = st_union(location) |> st_convex_hull() |> st_centroid(),
+    segment  = unique(.segment),
+    N        = .N
+  ), by = cluster]
+  class(tbl) = c("summary_ctdf", class(tbl))
+  tbl
+}
