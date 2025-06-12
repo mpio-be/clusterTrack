@@ -16,7 +16,7 @@ NULL
 
 map <- function(ctdf) {
 
-  # if (Sys.info()[["sysname"]] == "Linux")  mapviewOptions(fgb = FALSE) 'cause Chrome sucks. 
+  if (Sys.info()[["sysname"]] == "Linux")  mapviewOptions(fgb = FALSE) # 'cause Chrome sucks. 
 
   x            = copy(ctdf)
   clus         = st_as_sf(x[cluster>0])  
@@ -62,7 +62,7 @@ map <- function(ctdf) {
   o = 
     mapview(map.types = c("CartoDB", "Esri.WorldImagery")) +
     mapview(polys, zcol = "cluster", layer.name = "cluster", alpha = 0.2) +
-    mapview(nonclus, color = "#7e7f81cc", cex = 3,  legend = FALSE) +
+    if(nrow(nonclus)>0) mapview(nonclus, color = "#7e7f81cc", cex = 3,  legend = FALSE) +
     mapview(tr, legend = FALSE, color = "#7e7f81cc") +
     mapview(clus, zcol = "cluster", layer.name = "cluster")
 
