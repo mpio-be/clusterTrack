@@ -1,6 +1,6 @@
 
 
-#' Cluster movement tracks
+#' Cluster segments
 #'
 #'
 #' @param ctdf A `ctdf`.
