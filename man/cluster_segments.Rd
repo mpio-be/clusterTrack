@@ -2,7 +2,7 @@
 % Please edit documentation in R/cluster.R
 \name{cluster_segments}
 \alias{cluster_segments}
-\title{Cluster movement tracks}
+\title{Cluster segments}
 \usage{
 cluster_segments(ctdf, threshold = 0.75, method = "quantile")
 }
@@ -13,7 +13,7 @@ cluster_segments(ctdf, threshold = 0.75, method = "quantile")
 NULL.  The `ctdf` object is updated in place.
 }
 \description{
-Cluster movement tracks
+Cluster segments
 }
 \examples{
 data(toy_ctdf_k2)

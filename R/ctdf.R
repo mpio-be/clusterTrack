@@ -32,7 +32,7 @@ plot.ctdf <- function(x,y = NULL,  pch = 16) {
 #' @param coords  Character vector of length 2 specifying the coordinate column names.
 #'                Defaults to `c("longitude", "latitude")`.
 #' @param time    Name of the time column. Will be renamed to `"timestamp"` internally.
-#' @param crs     Coordinate reference system. Default is NA. Upstream methods will warn when unprojected
+#' @param crs     Coordinate reference system. Default is NA. Upstream methods should warn when unprojected
 #'                coordinates found (#TODO)
 #' @param project_to  passed to `st_transform()`.
 #'

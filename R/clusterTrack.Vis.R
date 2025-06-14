@@ -7,7 +7,11 @@
 #' @import mapview leaflet glue ggplot2
 NULL
 
-#' Map a ctdf
+#' Map a ctdf object
+#'
+#' Visualize clustered track data on an interactive map.
+#'
+#' @param ctdf A `ctdf` object.
 #' @export
 #' @examples
 #' data(pesa56511)
