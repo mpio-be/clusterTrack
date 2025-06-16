@@ -13,10 +13,10 @@ slice_ctdf
 }
 \examples{
 data(toy_ctdf_k2)
-ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to = "+proj=eqearth")
+ctdf = as_ctdf(toy_ctdf_k2, s_srs = 4326, t_srs = "+proj=eqearth")
 ctdf = slice_ctdf(ctdf)  
 
 data(pesa56511)
-ctdf = as_ctdf(pesa56511, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")
+ctdf = as_ctdf(pesa56511, time = "locationDate", s_srs = 4326, t_srs = "+proj=eqearth")
 slice_ctdf(ctdf )   
 }

@@ -1,3 +1,26 @@
+
+.check_ctdf <- function(x) {
+  
+  if (!inherits(x, "ctdf")) {
+    stop("Not a 'ctdf' object!",call. = FALSE)
+    }
+
+  if(is.unsorted(x$timestamp)) {
+    stop("It seems this ctdf is not sorted anymore along timestamp!", call. = FALSE)
+  }
+
+  nams = c(".id", ".segment", "cluster", "location", "timestamp")
+  nams_ok = nams %in% names(x)
+  
+  if(!all(nams_ok)) {
+    stop("Some build in columns are missing", call. = FALSE)
+  }
+
+
+
+}
+
+
 #' @export
 as_ctdf <- function(x, ...) {
   UseMethod("as_ctdf")
@@ -32,9 +55,8 @@ plot.ctdf <- function(x,y = NULL,  pch = 16) {
 #' @param coords  Character vector of length 2 specifying the coordinate column names.
 #'                Defaults to `c("longitude", "latitude")`.
 #' @param time    Name of the time column. Will be renamed to `"timestamp"` internally.
-#' @param crs     Coordinate reference system. Default is NA. Upstream methods should warn when unprojected
-#'                coordinates found (#TODO)
-#' @param project_to  passed to `st_transform()`.
+#' @param s_srs   Source spatial reference. Default is 4326. 
+#' @param t_srs  target spatial reference passed to `st_transform()`. Default is "+proj=eqearth".
 #'
 #' @param ...     Currently unused
 #'
@@ -53,22 +75,8 @@ plot.ctdf <- function(x,y = NULL,  pch = 16) {
 #'
 #' @export
 
-as_ctdf <- function(x, coords = c("longitude", "latitude"), time = "time", crs = NA, project_to, ...) {
+as_ctdf <- function(x, coords = c("longitude", "latitude"), time = "time", s_srs = 4326, t_srs = "+proj=eqearth", ...) {
   
-  v = c(coords,time)
-  dups = which(duplicated(x[, ..v]))
-  if (length(dups) > 0) {
-    stop(
-      sprintf(
-        "as_ctdf(): found %d duplicated point%s at row%s: %s",
-        length(dups),
-        if (length(dups) > 1) "s" else "",
-        if (length(dups) > 1) "s" else "",
-        paste(dups, collapse = ", ")
-      ),
-      call. = FALSE
-    )
-  }
 
   reserved = intersect(names(x), c(".segment", ".id", "cluster"))
 
@@ -84,17 +92,31 @@ as_ctdf <- function(x, coords = c("longitude", "latitude"), time = "time", crs =
 
   o = copy(x)
   setnames(o, time, "timestamp")
+
+  dups = which(duplicated(o[, .(latitude, longitude, timestamp)]))
+  if (length(dups) > 0) {
+    stop(
+      sprintf(
+        "as_ctdf(): found %d duplicated point%s (latitude, longitude, timestamp) at row%s: %s",
+        length(dups),
+        if (length(dups) > 1) "s" else "",
+        if (length(dups) > 1) "s" else "",
+        paste(dups, collapse = ", ")
+      ),
+      call. = FALSE
+    )
+  }
+
   setorder(o, timestamp)
+
 
   o[, .id := .I]
   o[, .segment := NA_integer_]
   o[, cluster  := NA_integer_]
 
-  o = st_as_sf(o, coords = coords, crs = crs)
+  o = st_as_sf(o, coords = coords, crs = s_srs)
 
-  if (!missing(project_to)) {
-    o = st_transform(o, project_to)
-  }
+  o = st_transform(o, crs = t_srs)
 
   st_geometry(o) = "location"
 
@@ -122,16 +144,15 @@ as_ctdf <- function(x, coords = c("longitude", "latitude"), time = "time", crs =
 #'
 #' @examples
 #' data(toy_ctdf_k2)
-#' ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to = "+proj=eqearth")
+#' ctdf = as_ctdf(toy_ctdf_k2, s_srs = 4326, t_srs = "+proj=eqearth")
 #' s = as_ctdf_track(ctdf)
 #' plot(s['.id'])
 #'
 #' @export
 as_ctdf_track <- function(ctdf) {
   
-  if (!inherits(ctdf, "ctdf")) {
-    stop("as_ctdf_track() only works on objects of class 'ctdf'")
-  }
+  .check_ctdf(ctdf)
+
 
   o = ctdf |>
     st_as_sf() |>
@@ -140,7 +161,7 @@ as_ctdf_track <- function(ctdf) {
       start          = lag(timestamp), 
       stop           = timestamp
     )
-  crs = st_crs(o)
+  s_srs = st_s_srs(o)
 
   o = o |>
     dplyr::filter(!st_is_empty(location_prev))
@@ -153,7 +174,7 @@ as_ctdf_track <- function(ctdf) {
     ungroup() |>
     st_set_geometry("track") |>
     select(.id, .segment, start, stop, track)|>
-    st_set_crs(crs)
+    st_set_s_srs(s_srs)
 
 
 }

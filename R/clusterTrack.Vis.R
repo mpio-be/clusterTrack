@@ -15,7 +15,7 @@ NULL
 #' @export
 #' @examples
 #' data(pesa56511)
-#' ctdf  = as_ctdf(pesa56511, time = "locationDate", crs = 4326, project_to = "+proj=eqearth") |>cluster_track()
+#' ctdf  = as_ctdf(pesa56511, time = "locationDate", s_srs = 4326, t_srs = "+proj=eqearth") |>cluster_track()
 #' map(ctdf)
 
 map <- function(ctdf) {

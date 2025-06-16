@@ -37,21 +37,21 @@
 #' @export
 #' @examples
 #' data(toy_ctdf_k2)
-#' ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to = "+proj=eqearth")
+#' ctdf = as_ctdf(toy_ctdf_k2, s_srs = 4326, t_srs = "+proj=eqearth")
 #' slice_ctdf(ctdf)
 #' cluster_segments(ctdf)
 #' stitch_cluster(ctdf)
 #' map(ctdf)
 
 #' data(pesa56511)
-#' ctdf  = as_ctdf(pesa56511, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")
+#' ctdf  = as_ctdf(pesa56511, time = "locationDate", s_srs = 4326, t_srs = "+proj=eqearth")
 #' slice_ctdf(ctdf) 
 #' cluster_segments(ctdf)
 #' stitch_cluster(ctdf)
 #' map(ctdf)
 #' 
 #' data(lbdo66862)
-#' ctdf = as_ctdf(lbdo66862, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")
+#' ctdf = as_ctdf(lbdo66862, time = "locationDate", s_srs = 4326, t_srs = "+proj=eqearth")
 #' slice_ctdf(ctdf)
 #' cluster_segments(ctdf)
 #' stitch_cluster(ctdf)
@@ -60,8 +60,10 @@
 
 
 stitch_cluster <- function(ctdf,  overlap_threshold = 0) {
-  stopifnot(!is.unsorted(ctdf$timestamp))
   
+  .check_ctdf(ctdf)
+
+    
   repeat {
     n_prev = max(ctdf$cluster)
     .stitch(ctdf, overlap_threshold = overlap_threshold)

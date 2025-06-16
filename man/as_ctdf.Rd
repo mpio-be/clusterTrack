@@ -8,8 +8,8 @@ as_ctdf(
   x,
   coords = c("longitude", "latitude"),
   time = "time",
-  crs = NA,
-  project_to,
+  s_srs = 4326,
+  t_srs = 1078,
   ...
 )
 }
@@ -21,10 +21,9 @@ Defaults to `c("longitude", "latitude")`.}
 
 \item{time}{Name of the time column. Will be renamed to `"timestamp"` internally.}
 
-\item{crs}{Coordinate reference system. Default is NA. Upstream methods will warn when unprojected
-coordinates found (#TODO)}
+\item{s_srs}{Source spatial reference. Default is 4326.}
 
-\item{project_to}{passed to `st_transform()`.}
+\item{t_srs}{target spatial reference passed to `st_transform()`. Default is 1078 "+proj=eqearth".}
 
 \item{...}{Currently unused}
 }

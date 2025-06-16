@@ -26,7 +26,7 @@
     as_ctdf_track() |>
     mutate(len = st_length(track) |> set_units("km") |> as.numeric())
     
-  crs = st_crs(segs)
+  s_srs = st_s_srs(segs)
 
   ints = st_crosses(segs) 
 
@@ -73,11 +73,11 @@
 #' @export
 #' @examples
 #' data(toy_ctdf_k2)
-#' ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to = "+proj=eqearth")
+#' ctdf = as_ctdf(toy_ctdf_k2, s_srs = 4326, t_srs = "+proj=eqearth")
 #' ctdf = slice_ctdf(ctdf)  
 #' 
 #' data(pesa56511)
-#' ctdf = as_ctdf(pesa56511, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")
+#' ctdf = as_ctdf(pesa56511, time = "locationDate", s_srs = 4326, t_srs = "+proj=eqearth")
 #' slice_ctdf(ctdf )   
 
 
@@ -85,9 +85,7 @@
 
 slice_ctdf <- function(ctdf, deltaT = 30) {
 
-  if (!inherits(ctdf, "ctdf")) {
-    stop("slice_ctdf() only works on objects of class 'ctdf'")
-  }
+  .check_ctdf(ctdf)
 
   X = copy(ctdf)
   X[, .segment := NA]

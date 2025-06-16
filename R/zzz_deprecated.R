@@ -2,14 +2,14 @@
 # TODO: deprecate before new major release!
 
 #' @export
-as_tdbscan <- function(x, coords = c("longitude","latitude"),time = "time", crs = 4326) {
+as_tdbscan <- function(x, coords = c("longitude","latitude"),time = "time", s_srs = 4326) {
 
   o=  copy(x)  
 
   setnames(o, time, "timestamp")
   setorder(o, timestamp)
 
-  st_as_sf(o, coords = coords, crs = crs)
+  st_as_sf(o, coords = coords, s_srs = s_srs)
 
 
   }
@@ -42,7 +42,7 @@ as_tdbscan <- function(x, coords = c("longitude","latitude"),time = "time", crs 
 #' 
 #' # Pectoral Sandpiper
 #' data(pesa56511)
-#' x = as_tdbscan(pesa56511, time = "locationDate", crs = 4326)
+#' x = as_tdbscan(pesa56511, time = "locationDate", s_srs = 4326)
 #' x = st_transform(x, '+proj=eqearth')
 #' z = tdbscan(track=x, eps =6600 , minPts   = 8, maxLag = 6, borderPoints = TRUE )
 #' 

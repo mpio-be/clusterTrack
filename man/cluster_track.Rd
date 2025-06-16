@@ -6,38 +6,47 @@
 \usage{
 cluster_track(
   ctdf,
-  deltaT = 30,
+  deltaT = 1,
   threshold = 0.75,
   method = "quantile",
   overlap_threshold = 0
 )
 }
 \arguments{
-\item{ctdf}{A `ctdf` object (from [as_ctdf()]), representing sequential movement points with timestamps and locations.}
+\item{ctdf}{A `ctdf` data frame.}
 }
 \value{
-NULL.  The `ctdf` object is updated in place.
+NULL. The function updates the 'cluster' column of `ctdf` by reference.
 }
 \description{
-Perform clustering on a `ctdf` object to identify use-sites.
+Perform clustering on a `ctdf` object, identifying spatial-temporal segments and grouping them into clusters.
+}
+\details{
+This function is composed of three main components:
+- \code{slice_ctdf()} segments the track based on spatial and temporal criteria.
+- \code{cluster_segments()} clusters these segments into preliminary groups.
+- \code{stitch_cluster()} stitches clusters based on overlap criteria.
+
+See individual components for detailed implementation.
 }
 \examples{
 data(toy_ctdf_k2)
-ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to = "+proj=eqearth")
+ctdf = as_ctdf(toy_ctdf_k2, s_srs = 4326, t_srs = "+proj=eqearth")
 cluster_track(ctdf)
 map(ctdf)
 data(pesa56511)
-ctdf  = as_ctdf(pesa56511, time = "locationDate", crs = 4326, project_to = "+proj=eqearth") |>cluster_track()
+ctdf  = as_ctdf(pesa56511, time = "locationDate", s_srs = 4326, t_srs = "+proj=eqearth")
+cluster_track(deltaT =1)
 map(ctdf)
 
 data(lbdo66867)
-ctdf = as_ctdf(lbdo66867, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")
-cluster_track(ctdf)
+ctdf = as_ctdf(lbdo66867, time = "locationDate", s_srs = 4326, t_srs = "+proj=eqearth")
+cluster_track(ctdf, deltaT =1)
 map(ctdf)
 
 data(lbdo66862)
-ctdf = as_ctdf(lbdo66862, time = "locationDate", crs = 4326, project_to = "+proj=eqearth")
-cluster_track(ctdf)
+ctdf = as_ctdf(lbdo66862, time = "locationDate", s_srs = 4326, t_srs = "+proj=eqearth")
+cluster_track(ctdf,deltaT =1)
 map(ctdf)
 
 

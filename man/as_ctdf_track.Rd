@@ -23,7 +23,7 @@ The number of rows is nrow(ctdf) - i, where i = 1 and corresponds to the startin
 }
 \examples{
 data(toy_ctdf_k2)
-ctdf = as_ctdf(toy_ctdf_k2, crs = 4326, project_to = "+proj=eqearth")
+ctdf = as_ctdf(toy_ctdf_k2, s_srs = 4326, t_srs = "+proj=eqearth")
 s = as_ctdf_track(ctdf)
 plot(s['.id'])
 

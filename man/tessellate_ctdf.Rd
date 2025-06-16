@@ -21,7 +21,7 @@ Dirichlet polygons are computed via the `deldir` package.
 \examples{
 library(clusterTrack)
 data(toy_ctdf_k2)
-ctdf = as_ctdf(toy_ctdf_k2,crs = 4326, project_to = "+proj=eqearth")
+ctdf = as_ctdf(toy_ctdf_k2,s_srs = 4326, t_srs = "+proj=eqearth")
 x = tessellate_ctdf(ctdf)
 s = prune_tesselation(x, threshold = 1, method = 'sd')
 
