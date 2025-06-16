@@ -174,7 +174,7 @@ as_ctdf_track <- function(ctdf) {
     ungroup() |>
     st_set_geometry("track") |>
     select(.id, .segment, start, stop, track)|>
-    st_set_s_srs(s_srs)
+    st_set_crs(s_srs)
 
 
 }

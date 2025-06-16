@@ -1,6 +1,4 @@
 
-data(toy_ctdf_k2)
-ctdf = as_ctdf(toy_ctdf_k2)
 
 # Test .check_ctdf
 
@@ -10,6 +8,8 @@ test_that(".check_ctdf errors on non-ctdf input", {
 
 
 test_that(".check_ctdf errors on unsorted timestamp", {
+  ctdf = as_ctdf(toy_ctdf_k2)
+
   x = ctdf[sample(.N)]
 
   expect_error(.check_ctdf(x))
@@ -17,7 +17,7 @@ test_that(".check_ctdf errors on unsorted timestamp", {
 
 
 test_that(".check_ctdf errors when required columns missing", {
-
+  ctdf = as_ctdf(toy_ctdf_k2)
   x = copy(ctdf)[, .id := NULL]
   expect_error(.check_ctdf(x))
 
@@ -42,18 +42,18 @@ test_that("as_ctdf warns on reserved columns", {
 # Test as_ctdf_track
 
 test_that("as_ctdf_track creates LINESTRING segments", {
-  ctdf = as_ctdf(test_dt)
+  ctdf = as_ctdf(toy_ctdf_k2)
   track = as_ctdf_track(ctdf)
   expect_true(nrow(track) == nrow(ctdf) - 1)
-  geom_types = st_geometry_type(track)
+  geom_types = st_geometry_type(track$track)
   expect_true(all(geom_types == "LINESTRING"))
 })
 
 # Test summary.ctdf
 
 test_that("summary.ctdf returns correct summary", {
-  ctdf = as_ctdf(test_dt)
-  ctdf[, cluster := c(1, 1, 2)]
+  ctdf = as_ctdf(toy_ctdf_k2)
+  ctdf[c(1:2, 4:5, 7:9), cluster := rep(c(1, 1, 2), each = 2)]
   sum_tbl = summary(ctdf)
   expect_s3_class(sum_tbl, c("summary_ctdf", "data.table", "data.frame"))
   expect_equal(nrow(sum_tbl), 2)
@@ -67,6 +67,6 @@ test_that("summary.ctdf returns correct summary", {
 # Test plot.ctdf
 
 test_that("plot.ctdf runs without error", {
-  ctdf = as_ctdf(test_dt)
+  ctdf = as_ctdf(toy_ctdf_k2)
   expect_silent(plot(ctdf))
 })
