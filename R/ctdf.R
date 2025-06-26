@@ -161,7 +161,7 @@ as_ctdf_track <- function(ctdf) {
       start          = lag(timestamp), 
       stop           = timestamp
     )
-  s_srs = st_s_srs(o)
+  this_crs = st_crs(o)
 
   o = o |>
     dplyr::filter(!st_is_empty(location_prev))
@@ -174,7 +174,7 @@ as_ctdf_track <- function(ctdf) {
     ungroup() |>
     st_set_geometry("track") |>
     select(.id, .segment, start, stop, track)|>
-    st_set_crs(s_srs)
+    st_set_crs(this_crs)
 
 
 }
@@ -190,7 +190,7 @@ as_ctdf_track <- function(ctdf) {
 #' @return A `data.table` (and `data.frame`) of class c("summary_ctdf","data.table","data.frame").
 #' @export
 summary.ctdf = function(object, ...) {
-  tbl = object[, .(
+  tbl = object[!is.na(cluster), .(
     start    = min(timestamp),
     stop     = max(timestamp),
     tenure   = difftime(max(timestamp), min(timestamp), units = "days") ,

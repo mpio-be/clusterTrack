@@ -9,7 +9,7 @@ as_ctdf(
   coords = c("longitude", "latitude"),
   time = "time",
   s_srs = 4326,
-  t_srs = 1078,
+  t_srs = "+proj=eqearth",
   ...
 )
 }
@@ -23,7 +23,7 @@ Defaults to `c("longitude", "latitude")`.}
 
 \item{s_srs}{Source spatial reference. Default is 4326.}
 
-\item{t_srs}{target spatial reference passed to `st_transform()`. Default is 1078 "+proj=eqearth".}
+\item{t_srs}{target spatial reference passed to `st_transform()`. Default is "+proj=eqearth".}
 
 \item{...}{Currently unused}
 }

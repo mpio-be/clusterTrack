@@ -26,7 +26,6 @@
     as_ctdf_track() |>
     mutate(len = st_length(track) |> set_units("km") |> as.numeric())
     
-  s_srs = st_s_srs(segs)
 
   ints = st_crosses(segs) 
 
