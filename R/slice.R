@@ -82,7 +82,7 @@
 
 
 
-slice_ctdf <- function(ctdf, deltaT = 30) {
+slice_ctdf <- function(ctdf, deltaT = 1) {
 
   .check_ctdf(ctdf)
 
