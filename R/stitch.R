@@ -41,21 +41,18 @@
 #' slice_ctdf(ctdf)
 #' cluster_segments(ctdf)
 #' stitch_cluster(ctdf)
-#' map(ctdf)
 
 #' data(pesa56511)
 #' ctdf  = as_ctdf(pesa56511, time = "locationDate", s_srs = 4326, t_srs = "+proj=eqearth")
 #' slice_ctdf(ctdf) 
 #' cluster_segments(ctdf)
 #' stitch_cluster(ctdf)
-#' map(ctdf)
 #' 
 #' data(lbdo66862)
 #' ctdf = as_ctdf(lbdo66862, time = "locationDate", s_srs = 4326, t_srs = "+proj=eqearth")
 #' slice_ctdf(ctdf)
 #' cluster_segments(ctdf)
 #' stitch_cluster(ctdf)
-#' map(ctdf)
 
 
 

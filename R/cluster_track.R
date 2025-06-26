@@ -42,23 +42,18 @@ plot.clusterTrack <- function(x ) {
 #' data(toy_ctdf_k2)
 #' ctdf = as_ctdf(toy_ctdf_k2, s_srs = 4326, t_srs = "+proj=eqearth")
 #' cluster_track(ctdf)
-#' map(ctdf)
-
-
+#' 
 #' data(pesa56511)
 #' ctdf  = as_ctdf(pesa56511, time = "locationDate", s_srs = 4326, t_srs = "+proj=eqearth")
 #' cluster_track(deltaT =1)
-#' map(ctdf)
 #' 
 #' data(lbdo66867)
 #' ctdf = as_ctdf(lbdo66867, time = "locationDate", s_srs = 4326, t_srs = "+proj=eqearth")
 #' cluster_track(ctdf, deltaT =1)
-#' map(ctdf)
 #' 
 #' data(lbdo66862)
 #' ctdf = as_ctdf(lbdo66862, time = "locationDate", s_srs = 4326, t_srs = "+proj=eqearth")
 #' cluster_track(ctdf,deltaT =1)
-#' map(ctdf)
 #' 
 #' 
 

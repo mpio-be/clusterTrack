@@ -1,8 +1,7 @@
 
 #' @import foreach 
 #' @import sf data.table  
-
-#' @import ggplot2 glue
+#' @importFrom glue glue_data
 #' 
 #' @importFrom igraph graph_from_edgelist set_edge_attr subgraph_from_edges E groups
 #' @importFrom igraph graph_from_adj_list as_undirected components

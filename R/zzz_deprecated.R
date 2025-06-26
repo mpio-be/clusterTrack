@@ -34,13 +34,6 @@ as_tdbscan <- function(x, coords = c("longitude","latitude"),time = "time", crs 
 #' @md
 #'
 #' @examples
-#' require(clusterTrack)
-#' require(data.table)
-#' require(magrittr)
-#' require(ggplot2)
-
-#' 
-#' # Pectoral Sandpiper
 #' data(pesa56511)
 #' x = as_tdbscan(pesa56511, time = "locationDate", s_srs = 4326)
 #' x = st_transform(x, '+proj=eqearth')

@@ -28,12 +28,6 @@ tdbscan
 When maxLag is set to \code{maxLag>N} output is the same as for \link[dbscan:dbscan]{dbscan}.
 }
 \examples{
-require(clusterTrack)
-require(data.table)
-require(magrittr)
-require(ggplot2)
-
-# Pectoral Sandpiper
 data(pesa56511)
 x = as_tdbscan(pesa56511, time = "locationDate", s_srs = 4326)
 x = st_transform(x, '+proj=eqearth')

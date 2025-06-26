@@ -13,19 +13,16 @@
 #' ctdf = as_ctdf(toy_ctdf_k2, s_srs = 4326, t_srs = "+proj=eqearth")
 #' slice_ctdf(ctdf)
 #' cluster_segments(ctdf )
-#' map(ctdf)
 #'
 #' data(lbdo66867)
 #' ctdf = as_ctdf(lbdo66867, time = "locationDate", s_srs = 4326, t_srs = "+proj=eqearth")
 #' slice_ctdf(ctdf)
 #' cluster_segments(ctdf)
-#' map(ctdf)
 #'
 #' data(pesa56511)
 #' ctdf  = as_ctdf(pesa56511, time = "locationDate", s_srs = 4326, t_srs = "+proj=eqearth")
 #' slice_ctdf(ctdf) 
 #' cluster_segments(ctdf) 
-#' map(ctdf)
 #' 
 cluster_segments <- function(ctdf, threshold = 0.75, method = "quantile") {
 
