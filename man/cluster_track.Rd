@@ -13,21 +13,20 @@ cluster_track(
 )
 }
 \arguments{
-\item{ctdf}{A `ctdf` data frame.}
+\item{ctdf}{A `ctdf` data frame (see [as_ctdf()]) representing a single movement track, modified by reference.}
+
+\item{deltaT}{Numeric. Passed to [slice_cdf()] The maximum temporal gap (in days) allowed between intersecting segments. Default is 1 day.}
+
+\item{thereshold}{Numeric. ...}
 }
 \value{
-NULL. The function updates the 'cluster' column of `ctdf` by reference.
+NULL. The function modifies `ctdf` by reference, adding or updating the column \code{cluster}, which assigns a cluster ID to each row (point).
 }
 \description{
-Perform clustering on a `ctdf` object, identifying spatial-temporal segments and grouping them into clusters.
+Performs spatial-temporal clustering on a `ctdf` object by identifying movement segments, then isolating their stop portions of a track and then and grouping them into clusters.
 }
 \details{
-This function is composed of three main components:
-- \code{slice_ctdf()} segments the track based on spatial and temporal criteria.
-- \code{cluster_segments()} clusters these segments into preliminary groups.
-- \code{stitch_cluster()} stitches clusters based on overlap criteria.
-
-See individual components for detailed implementation.
+This is a high-level wrapper function that applies a pipeline of segmentation, clustering, and stitching steps on a movement track stored in a `ctdf` object.
 }
 \examples{
 data(toy_ctdf_k2)
@@ -36,15 +35,15 @@ cluster_track(ctdf)
 
 data(pesa56511)
 ctdf  = as_ctdf(pesa56511, time = "locationDate", s_srs = 4326, t_srs = "+proj=eqearth")
-cluster_track(deltaT =1)
+cluster_track(ctdf)
 
 data(lbdo66867)
 ctdf = as_ctdf(lbdo66867, time = "locationDate", s_srs = 4326, t_srs = "+proj=eqearth")
-cluster_track(ctdf, deltaT =1)
+cluster_track(ctdf)
 
 data(lbdo66862)
 ctdf = as_ctdf(lbdo66862, time = "locationDate", s_srs = 4326, t_srs = "+proj=eqearth")
-cluster_track(ctdf,deltaT =1)
+cluster_track(ctdf)
 
 
 }
