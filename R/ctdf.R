@@ -51,7 +51,7 @@ plot.ctdf <- function(x,y = NULL,  pch = 16) {
 #' Converts an object with spatial coordinates and a timestamp column
 #' to a standardized `sf/data.table`-based format used internally by the clusterTrack package.
 #'
-#' @param x       A `data.table` object.
+#' @param x       A `data.frame` object.
 #' @param coords  Character vector of length 2 specifying the coordinate column names.
 #'                Defaults to `c("longitude", "latitude")`.
 #' @param time    Name of the time column. Will be renamed to `"timestamp"` internally.
@@ -90,10 +90,10 @@ as_ctdf <- function(x, coords = c("longitude", "latitude"), time = "time", s_srs
     )
   }
 
-  o = copy(x)
-  setnames(o, time, "timestamp")
+  o =  as.data.table(x)
+  setnames(o, c(coords, time), c("X", "Y", "timestamp"))
 
-  dups = which(duplicated(o[, .(latitude, longitude, timestamp)]))
+  dups = which(duplicated(o[, .(Y, X, timestamp)]))
   if (length(dups) > 0) {
     stop(
       sprintf(
@@ -109,12 +109,11 @@ as_ctdf <- function(x, coords = c("longitude", "latitude"), time = "time", s_srs
 
   setorder(o, timestamp)
 
-
   o[, .id := .I]
   o[, .segment := NA_integer_]
   o[, cluster  := NA_integer_]
 
-  o = st_as_sf(o, coords = coords, crs = s_srs)
+  o = st_as_sf(o, coords = c("X", "Y"), crs = s_srs)
 
   o = st_transform(o, crs = t_srs)
 
