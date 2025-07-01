@@ -4,12 +4,12 @@
 \alias{summary.ctdf}
 \title{Summarise a ctdf by cluster}
 \usage{
-\method{summary}{ctdf}(object, ...)
+\method{summary}{ctdf}(ctdf, ...)
 }
 \arguments{
-\item{object}{A `ctdf` (inherits `data.table`).}
-
 \item{...}{Currently ignored.}
+
+\item{object}{A `ctdf` (inherits `data.table`).}
 }
 \value{
 A `data.table` (and `data.frame`) of class c("summary_ctdf","data.table","data.frame").
@@ -17,4 +17,12 @@ A `data.table` (and `data.frame`) of class c("summary_ctdf","data.table","data.f
 \description{
 Returns one row per `cluster` with start/stop times, tenure (days),
 convex‐hull centroid and row‐count.
+}
+\examples{
+#' data(toy_ctdf_k2)
+ctdf = as_ctdf(toy_ctdf_k2)
+cluster_track(ctdf)
+summary(ctdf)
+
+
 }

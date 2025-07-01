@@ -20,7 +20,6 @@
 
 }
 
-
 #' @export
 as_ctdf <- function(x, ...) {
   UseMethod("as_ctdf")
@@ -143,7 +142,7 @@ as_ctdf <- function(x, coords = c("longitude", "latitude"), time = "time", s_srs
 #'
 #' @examples
 #' data(toy_ctdf_k2)
-#' ctdf = as_ctdf(toy_ctdf_k2, s_srs = 4326, t_srs = "+proj=eqearth")
+#' ctdf = as_ctdf(toy_ctdf_k2)
 #' s = as_ctdf_track(ctdf)
 #' plot(s['.id'])
 #'
@@ -188,15 +187,36 @@ as_ctdf_track <- function(ctdf) {
 #' @param ...  Currently ignored.
 #' @return A `data.table` (and `data.frame`) of class c("summary_ctdf","data.table","data.frame").
 #' @export
-summary.ctdf = function(object, ...) {
-  tbl = object[!is.na(cluster), .(
+#' @examples 
+#' #' data(toy_ctdf_k2)
+#' ctdf = as_ctdf(toy_ctdf_k2)
+#' cluster_track(ctdf)
+#' summary(ctdf)
+#' 
+#' 
+summary.ctdf = function(ctdf, ...) {
+  
+  .check_ctdf(ctdf)
+
+  # TODO: pre-cluster summary. 
+
+  out = 
+  ctdf[cluster > 0, .(
     start    = min(timestamp),
     stop     = max(timestamp),
-    tenure   = difftime(max(timestamp), min(timestamp), units = "days") ,
     geometry = st_union(location) |> st_convex_hull() |> st_centroid(),
     segment  = unique(.segment),
     N        = .N
   ), by = cluster]
-  class(tbl) = c("summary_ctdf", class(tbl))
-  tbl
+
+  out[, tenure := difftime(stop, start, units = "days")]
+
+  out[, next_geom := geometry[ shift(seq_len(.N), type = "lead") ] ]
+
+  out[, dist_to_next := st_distance(geometry, next_geom, by_element = TRUE)]
+
+  out[, next_geom := NULL]
+
+  class(out) = c("summary_ctdf", class(out))
+  out
 }

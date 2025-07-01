@@ -14,7 +14,7 @@ as_ctdf(
 )
 }
 \arguments{
-\item{x}{A `data.table` object.}
+\item{x}{A `data.frame` object.}
 
 \item{coords}{Character vector of length 2 specifying the coordinate column names.
 Defaults to `c("longitude", "latitude")`.}
