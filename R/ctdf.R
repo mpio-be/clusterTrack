@@ -205,7 +205,7 @@ summary.ctdf = function(ctdf, ...) {
     start    = min(timestamp),
     stop     = max(timestamp),
     geometry = st_union(location) |> st_convex_hull() |> st_centroid(),
-    segment  = unique(.segment),
+    segments  = list(range(.segment, na.rm = TRUE)) ,
     N        = .N
   ), by = cluster]
 
