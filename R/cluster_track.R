@@ -49,7 +49,7 @@ plot.clusterTrack <- function(x) {
 #'                        Default to `FALSE`.
 #'                        Passed to [cluster_segments()].
 #' #' @param overlap_threshold Numeric between 0 and 1; minimum area‐overlap ratio
-#'                          required to merge adjacent clusters. 
+#'                          required to merge adjacent clusters. Default to 0.1.
 #'                          Clusters with overlap > threshold are combined.
 #'                          Passed to [stitch_cluster()]
 
@@ -78,7 +78,7 @@ plot.clusterTrack <- function(x) {
 #' 
 
 
-cluster_track <- function(ctdf,deltaT = 1, nmin = 3, threshold = 0.90, method = "quantile", time_contiguity = FALSE, overlap_threshold = 0) {
+cluster_track <- function(ctdf,deltaT = 1, nmin = 3, threshold = 0.90, method = "quantile", time_contiguity = FALSE, overlap_threshold = 0.1) {
 
   ctdf |>
   slice_ctdf(deltaT = deltaT) |>
