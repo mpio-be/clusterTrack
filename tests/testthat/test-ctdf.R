@@ -53,11 +53,14 @@ test_that("as_ctdf_track creates LINESTRING segments", {
 
 test_that("summary.ctdf returns correct summary", {
   ctdf = as_ctdf(toy_ctdf_k2)
-  ctdf[c(1:2, 4:5), cluster := rep(c(1,2), each = 2)]
+  ctdf[c(1:2, 4:5), let(cluster = rep(c(1, 2), each = 2))][, .segment := cluster]
   sum_tbl = summary(ctdf)
   expect_s3_class(sum_tbl, c("summary_ctdf", "data.table", "data.frame"))
   expect_equal(nrow(sum_tbl), 2)
-  expect_true(all(c('start', 'stop', 'tenure', 'geometry', 'segment', 'N') %in% names(sum_tbl)))
+  expect_true(all(c(
+    "cluster", "start", "stop", "geometry", "segments", "N", "tenure",
+    "dist_to_next"
+  ) %in% names(sum_tbl)))
 
 })
 

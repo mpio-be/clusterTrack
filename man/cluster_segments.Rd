@@ -2,18 +2,50 @@
 % Please edit documentation in R/cluster.R
 \name{cluster_segments}
 \alias{cluster_segments}
-\title{Cluster segments}
+\title{Cluster segments of a ctdf}
 \usage{
-cluster_segments(ctdf, threshold = 0.75, method = "quantile")
+cluster_segments(
+  ctdf,
+  nmin = 3,
+  threshold = 0.9,
+  method = "quantile",
+  time_contiguity = FALSE
+)
 }
 \arguments{
-\item{ctdf}{A `ctdf`.}
+\item{ctdf}{A `ctdf` object, must contain a `.segment` column; see [slice_ctdf()],.}
+
+\item{nmin}{Integer. Segments or tessellations with fewer than nmin points yield no clusters.
+Default to 3.}
+
+\item{threshold}{Numeric. If `method = "sd"`, interpreted as the probability for
+the area quantile used in pruning.
+If `method = "quantile"`, interpreted as the multiplier of the standard deviation
+on log‐areas used in pruning.}
+
+\item{method}{Character, one of `"sd"` or `"quantile"`. Determines the pruning
+strategy in the tessellation step:  
+- `"sd"`: prune cells with area < quantile(polygon_area, probs = threshold)  
+- `"quantile"`: prune cells with log(area) ≤ mean(log(area)) + threshold * sd(log(area))}
+
+\item{time_contiguity}{Logical; if `TRUE`, missing cluster IDs are forward‐filled
+and backward‐filled within each segment to enforce temporal continuity. Default to `FALSE`.}
 }
 \value{
-NULL.  The `ctdf` object is updated in place.
+Invisibly returns `NULL`. The input `ctdf` is modified by reference,
+ updating the column `cluster`; `0` indicates unclustered points.
 }
 \description{
-Cluster segments
+Compute cluster IDs for each point in a `ctdf` by segment, using Dirichlet
+tessellation followed by area-based pruning, spatial adjacency and graph-based clustering.
+Optionally enforce temporal contiguity of clusters within each segment.
+}
+\details{
+For each unique segment in `ctdf`, points are tessellated via
+  [tessellate_ctdf()], pruned via [prune_tesselation()], and adjacency
+  neighborhoods are computed with `poly2nb()`. These neighborhoods are
+  converted to an undirected graph, and clusters are identified as connected
+  components.
 }
 \examples{
 data(toy_ctdf_k2)

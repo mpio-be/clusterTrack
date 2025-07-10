@@ -30,9 +30,17 @@
   set(ctdf, j = "cluster", value = o$cluster)
 }
 
-
-#' stitch_cluster
-#' stitch a cluster
+#' Stitch clusters by spatial overlap across segments
+#'
+#' Iteratively merge spatial clusters in a CTDF based on the area overlap of
+#' their convex hulls. Clusters whose hulls overlap above a specified ratio
+#' are combined into a single cluster ID.
+#'
+#' @param ctdf A CTDF object. Must contain an updated `cluster` column.
+#' @param overlap_threshold Numeric between 0 and 1; minimum area‐overlap ratio
+#'                          required to merge adjacent clusters. 
+#'                          Clusters with overlap > threshold are combined.
+#'#' @return The input CTDF, with an updated (in-place) cluster` column.
 #'
 #' @export
 #' @examples

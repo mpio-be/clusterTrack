@@ -66,8 +66,17 @@
 }
 
 
-#' segment and filter a ctdf
-#' slice_ctdf
+#' Segment and filter a CTDF by temporal continuity and spatial clustering
+#'
+#' Recursively splits a CTDF into continuous bouts. The split stops when any bout  has one
+#' cluster (via HDBSCAN).
+
+#' @param ctdf A CTDF object.
+#' @param deltaT Numeric; maximum allowable gap (in days) between segment
+#'   endpoints to consider them continuous.
+#' @return The input CTDF, updated (in-place) with an integer
+#'   \code{.segment} column indicating bout membership.
+
 
 #' @export
 #' @examples

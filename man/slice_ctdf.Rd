@@ -2,14 +2,23 @@
 % Please edit documentation in R/slice.R
 \name{slice_ctdf}
 \alias{slice_ctdf}
-\title{segment and filter a ctdf
-slice_ctdf}
+\title{Segment and filter a CTDF by temporal continuity and spatial clustering}
 \usage{
 slice_ctdf(ctdf, deltaT = 1)
 }
+\arguments{
+\item{ctdf}{A CTDF object.}
+
+\item{deltaT}{Numeric; maximum allowable gap (in days) between segment
+endpoints to consider them continuous.}
+}
+\value{
+The input CTDF, updated (in-place) with an integer
+  \code{.segment} column indicating bout membership.
+}
 \description{
-segment and filter a ctdf
-slice_ctdf
+Recursively splits a CTDF into continuous bouts. The split stops when any bout  has one
+cluster (via HDBSCAN).
 }
 \examples{
 data(toy_ctdf_k2)
