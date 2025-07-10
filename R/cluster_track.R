@@ -24,7 +24,7 @@ plot.clusterTrack <- function(x) {
 
 #' Cluster movement tracks
 #'
-#' Performs spatial-temporal clustering on a `ctdf` object by identifying movement segments, then isolating their stop portions of a track and then and grouping them into clusters.
+#' Performs spatiotemporal clustering on a ctdf by segmenting movement, identifying stops, and applying DBSCAN-like clustering.
 #'
 #'
 #' This is a high-level wrapper function that applies a pipeline of segmentation, clustering, and stitching steps on a movement track stored in a `ctdf` object.

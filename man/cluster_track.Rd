@@ -47,7 +47,7 @@ Passed to [cluster_segments()].}
 NULL. The function modifies `ctdf` by reference, adding or updating the column \code{cluster}, which assigns a cluster ID to each row (point).
 }
 \description{
-Performs spatial-temporal clustering on a `ctdf` object by identifying movement segments, then isolating their stop portions of a track and then and grouping them into clusters.
+Performs spatiotemporal clustering on a ctdf by segmenting movement, identifying stops, and applying DBSCAN-like clustering.
 }
 \details{
 This is a high-level wrapper function that applies a pipeline of segmentation, clustering, and stitching steps on a movement track stored in a `ctdf` object.
