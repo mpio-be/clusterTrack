@@ -48,12 +48,21 @@ tessellate_ctdf <- function(ctdf) {
 
 #' @export
 prune_tesselation <- function(x, threshold = 1, method = c("sd", "quantile")) {
-    
+
+  method = match.arg(method)
+
   prune =
-    if (method == "quantile")       x$A < quantile(x$A, probs = threshold) else
+    if (method == "quantile") {
+      if (!between(threshold, 0, 1)) {
+        stop("for quantile method, 'threshold' must be in [0,1]")
+      }
+      prune = x$A < quantile(x$A, probs = threshold) 
+    }      
+    
+    
     if (method == "sd") {
       logA = log(x$A)
-      logA <= (mean(logA) + threshold * sd(logA))
+      prune = logA <= (mean(logA) + threshold * sd(logA))
     }      
 
   dplyr::filter(x, prune)
