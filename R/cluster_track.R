@@ -55,21 +55,24 @@ plot.clusterTrack <- function(x) {
 
 #' @export
 #' @examples
-#' data(toy_ctdf_k2)
-#' ctdf = as_ctdf(toy_ctdf_k2)
+#' data(toy_ctdf_k3)
+#' ctdf = as_ctdf(toy_ctdf_k3)
 #' cluster_track(ctdf)
 #' \dontrun{
 #' data(pesa56511)
 #' ctdf = as_ctdf(pesa56511, time = "locationDate")
 #' cluster_track(ctdf)
 #'
-#' data(lbdo66867)
-#' ctdf = as_ctdf(lbdo66867, time = "locationDate")
-#' cluster_track(ctdf)
-#'
 #' data(lbdo66862)
 #' ctdf = as_ctdf(lbdo66862, time = "locationDate")
 #' cluster_track(ctdf)
+#' 
+#' 
+#' data(ruff143789)
+#' ctdf = as_ctdf(ruff143789, time = "locationDate")
+#' cluster_track(ctdf )
+#' 
+#' 
 #' }
 
 cluster_track <- function(ctdf,deltaT = 1, nmin = 3, threshold = 1, method = "sd", time_contiguity = FALSE, overlap_threshold = 0.1) {

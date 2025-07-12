@@ -54,20 +54,23 @@ Performs spatiotemporal clustering on a ctdf by segmenting movement, identifying
 This is a high-level wrapper function that applies a pipeline of segmentation, clustering, and stitching steps on a movement track stored in a `ctdf` object.
 }
 \examples{
-data(toy_ctdf_k2)
-ctdf = as_ctdf(toy_ctdf_k2)
+data(toy_ctdf_k3)
+ctdf = as_ctdf(toy_ctdf_k3)
 cluster_track(ctdf)
 \dontrun{
 data(pesa56511)
 ctdf = as_ctdf(pesa56511, time = "locationDate")
 cluster_track(ctdf)
 
-data(lbdo66867)
-ctdf = as_ctdf(lbdo66867, time = "locationDate")
-cluster_track(ctdf)
-
 data(lbdo66862)
 ctdf = as_ctdf(lbdo66862, time = "locationDate")
 cluster_track(ctdf)
+
+
+data(ruff143730)
+ctdf = as_ctdf(ruff143730, time = "locationDate")
+cluster_track(ctdf )
+
+
 }
 }

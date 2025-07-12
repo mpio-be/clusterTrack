@@ -13,16 +13,6 @@ require(tracktools)
   pesa56511 = copy(d)[, let( tagID = NULL)]
   usethis::use_data(pesa56511, overwrite = TRUE)
 
-# lbdo66867
-  d = dbq(q = 'SELECT distinct tagID, latitude,longitude,locationDate,locationClass FROM ARGOS.ARGOS_ALL where tagID = "66867"')[, i := .I]
-  d = d[!i%in% c(128,138,265,331,334)]
-  d = tracktools::argos_prepare(d)
-  d = unique(d, by = c("latitude", "longitude"))
-
-  # check tracktools::flagpts(d)
-
-  lbdo66867 = copy(d)[, let(i = NULL, tagID = NULL)]
-  usethis::use_data(lbdo66867, overwrite = TRUE)
 
 # lbdo66862
   d = dbq(q = 'SELECT distinct tagID, latitude,longitude,locationDate,locationClass FROM ARGOS.ARGOS_ALL where tagID = "66862"')[, pk := .I]
@@ -36,12 +26,29 @@ require(tracktools)
   usethis::use_data(lbdo66862, overwrite = TRUE)
 
 
+# ruff143789
+  d = dbq(q = 'SELECT distinct tagID, latitude,longitude,locationDate,locationClass, pk FROM ARGOS.2015_RUFF
+        where tagID = "143789" ')
+  d = d[locationDate < as.POSIXct('2015-07-15 00:00:00') &  locationDate > as.POSIXct('2015-04-15 00:00:00')]
+  #' ds = st_as_sf(d, coords = c("longitude", "latitude"), crs = 4326)
+  #' mapview(ds)
+  #' tracktools::flagpts(d)
+
+
+  d = d[!pk %in% c(275128,275129,275130,275134,275268)]
+  d = tracktools::argos_prepare(d)
+  d = unique(d, by = c("latitude", "longitude"))
+
+
+  ruff143789 = d[, .( latitude,longitude,locationDate,locationClass )]
+  usethis::use_data(ruff143789, overwrite = TRUE)
 
 
 
 
 
-# toy_ctdf_k2: 2 simple clusters, movement from a to b and back.
+
+# toy_ctdf_k3: 3 clusters, movement from a to b and back.
   require(leaflet)
   require(sf)
   require(data.table)
@@ -81,7 +88,7 @@ require(tracktools)
   tt = as_ctdf_track(ctdf)
   mapview(cc) + mapview(tt)
 
-  toy_ctdf_k2 = x
-  setnames(toy_ctdf_k2, c("longitude", "latitude", "time"))
+  toy_ctdf_k3 = x
+  setnames(toy_ctdf_k3, c("longitude", "latitude", "time"))
 
-  usethis::use_data(toy_ctdf_k2, overwrite = TRUE)
+  usethis::use_data(toy_ctdf_k3, overwrite = TRUE)

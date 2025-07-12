@@ -22,8 +22,8 @@ ends at the position of the current row.
 The number of rows is nrow(ctdf) - i, where i = 1 and corresponds to the starting index in ctdf.
 }
 \examples{
-data(toy_ctdf_k2)
-ctdf = as_ctdf(toy_ctdf_k2)
+data(toy_ctdf_k3)
+ctdf = as_ctdf(toy_ctdf_k3)
 s = as_ctdf_track(ctdf)
 plot(s['.id'])
 

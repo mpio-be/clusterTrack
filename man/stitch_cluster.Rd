@@ -20,8 +20,8 @@ their convex hulls. Clusters whose hulls overlap above a specified ratio
 are combined into a single cluster ID.
 }
 \examples{
-data(toy_ctdf_k2)
-ctdf = as_ctdf(toy_ctdf_k2, s_srs = 4326, t_srs = "+proj=eqearth")
+data(toy_ctdf_k3)
+ctdf = as_ctdf(toy_ctdf_k3, s_srs = 4326, t_srs = "+proj=eqearth")
 slice_ctdf(ctdf)
 cluster_segments(ctdf)
 stitch_cluster(ctdf)

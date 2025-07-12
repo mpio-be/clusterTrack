@@ -14,7 +14,8 @@ A data.table with 882 rows and 4 columns:
 }
 }
 \source{
-Department of Ornithology, Max Planck Institute for Biological Intelligence.
+Kempenaers, Bart, and Mihai Valcu. "Breeding site sampling across the Arctic 
+         by individual males of a polygynous shorebird." Nature 541.7638 (2017): 528-531.
 }
 \usage{
 pesa56511

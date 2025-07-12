@@ -14,8 +14,8 @@
 #' @export
 #' @examples
 #' library(clusterTrack)
-#' data(toy_ctdf_k2)
-#' ctdf = as_ctdf(toy_ctdf_k2,s_srs = 4326, t_srs = "+proj=eqearth")
+#' data(toy_ctdf_k3)
+#' ctdf = as_ctdf(toy_ctdf_k3,s_srs = 4326, t_srs = "+proj=eqearth")
 #' x = tessellate_ctdf(ctdf)
 #' s = prune_tesselation(x, threshold = 1, method = 'sd')
 #' 
