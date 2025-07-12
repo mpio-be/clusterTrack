@@ -39,14 +39,14 @@ plot.clusterTrack <- function(x) {
 #'                  on log‐areas used in pruning. Passed to [cluster_segments()].
 #' @param method Character, one of `"sd"` or `"quantile"`. Determines the pruning
 #'               strategy in the tessellation step:
-#'               - `"sd"`: prune cells with area < quantile(polygon_area, probs = threshold)
-#'               - `"quantile"`: prune cells with log(area) ≤ mean(log(area)) + threshold * sd(log(area)).
+#'               - `"quantile"`: prune cells with area < quantile(polygon_area, probs = threshold)
+#'               - `"sd"`: prune cells with log(area) ≤ mean(log(area)) + threshold * sd(log(area)).
 #'               Passed to [cluster_segments()].
 #' @param time_contiguity Logical; if `TRUE`, missing cluster IDs are forward‐filled.
 #'                        and backward‐filled within each segment to enforce temporal continuity.
 #'                        Default to `FALSE`.
 #'                        Passed to [cluster_segments()].
-#' #' @param overlap_threshold Numeric between 0 and 1; minimum area‐overlap ratio
+#' @param overlap_threshold Numeric between 0 and 1; minimum area‐overlap ratio
 #'                          required to merge adjacent clusters. Default to 0.1.
 #'                          Clusters with overlap > threshold are combined.
 #'                          Passed to [stitch_cluster()]
@@ -72,7 +72,7 @@ plot.clusterTrack <- function(x) {
 #' cluster_track(ctdf)
 #' }
 
-cluster_track <- function(ctdf,deltaT = 1, nmin = 3, threshold = 0.90, method = "quantile", time_contiguity = FALSE, overlap_threshold = 0.1) {
+cluster_track <- function(ctdf,deltaT = 1, nmin = 3, threshold = 1, method = "sd", time_contiguity = FALSE, overlap_threshold = 0.1) {
 
   ctdf |>
   slice_ctdf(deltaT = deltaT) |>

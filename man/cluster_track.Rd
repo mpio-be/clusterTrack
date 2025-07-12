@@ -8,16 +8,16 @@ cluster_track(
   ctdf,
   deltaT = 1,
   nmin = 3,
-  threshold = 0.9,
-  method = "quantile",
+  threshold = 1,
+  method = "sd",
   time_contiguity = FALSE,
-  overlap_threshold = 0
+  overlap_threshold = 0.1
 )
 }
 \arguments{
 \item{ctdf}{A `ctdf` data frame (see [as_ctdf()]) representing a single movement track .}
 
-\item{deltaT}{Numeric; maximum allowable gap (in days) between segment endpoints to consider them continuous. 
+\item{deltaT}{Numeric; maximum allowable gap (in days) between segment endpoints to consider them continuous.
 Default to 1 day. Passed to [slice()]) .}
 
 \item{nmin}{Integer. Segments or tessellations with fewer than nmin points yield no clusters.
@@ -29,19 +29,20 @@ If `method = "quantile"`, interpreted as the multiplier of the standard deviatio
 on log‐areas used in pruning. Passed to [cluster_segments()].}
 
 \item{method}{Character, one of `"sd"` or `"quantile"`. Determines the pruning
-strategy in the tessellation step:  
-- `"sd"`: prune cells with area < quantile(polygon_area, probs = threshold)  
-- `"quantile"`: prune cells with log(area) ≤ mean(log(area)) + threshold * sd(log(area)).
+strategy in the tessellation step:
+- `"quantile"`: prune cells with area < quantile(polygon_area, probs = threshold)
+- `"sd"`: prune cells with log(area) ≤ mean(log(area)) + threshold * sd(log(area)).
 Passed to [cluster_segments()].}
 
 \item{time_contiguity}{Logical; if `TRUE`, missing cluster IDs are forward‐filled.
-                       and backward‐filled within each segment to enforce temporal continuity. 
-                       Default to `FALSE`.
-                       Passed to [cluster_segments()].
-#' @param overlap_threshold Numeric between 0 and 1; minimum area‐overlap ratio
-                         required to merge adjacent clusters. 
-                         Clusters with overlap > threshold are combined.
-                         Passed to [stitch_cluster()]}
+and backward‐filled within each segment to enforce temporal continuity.
+Default to `FALSE`.
+Passed to [cluster_segments()].}
+
+\item{overlap_threshold}{Numeric between 0 and 1; minimum area‐overlap ratio
+required to merge adjacent clusters. Default to 0.1.
+Clusters with overlap > threshold are combined.
+Passed to [stitch_cluster()]}
 }
 \value{
 NULL. The function modifies `ctdf` by reference, adding or updating the column \code{cluster}, which assigns a cluster ID to each row (point).
@@ -54,20 +55,19 @@ This is a high-level wrapper function that applies a pipeline of segmentation, c
 }
 \examples{
 data(toy_ctdf_k2)
-ctdf = as_ctdf(toy_ctdf_k2, s_srs = 4326, t_srs = "+proj=eqearth")
+ctdf = as_ctdf(toy_ctdf_k2)
 cluster_track(ctdf)
-
+\dontrun{
 data(pesa56511)
-ctdf  = as_ctdf(pesa56511, time = "locationDate", s_srs = 4326, t_srs = "+proj=eqearth")
+ctdf = as_ctdf(pesa56511, time = "locationDate")
 cluster_track(ctdf)
 
 data(lbdo66867)
-ctdf = as_ctdf(lbdo66867, time = "locationDate", s_srs = 4326, t_srs = "+proj=eqearth")
+ctdf = as_ctdf(lbdo66867, time = "locationDate")
 cluster_track(ctdf)
 
 data(lbdo66862)
-ctdf = as_ctdf(lbdo66862, time = "locationDate", s_srs = 4326, t_srs = "+proj=eqearth")
+ctdf = as_ctdf(lbdo66862, time = "locationDate")
 cluster_track(ctdf)
-
-
+}
 }

@@ -50,8 +50,8 @@ tessellate_ctdf <- function(ctdf) {
 prune_tesselation <- function(x, threshold = 1, method = c("sd", "quantile")) {
     
   prune =
-    if (method == "sd")       x$A < quantile(x$A, probs = threshold) else
-    if (method == "quantile") {
+    if (method == "quantile")       x$A < quantile(x$A, probs = threshold) else
+    if (method == "sd") {
       logA = log(x$A)
       logA <= (mean(logA) + threshold * sd(logA))
     }      
