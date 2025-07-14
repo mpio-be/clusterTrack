@@ -82,9 +82,6 @@ cluster_tessellation <- function(x, nmin = 3,threshold = 1, method = "sd") {
   g = graph_from_adj_list(nb, mode = "all") |>  as_undirected()
   tess$cluster = components(g)$membership
   
-  # ggplot(tess)+geom_sf(aes(fill=factor(cluster)))+geom_sf_text(aes(label=.id), size = 2)+ggtitle(x$.segment[1])
-  # ggsave(glue("~/Desktop/temp/{paste(range(tess$.id), collapse='_')}.png"))
-
   dt = data.table(tess)
   dt[, n := .N, by = cluster]
   res = dt[n > nmin, .(.id, cluster)]
