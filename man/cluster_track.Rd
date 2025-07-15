@@ -11,7 +11,8 @@ cluster_track(
   threshold = 1,
   method = "sd",
   time_contiguity = FALSE,
-  overlap_threshold = 0.1
+  overlap_threshold = 0.1,
+  progress_bar = TRUE
 )
 }
 \arguments{

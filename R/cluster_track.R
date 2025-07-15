@@ -56,7 +56,7 @@ plot.clusterTrack <- function(x) {
 #' @export
 #' @examples
 #' data(toy_ctdf_k3)
-#' ctdf = as_ctdf(toy_ctdf_k3) |> cluster_track()
+#' ctdf = as_ctdf(toy_ctdf_k3) |> cluster_track(progress_bar = FALSE)
 #' 
 #' \dontrun{
 #' data(pesa56511)
@@ -72,12 +72,23 @@ plot.clusterTrack <- function(x) {
 #' 
 #' }
 
-cluster_track <- function(ctdf,deltaT = 1, nmin = 3, threshold = 1, method = "sd", time_contiguity = FALSE, overlap_threshold = 0.1) {
+cluster_track <- function(ctdf,deltaT = 1, nmin = 3, threshold = 1, method = "sd", 
+                  time_contiguity = FALSE, overlap_threshold = 0.1, progress_bar = TRUE) {
 
   ctdf |>
-  slice_ctdf(deltaT = deltaT) |>
-  cluster_segments(nmin = nmin, threshold = threshold, method = method, time_contiguity = time_contiguity) |>
-  stitch_cluster(overlap_threshold = overlap_threshold)
+  slice_ctdf(
+    deltaT              = deltaT, 
+    progress_bar        = progress_bar
+  ) |>
+  cluster_segments(nmin = nmin,
+    threshold           = threshold,
+    method              = method,
+    time_contiguity     = time_contiguity,
+    progress_bar        = progress_bar
+  ) |>
+  stitch_cluster(
+    overlap_threshold   = overlap_threshold
+  )
 
   ctdf # otherwise we get a NULL return by assignment
 

@@ -9,7 +9,8 @@ cluster_segments(
   nmin = 3,
   threshold = 0.9,
   method = "quantile",
-  time_contiguity = FALSE
+  time_contiguity = FALSE,
+  progress_bar = TRUE
 )
 }
 \arguments{
@@ -30,6 +31,8 @@ strategy in the tessellation step:
 
 \item{time_contiguity}{Logical; if `TRUE`, missing cluster IDs are forward‐filled
 and backward‐filled within each segment to enforce temporal continuity. Default to `FALSE`.}
+
+\item{progress_bar}{Logical; whether to display a progress bar during execution. Defaults to `TRUE`.}
 }
 \value{
 Invisibly returns `NULL`. The input `ctdf` is modified by reference,

@@ -70,14 +70,14 @@
 #'
 #' Recursively splits a CTDF into continuous bouts. The split stops when any bout  has one
 #' cluster (via HDBSCAN).
-
+#' 
 #' @param ctdf A CTDF object.
 #' @param deltaT Numeric; maximum allowable gap (in days) between segment
 #'   endpoints to consider them continuous.
+#' @param progress_bar Logical; whether to display a progress bar during execution. Defaults to `TRUE`.
 #' @return The input CTDF, updated (in-place) with an integer
 #'   \code{.segment} column indicating bout membership.
-
-
+#' 
 #' @export
 #' @examples
 #' data(toy_ctdf_k3)
@@ -91,7 +91,7 @@
 
 
 
-slice_ctdf <- function(ctdf, deltaT = 1) {
+slice_ctdf <- function(ctdf, deltaT = 1, progress_bar = TRUE) {
 
   .check_ctdf(ctdf)
 
@@ -104,10 +104,14 @@ slice_ctdf <- function(ctdf, deltaT = 1) {
   total_n = nrow(X)
   i = 1
   processed_n = 0
-  pb = txtProgressBar(min = 0, max = 0.9, style = 1, char = "░")
+  if (progress_bar) {
+    pb = txtProgressBar(min = 0, max = 0.9, style = 1, char = "░")
+  }
 
   while (i <= length(queue)) {
-    setTxtProgressBar(pb, processed_n / total_n)
+    if(progress_bar) {
+      setTxtProgressBar(pb, processed_n / total_n)
+    }
 
     current = queue[[i]]
 
@@ -121,7 +125,8 @@ slice_ctdf <- function(ctdf, deltaT = 1) {
 
     i = i + 1
   }
-  close(pb)
+  
+  if(progress_bar) { close(pb) }
   
 
   sids = 1:length(result)

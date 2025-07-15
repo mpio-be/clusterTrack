@@ -17,6 +17,7 @@
 #'   - `"quantile"`: prune cells with log(area) ≤ mean(log(area)) + threshold * sd(log(area))
 #' @param time_contiguity Logical; if `TRUE`, missing cluster IDs are forward‐filled
 #'   and backward‐filled within each segment to enforce temporal continuity. Default to `FALSE`.
+#' @param progress_bar Logical; whether to display a progress bar during execution. Defaults to `TRUE`.
 #'
 #' @return Invisibly returns `NULL`. The input `ctdf` is modified by reference,
 #'  updating the column `cluster`; `0` indicates unclustered points.
@@ -35,7 +36,8 @@
 #' cluster_segments(ctdf )
 #'
 #' 
-cluster_segments <- function(ctdf, nmin = 3, threshold = 0.9, method = "quantile", time_contiguity = FALSE) {
+cluster_segments <- function(ctdf, nmin = 3, threshold = 0.9, method = "quantile", 
+                            time_contiguity = FALSE, progress_bar = TRUE) {
 
   s = ctdf[!is.na(.segment)]
   s[, n := .N, .segment]
@@ -43,9 +45,13 @@ cluster_segments <- function(ctdf, nmin = 3, threshold = 0.9, method = "quantile
 
   segs = s$.segment |> unique()
   
-  pb = txtProgressBar(min =  min(segs), max = max(segs), style = 1, char = "░")
+  if (progress_bar) {
+    pb = txtProgressBar(min = min(segs), max = max(segs), style = 1, char = "░")
+  }
   o = foreach(si = segs) %do% {
-    setTxtProgressBar(pb, si)
+    if (progress_bar) {
+      setTxtProgressBar(pb, si)
+    }
 
     x = s[.segment == si]
     oi = cluster_tessellation(x, nmin = nmin, threshold = threshold, method = method)
@@ -53,7 +59,10 @@ cluster_segments <- function(ctdf, nmin = 3, threshold = 0.9, method = "quantile
     oi[, .segment := si]
     oi
   }
-  close(pb)
+
+  if (progress_bar) {
+    close(pb)
+  }
 
   o = rbindlist(o)
   o[, cluster := .GRP, by = .(.segment, cluster) ]

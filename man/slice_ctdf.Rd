@@ -4,13 +4,15 @@
 \alias{slice_ctdf}
 \title{Segment and filter a CTDF by temporal continuity and spatial clustering}
 \usage{
-slice_ctdf(ctdf, deltaT = 1)
+slice_ctdf(ctdf, deltaT = 1, progress_bar = TRUE)
 }
 \arguments{
 \item{ctdf}{A CTDF object.}
 
 \item{deltaT}{Numeric; maximum allowable gap (in days) between segment
 endpoints to consider them continuous.}
+
+\item{progress_bar}{Logical; whether to display a progress bar during execution. Defaults to `TRUE`.}
 }
 \value{
 The input CTDF, updated (in-place) with an integer
