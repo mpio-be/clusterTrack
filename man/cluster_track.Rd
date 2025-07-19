@@ -56,7 +56,7 @@ This is a high-level wrapper function that applies a pipeline of segmentation, c
 }
 \examples{
 data(toy_ctdf_k3)
-ctdf = as_ctdf(toy_ctdf_k3) |> cluster_track()
+ctdf = as_ctdf(toy_ctdf_k3) |> cluster_track(progress_bar = FALSE)
 
 \dontrun{
 data(pesa56511)

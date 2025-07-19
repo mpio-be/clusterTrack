@@ -42,8 +42,8 @@ plot.clusterTrack <- function(x) {
 #'               - `"quantile"`: prune cells with area < quantile(polygon_area, probs = threshold)
 #'               - `"sd"`: prune cells with log(area) ≤ mean(log(area)) + threshold * sd(log(area)).
 #'               Passed to [cluster_segments()].
-#' @param time_contiguity Logical; if `TRUE`, missing cluster IDs are forward‐filled.
-#'                        and backward‐filled within each segment to enforce temporal continuity.
+#' @param time_contiguity Logical; if `TRUE`, missing cluster IDs (usually spatial outliers) are  filled
+#'                        within each cluster to enforce temporal continuity.
 #'                        Default to `FALSE`.
 #'                        Passed to [cluster_segments()].
 #' @param overlap_threshold Numeric between 0 and 1; minimum area‐overlap ratio
