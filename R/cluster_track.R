@@ -50,7 +50,10 @@ plot.clusterTrack <- function(x) {
 #'                          required to merge adjacent clusters. Default to 0.1.
 #'                          Clusters with overlap > threshold are combined.
 #'                          Passed to [stitch_cluster()]
-#' @return NULL. The function modifies `ctdf` by reference, adding or updating the column \code{cluster}, which assigns a cluster ID to each row (point).
+#' @return NULL. 
+#' The function modifies `ctdf` by reference, adding or updating the column \code{cluster}, 
+#' which assigns a cluster ID to each row (point).
+#' Clustering parameters are stored as an attribute: `attr(ctdf, "cluster_params")`.
 #'
 
 #' @export
@@ -90,6 +93,18 @@ cluster_track <- function(ctdf,deltaT = 1, nmin = 3, threshold = 1, method = "sd
     overlap_threshold   = overlap_threshold
   )
 
-  ctdf # otherwise we get a NULL return by assignment
+  cluster_params = list(
+    deltaT            = deltaT,
+    nmin              = nmin,
+    threshold         = threshold,
+    method            = method,
+    time_contiguity   = time_contiguity,
+    overlap_threshold = overlap_threshold
+    )
+  
+  setattr(ctdf, "cluster_params", cluster_params)
+
+  ctdf
+
 
 }

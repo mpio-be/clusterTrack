@@ -35,8 +35,8 @@ strategy in the tessellation step:
 - `"sd"`: prune cells with log(area) ≤ mean(log(area)) + threshold * sd(log(area)).
 Passed to [cluster_segments()].}
 
-\item{time_contiguity}{Logical; if `TRUE`, missing cluster IDs are forward‐filled.
-and backward‐filled within each segment to enforce temporal continuity.
+\item{time_contiguity}{Logical; if `TRUE`, missing cluster IDs (usually spatial outliers) are  filled
+within each cluster to enforce temporal continuity.
 Default to `FALSE`.
 Passed to [cluster_segments()].}
 
@@ -46,7 +46,10 @@ Clusters with overlap > threshold are combined.
 Passed to [stitch_cluster()]}
 }
 \value{
-NULL. The function modifies `ctdf` by reference, adding or updating the column \code{cluster}, which assigns a cluster ID to each row (point).
+NULL. 
+The function modifies `ctdf` by reference, adding or updating the column \code{cluster}, 
+which assigns a cluster ID to each row (point).
+Clustering parameters are stored as an attribute: `attr(ctdf, "cluster_params")`.
 }
 \description{
 Performs spatiotemporal clustering on a ctdf by segmenting movement, identifying stops, and applying DBSCAN-like clustering.
