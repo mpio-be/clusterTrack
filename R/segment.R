@@ -35,7 +35,7 @@
     j = ints[[i]]
 
     dfs = difftime(segs$start[j], segs$stop[i], units = "days") |> abs()
-
+    print(dfs)
     j[dfs <= deltaT]
   })
   
@@ -134,8 +134,13 @@ slice_ctdf <- function(ctdf, deltaT = 1, progress_bar = TRUE) {
     result[[i]][, .segment := i]
   }
   
+  # remove all segments n < 4 (n = 4 == one possible intersection)
+
+  n_by_seg = sapply(result, nrow)
+  result = result[n_by_seg> 3]
 
   o = rbindlist(result)
+
   setorder(o, .id)
   o[, .segment := factor(.segment) |> fct_inorder() |> as.numeric()]
   o = merge(ctdf[, .(.id)], o[, .(.id, .segment)], all.x = TRUE, sort = FALSE)

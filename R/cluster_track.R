@@ -29,7 +29,7 @@ plot.clusterTrack <- function(x) {
 #'
 #'
 #' @param ctdf   A `ctdf` data frame (see [as_ctdf()]) representing a single movement track .
-#' @param deltaT Numeric; maximum allowable gap (in days) between segment endpoints to consider them continuous.
+#' @param deltaT Numeric; maximum allowable gap (in days) between segment endpoints to consider them non-intersecting.
 #'               Default to 1 day. Passed to [slice()]) .
 #' @param nmin   Integer. Segments or tessellations with fewer than nmin points yield no clusters.
 #'               Default to 3. Passed to [cluster_segments()].
