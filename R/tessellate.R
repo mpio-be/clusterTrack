@@ -1,7 +1,9 @@
 
 #' Tesselate a ctdf
 #'
-#' This function computes Dirichlet (Voronoi) polygons from a `ctdf` object 
+#' This function computes Dirichlet (Voronoi) polygons from a `ctdf` object, 
+#' typically a segment of a ctdf. See [(cluster_segments)] where this function 
+#' is called for each segment.
 #'
 #' @param ctdf A `ctdf` data frame.
 #'
