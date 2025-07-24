@@ -4,13 +4,7 @@
 \alias{cluster_segments}
 \title{Cluster segments of a ctdf}
 \usage{
-cluster_segments(
-  ctdf,
-  nmin = 3,
-  threshold = 1,
-  method = "sd",
-  time_contiguity = FALSE
-)
+cluster_segments(ctdf, nmin = 3, threshold = 1, time_contiguity = FALSE)
 }
 \arguments{
 \item{ctdf}{A `ctdf` object, must contain a `.segment` column; see [slice_ctdf()],.}
@@ -18,15 +12,7 @@ cluster_segments(
 \item{nmin}{Integer. Segments or tessellations with fewer than nmin points yield no clusters.
 Default to 3.}
 
-\item{threshold}{Numeric. If `method = "sd"`, interpreted as the probability for
-the area quantile used in pruning.
-If `method = "quantile"`, interpreted as the multiplier of the standard deviation
-on log‐areas used in pruning.}
-
-\item{method}{Character, one of `"sd"` or `"quantile"`. Determines the pruning
-strategy in the tessellation step:  
-- `"sd"`: prune cells with area < quantile(polygon_area, probs = threshold)  
-- `"quantile"`: prune cells with log(area) ≤ mean(log(area)) + threshold * sd(log(area))}
+\item{threshold}{Numeric. The multiplier of the standard deviation on log‐areas used in pruning.}
 
 \item{time_contiguity}{Logical; if `TRUE`, missing cluster IDs are forward‐filled
 and backward‐filled within each segment to enforce temporal continuity. Default to `FALSE`.}

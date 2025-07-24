@@ -11,12 +11,13 @@
     st_collection_extract("POLYGON")
 
   env = st_union(p) |>
-    st_convex_hull() |>
+    st_concave_hull(ratio = 0) |>
     st_buffer(dist = sqrt(median(st_area(tess)) / pi))
 
-  #'  plot(tess); plot(env, add = TRUE)
+  #'  plot(tess); plot(env, add = TRUE, border = 2, lwd = 2)
 
-  tess = st_intersection(tess, env) 
+  tess = st_intersection(tess, env)
+  tess = st_cast(tess, "POLYGON")
   
   st_set_geometry(p, st_geometry(tess) )
 

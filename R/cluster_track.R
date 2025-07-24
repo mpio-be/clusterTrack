@@ -33,15 +33,8 @@ plot.clusterTrack <- function(x) {
 #'               Default to 1 day. Passed to [slice()]) .
 #' @param nmin   Integer. Segments or tessellations with fewer than nmin points yield no clusters.
 #'               Default to 3. Passed to [cluster_segments()].
-#' @param threshold Numeric. If `method = "sd"`, interpreted as the probability for
-#'                  the area quantile used in pruning. Passed to [cluster_segments()].
-#'                  If `method = "quantile"`, interpreted as the multiplier of the standard deviation
+#' @param threshold Numeric. the multiplier of the standard deviation
 #'                  on log‐areas used in pruning. Passed to [cluster_segments()].
-#' @param method Character, one of `"sd"` or `"quantile"`. Determines the pruning
-#'               strategy in the tessellation step:
-#'               - `"quantile"`: prune cells with area < quantile(polygon_area, probs = threshold)
-#'               - `"sd"`: prune cells with log(area) ≤ mean(log(area)) + threshold * sd(log(area)).
-#'               Passed to [cluster_segments()].
 #' @param time_contiguity Logical; if `TRUE`, missing cluster IDs (usually spatial outliers) are  filled
 #'                        within each cluster to enforce temporal continuity.
 #'                        Default to `FALSE`.
@@ -75,7 +68,7 @@ plot.clusterTrack <- function(x) {
 #' 
 #' }
 
-cluster_track <- function(ctdf,deltaT = 1, nmin = 3, threshold = 1, method = "sd", 
+cluster_track <- function(ctdf,deltaT = 1, nmin = 3, threshold = 2, 
                   time_contiguity = FALSE, overlap_threshold = 0.1 ) {
 
   options(datatable.showProgress = FALSE)
@@ -93,7 +86,6 @@ cluster_track <- function(ctdf,deltaT = 1, nmin = 3, threshold = 1, method = "sd
   cluster_segments(ctdf,
     nmin = nmin,
     threshold = threshold,
-    method = method,
     time_contiguity = time_contiguity
   )
   cli_progress_update()
@@ -109,7 +101,6 @@ cluster_track <- function(ctdf,deltaT = 1, nmin = 3, threshold = 1, method = "sd
     deltaT            = deltaT,
     nmin              = nmin,
     threshold         = threshold,
-    method            = method,
     time_contiguity   = time_contiguity,
     overlap_threshold = overlap_threshold
     )

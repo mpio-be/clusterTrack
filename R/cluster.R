@@ -7,14 +7,7 @@
 #' @param ctdf A `ctdf` object, must contain a `.segment` column; see [slice_ctdf()],.
 #' @param nmin Integer. Segments or tessellations with fewer than nmin points yield no clusters.
 #'   Default to 3.
-#' @param threshold Numeric. If `method = "sd"`, interpreted as the probability for
-#'   the area quantile used in pruning.
-#'   If `method = "quantile"`, interpreted as the multiplier of the standard deviation
-#'   on log‐areas used in pruning.
-#' @param method Character, one of `"sd"` or `"quantile"`. Determines the pruning
-#'   strategy in the tessellation step:  
-#'   - `"sd"`: prune cells with area < quantile(polygon_area, probs = threshold)  
-#'   - `"quantile"`: prune cells with log(area) ≤ mean(log(area)) + threshold * sd(log(area))
+#' @param threshold Numeric. The multiplier of the standard deviation on log‐areas used in pruning.
 #' @param time_contiguity Logical; if `TRUE`, missing cluster IDs are forward‐filled
 #'   and backward‐filled within each segment to enforce temporal continuity. Default to `FALSE`.
 #' @param progress_bar Logical; whether to display a progress bar during execution. Defaults to `TRUE`.
@@ -36,24 +29,15 @@
 #' tessellate_ctdf(ctdf )
 #' cluster_segments(ctdf)
 #' 
-cluster_segments <- function(ctdf, nmin = 3, threshold = 1, method = "sd", time_contiguity = FALSE) {
-
-  method = match.arg(method)                           
+cluster_segments <- function(ctdf, nmin = 3, threshold = 1, time_contiguity = FALSE) {
 
   # prune
     x = ctdf[!is.na(.segment), .(.id, .segment, tesselation)]
     x[, A := st_area(tesselation)]
 
-    if (method == "quantile") {
-      if (!between(threshold, 0, 1)) {
-        stop("for quantile method, 'threshold' must be in [0,1]") }
-      x[, keep := A < quantile(A, probs = threshold), by = .segment]
-    }      
 
-    if (method == "sd") {
-      x[, logA := log(A) |> as.numeric()]
-      x[, keep := logA <= (mean(logA) + threshold * sd(logA)), by = .segment]
-    }      
+    x[, logA := log(A) |> as.numeric()]
+    x[, keep := logA <= (mean(logA) + threshold * sd(logA)), by = .segment]
 
     x = x[(keep)]
 
