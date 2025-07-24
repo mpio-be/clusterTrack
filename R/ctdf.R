@@ -77,7 +77,7 @@ plot.ctdf <- function(x,y = NULL,  pch = 16) {
 as_ctdf <- function(x, coords = c("longitude", "latitude"), time = "time", s_srs = 4326, t_srs = "+proj=eqearth", ...) {
   
 
-  reserved = intersect(names(x), c(".segment", ".id", "cluster"))
+  reserved = intersect(names(x), c(".segment", ".id", "cluster", "tesselation"))
 
   if (length(reserved) > 0) {
     warning(
@@ -110,7 +110,8 @@ as_ctdf <- function(x, coords = c("longitude", "latitude"), time = "time", s_srs
 
   o[, .id := .I]
   o[, .segment := NA_integer_]
-  o[, cluster  := NA_integer_]
+  o[, cluster := NA_integer_]
+  o[, tesselation := vector("list", .N)]
 
   o = st_as_sf(o, coords = c("X", "Y"), crs = s_srs)
 
@@ -119,7 +120,7 @@ as_ctdf <- function(x, coords = c("longitude", "latitude"), time = "time", s_srs
   st_geometry(o) = "location"
 
   setDT(o)
-  setcolorder(o, c(".id", ".segment", "cluster", "location", "timestamp"))
+  setcolorder(o, c(".id", ".segment", "cluster", "location", "tesselation" , "timestamp"))
 
   class(o) <- c("ctdf", class(o))
   o

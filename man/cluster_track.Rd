@@ -11,8 +11,7 @@ cluster_track(
   threshold = 1,
   method = "sd",
   time_contiguity = FALSE,
-  overlap_threshold = 0.1,
-  progress_bar = TRUE
+  overlap_threshold = 0.1
 )
 }
 \arguments{
@@ -43,7 +42,7 @@ Passed to [cluster_segments()].}
 \item{overlap_threshold}{Numeric between 0 and 1; minimum area‐overlap ratio
 required to merge adjacent clusters. Default to 0.1.
 Clusters with overlap > threshold are combined.
-Passed to [stitch_cluster()]}
+Passed to [cluster_stitch()]}
 }
 \value{
 NULL. 
@@ -59,7 +58,7 @@ This is a high-level wrapper function that applies a pipeline of segmentation, c
 }
 \examples{
 data(toy_ctdf_k3)
-ctdf = as_ctdf(toy_ctdf_k3) |> cluster_track(progress_bar = FALSE)
+ctdf = as_ctdf(toy_ctdf_k3) |> cluster_track()
 
 \dontrun{
 data(pesa56511)

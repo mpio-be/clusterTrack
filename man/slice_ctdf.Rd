@@ -4,7 +4,7 @@
 \alias{slice_ctdf}
 \title{Segment and filter a CTDF by temporal continuity and spatial clustering}
 \usage{
-slice_ctdf(ctdf, deltaT = 1, progress_bar = TRUE)
+slice_ctdf(ctdf, deltaT = 1)
 }
 \arguments{
 \item{ctdf}{A CTDF object.}

@@ -7,10 +7,9 @@
 cluster_segments(
   ctdf,
   nmin = 3,
-  threshold = 0.9,
-  method = "quantile",
-  time_contiguity = FALSE,
-  progress_bar = TRUE
+  threshold = 1,
+  method = "sd",
+  time_contiguity = FALSE
 )
 }
 \arguments{
@@ -52,9 +51,9 @@ For each unique segment in `ctdf`, points are tessellated via
 }
 \examples{
 data(toy_ctdf_k3)
-ctdf = as_ctdf(toy_ctdf_k3, s_srs = 4326, t_srs = "+proj=eqearth")
+ctdf = as_ctdf(toy_ctdf_k3)
 slice_ctdf(ctdf)
-cluster_segments(ctdf )
-
+tessellate_ctdf(ctdf )
+cluster_segments(ctdf)
 
 }

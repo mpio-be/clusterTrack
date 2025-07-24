@@ -10,19 +10,16 @@ tessellate_ctdf(ctdf)
 \item{ctdf}{A `ctdf` data frame.}
 }
 \value{
-A sf object.
+un updated ctdf object.
 }
 \description{
-This function computes Dirichlet (Voronoi) polygons from a `ctdf` object
-}
-\note{
-Dirichlet polygons are computed via the `deldir` package.
+This function computes Dirichlet (Voronoi) polygons on each segment 
+of a `ctdf` object
 }
 \examples{
 library(clusterTrack)
 data(toy_ctdf_k3)
-ctdf = as_ctdf(toy_ctdf_k3,s_srs = 4326, t_srs = "+proj=eqearth")
-x = tessellate_ctdf(ctdf)
-s = prune_tesselation(x, threshold = 1, method = 'sd')
+ctdf = as_ctdf(toy_ctdf_k3,s_srs = 4326, t_srs = "+proj=eqearth") |> slice_ctdf()
+tessellate_ctdf(ctdf)
 
 }

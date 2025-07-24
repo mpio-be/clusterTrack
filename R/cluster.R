@@ -31,45 +31,49 @@
 #' @export
 #' @examples
 #' data(toy_ctdf_k3)
-#' ctdf = as_ctdf(toy_ctdf_k3, s_srs = 4326, t_srs = "+proj=eqearth")
+#' ctdf = as_ctdf(toy_ctdf_k3)
 #' slice_ctdf(ctdf)
-#' cluster_segments(ctdf )
-#'
+#' tessellate_ctdf(ctdf )
+#' cluster_segments(ctdf)
 #' 
-cluster_segments <- function(ctdf, nmin = 3, threshold = 0.9, method = "quantile", 
-                            time_contiguity = FALSE, progress_bar = TRUE) {
+cluster_segments <- function(ctdf, nmin = 3, threshold = 1, method = "sd", time_contiguity = FALSE) {
 
-  s = ctdf[!is.na(.segment)]
-  s[, n := .N, .segment]
+  method = match.arg(method)                           
 
+  # prune
+    x = ctdf[!is.na(.segment), .(.id, .segment, tesselation)]
+    x[, A := st_area(tesselation)]
 
-  segs = s$.segment |> unique()
-  
-  if (progress_bar) {
-    pb = txtProgressBar(min = min(segs), max = max(segs), style = 1, char = "░")
-  }
-  o = foreach(si = segs) %do% {
-    if (progress_bar) {
-      setTxtProgressBar(pb, si)
-    }
+    if (method == "quantile") {
+      if (!between(threshold, 0, 1)) {
+        stop("for quantile method, 'threshold' must be in [0,1]") }
+      x[, keep := A < quantile(A, probs = threshold), by = .segment]
+    }      
 
-    x = s[.segment == si]
-    oi = cluster_tessellation(x, nmin = nmin, threshold = threshold, method = method)
-    oi = oi[cluster > 0]
-    oi[, .segment := si]
-    oi
-  }
+    if (method == "sd") {
+      x[, logA := log(A) |> as.numeric()]
+      x[, keep := logA <= (mean(logA) + threshold * sd(logA)), by = .segment]
+    }      
 
-  if (progress_bar) {
-    close(pb)
-  }
-
-  o = rbindlist(o)
-  o[, cluster := .GRP, by = .(.segment, cluster) ]
-  o[, cluster := as.integer(cluster)]
+    x = x[(keep)]
 
 
-  o = merge(ctdf[, .(.id)], o[, .(.id, cluster)], by = ".id",  all.x = TRUE, sort = FALSE)
+  # isolate clusters and assign clusters ID-s
+
+    x[, cluster := .isolate_clusters(tesselation), by = .segment]
+
+    x[, cluster := .GRP, by = .(.segment, cluster) ]
+
+  # subset by min-N
+    x[, n := .N, cluster]
+    x = x[n > nmin]
+    x[, cluster := .GRP, by = cluster ] # re-asign id
+    x[, cluster := as.integer(cluster)]
+
+
+  # update ctdf
+
+  o = merge(ctdf[, .(.id)], x[, .(.id, cluster)], by = ".id",  all.x = TRUE, sort = FALSE)
 
   if(time_contiguity) {
     o[, cluster := {

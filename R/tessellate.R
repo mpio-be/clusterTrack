@@ -1,15 +1,43 @@
 
+#' ctdf = as_ctdf(toy_ctdf_k3,s_srs = 4326, t_srs = "+proj=eqearth") |> slice_ctdf()
+#' x = ctdf[.segment == 1]
+.tesselate <- function(x) {
+
+  p = st_as_sf(x[, .(.id, location)]) |>
+    st_make_valid()
+
+  tess = st_combine(p) |>
+    st_voronoi(point_order = TRUE, dTolerance = 1e-6) |>
+    st_collection_extract("POLYGON")
+
+  env = st_union(p) |>
+    st_convex_hull() |>
+    st_buffer(dist = sqrt(median(st_area(tess)) / pi))
+
+  #'  plot(tess); plot(env, add = TRUE)
+
+  tess = st_intersection(tess, env) 
+  
+  st_set_geometry(p, st_geometry(tess) )
+
+}
+
+.isolate_clusters <- function(tess) {
+  nb = poly2nb(tess, queen = TRUE) |> suppressWarnings()
+  g = graph_from_adj_list(nb, mode = "all") |>  as_undirected()
+  components(g)$membership
+}
+
+
 #' Tesselate a ctdf
 #'
-#' This function computes Dirichlet (Voronoi) polygons from a `ctdf` object, 
-#' typically a segment of a ctdf. See [(cluster_segments)] where this function 
-#' is called for each segment.
+#' This function computes Dirichlet (Voronoi) polygons on each segment 
+#' of a `ctdf` object
 #'
 #' @param ctdf A `ctdf` data frame.
 #'
-#' @return A sf object.
+#' @return un updated ctdf object.
 #'
-#' @note Dirichlet polygons are computed via the `deldir` package.
 #'
 #'
 #'
@@ -17,79 +45,15 @@
 #' @examples
 #' library(clusterTrack)
 #' data(toy_ctdf_k3)
-#' ctdf = as_ctdf(toy_ctdf_k3,s_srs = 4326, t_srs = "+proj=eqearth")
-#' x = tessellate_ctdf(ctdf)
-#' s = prune_tesselation(x, threshold = 1, method = 'sd')
+#' ctdf = as_ctdf(toy_ctdf_k3,s_srs = 4326, t_srs = "+proj=eqearth") |> slice_ctdf()
+#' tessellate_ctdf(ctdf)
 #' 
 tessellate_ctdf <- function(ctdf) {
 
-  dat = data.table(st_as_sf(ctdf) |> st_coordinates() )
+  o = ctdf[!is.na(.segment), .tesselate(.SD), .segment]
+
+  o = merge(ctdf[, .(.id)], o[, .(.id, location)], by = ".id",  all.x = TRUE, sort = FALSE)
+
+  set(ctdf, j = "tesselation", value = o$location)
   
-  dip = deldir(dat) |> tile.list()
-
-  dip = lapply(dip, function(x) {
-    o = x[c("x", "y")] |>
-      data.frame() |>
-      data.table()
-    o = rbind(o, o[1, .(x, y)]) |> as.matrix()
-    data.table(geometry = st_polygon(list(o)) |> st_sfc() )
-  }) |> rbindlist()
-
-  if (nrow(dip) != nrow(ctdf)) {
-    stop(paste("deldir::deldir() dropped", nrow(ctdf) - nrow(dip), "rows due to identical coordinates!"))
-  }
-
-  dip = cbind(dip, ctdf[, .(.id)])
-
-  st_as_sf(dip) |>
-    st_make_valid() |>
-    mutate(A = st_area(geometry))
-
-}
-
-
-#' @export
-prune_tesselation <- function(x, threshold = 1, method = c("sd", "quantile")) {
-
-  method = match.arg(method)
-
-  prune =
-    if (method == "quantile") {
-      if (!between(threshold, 0, 1)) {
-        stop("for quantile method, 'threshold' must be in [0,1]")
-      }
-      prune = x$A < quantile(x$A, probs = threshold) 
-    }      
-    
-    
-    if (method == "sd") {
-      logA = log(x$A)
-      prune = logA <= (mean(logA) + threshold * sd(logA))
-    }      
-
-  dplyr::filter(x, prune)
-  
-}
-
-#' @export
-cluster_tessellation <- function(x, nmin = 3,threshold = 1, method = "sd") {
-
-  onull = data.table(.id = integer(), cluster = integer())
-  if (nrow(x) < nmin) return(onull)
-
-  tess = tessellate_ctdf(x) |> prune_tesselation(threshold = threshold, method = method)
-  if (nrow(tess) < nmin) return(onull)
-
-  nb = poly2nb(tess, queen = TRUE) |> suppressWarnings()
-  g = graph_from_adj_list(nb, mode = "all") |>  as_undirected()
-  tess$cluster = components(g)$membership
-  
-  dt = data.table(tess)
-  dt[, n := .N, by = cluster]
-  res = dt[n > nmin, .(.id, cluster)]
-  if (nrow(res) < nmin) return(onull)
-  return(res)
-  
-
-
 }

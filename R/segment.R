@@ -35,7 +35,6 @@
     j = ints[[i]]
 
     dfs = difftime(segs$start[j], segs$stop[i], units = "days") |> abs()
-    print(dfs)
     j[dfs <= deltaT]
   })
   
@@ -91,7 +90,7 @@
 
 
 
-slice_ctdf <- function(ctdf, deltaT = 1, progress_bar = TRUE) {
+slice_ctdf <- function(ctdf, deltaT = 1) {
 
   .check_ctdf(ctdf)
 
@@ -101,17 +100,13 @@ slice_ctdf <- function(ctdf, deltaT = 1, progress_bar = TRUE) {
   # Initialize
   result = list()
   queue = .split_by_maxlen(X, deltaT = deltaT)
+  
   total_n = nrow(X)
   i = 1
   processed_n = 0
-  if (progress_bar) {
-    pb = txtProgressBar(min = 0, max = 0.9, style = 1, char = "░")
-  }
+
 
   while (i <= length(queue)) {
-    if(progress_bar) {
-      setTxtProgressBar(pb, processed_n / total_n)
-    }
 
     current = queue[[i]]
 
@@ -126,8 +121,6 @@ slice_ctdf <- function(ctdf, deltaT = 1, progress_bar = TRUE) {
     i = i + 1
   }
   
-  if(progress_bar) { close(pb) }
-  
 
   sids = 1:length(result)
   for (i in sids) {
@@ -137,7 +130,7 @@ slice_ctdf <- function(ctdf, deltaT = 1, progress_bar = TRUE) {
   # remove all segments n < 4 (n = 4 == one possible intersection)
 
   n_by_seg = sapply(result, nrow)
-  result = result[n_by_seg> 3]
+  result = result[n_by_seg > 3]
 
   o = rbindlist(result)
 

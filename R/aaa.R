@@ -7,12 +7,11 @@
 #' @importFrom igraph graph_from_adj_list as_undirected components
 #' 
 #' @importFrom dbscan     hdbscan
-#' @importFrom deldir     deldir tile.list
 #' @importFrom spdep      poly2nb 
 #' @importFrom forcats    fct_inorder
 #' @importFrom units      set_units
 #' @importFrom dplyr      mutate ungroup rowwise lag filter select rename
-NULL
+#' @importFrom cli        cli_progress_bar cli_progress_update cli_progress_done cli_progress_output
 
 
 utils::globalVariables(c('isCluster', 'datetime', 'tenure'))

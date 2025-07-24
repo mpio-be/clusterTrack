@@ -49,7 +49,7 @@ plot.clusterTrack <- function(x) {
 #' @param overlap_threshold Numeric between 0 and 1; minimum area‐overlap ratio
 #'                          required to merge adjacent clusters. Default to 0.1.
 #'                          Clusters with overlap > threshold are combined.
-#'                          Passed to [stitch_cluster()]
+#'                          Passed to [cluster_stitch()]
 #' @return NULL. 
 #' The function modifies `ctdf` by reference, adding or updating the column \code{cluster}, 
 #' which assigns a cluster ID to each row (point).
@@ -59,7 +59,7 @@ plot.clusterTrack <- function(x) {
 #' @export
 #' @examples
 #' data(toy_ctdf_k3)
-#' ctdf = as_ctdf(toy_ctdf_k3) |> cluster_track(progress_bar = FALSE)
+#' ctdf = as_ctdf(toy_ctdf_k3) |> cluster_track()
 #' 
 #' \dontrun{
 #' data(pesa56511)
@@ -76,23 +76,35 @@ plot.clusterTrack <- function(x) {
 #' }
 
 cluster_track <- function(ctdf,deltaT = 1, nmin = 3, threshold = 1, method = "sd", 
-                  time_contiguity = FALSE, overlap_threshold = 0.1, progress_bar = TRUE) {
+                  time_contiguity = FALSE, overlap_threshold = 0.1 ) {
 
-  ctdf |>
-  slice_ctdf(
-    deltaT              = deltaT, 
-    progress_bar        = progress_bar
-  ) |>
-  cluster_segments(nmin = nmin,
-    threshold           = threshold,
-    method              = method,
-    time_contiguity     = time_contiguity,
-    progress_bar        = progress_bar
-  ) |>
-  stitch_cluster(
-    overlap_threshold   = overlap_threshold
+  options(datatable.showProgress = FALSE)
+  cli_progress_bar("", type = "tasks", total = 4)
+
+  cli_progress_output("Track segmentation...")
+  slice_ctdf(ctdf, deltaT = deltaT)
+  cli_progress_update()
+
+  cli_progress_output("Tessellating points by segment..")
+  tessellate_ctdf(ctdf)
+  cli_progress_update()
+
+  cli_progress_output("Within-segment clustering...")
+  cluster_segments(ctdf,
+    nmin = nmin,
+    threshold = threshold,
+    method = method,
+    time_contiguity = time_contiguity
   )
+  cli_progress_update()
+    
+  cli_progress_output("Cluster stitching ...")
+  cluster_stitch(ctdf,
+    overlap_threshold = overlap_threshold
+  )
+  cli_progress_update()
 
+  # collect parameters to save
   cluster_params = list(
     deltaT            = deltaT,
     nmin              = nmin,
@@ -103,6 +115,8 @@ cluster_track <- function(ctdf,deltaT = 1, nmin = 3, threshold = 1, method = "sd
     )
   
   setattr(ctdf, "cluster_params", cluster_params)
+
+  cli_progress_done()
 
   ctdf
 

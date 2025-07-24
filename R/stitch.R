@@ -48,23 +48,23 @@
 #' ctdf = as_ctdf(toy_ctdf_k3, s_srs = 4326, t_srs = "+proj=eqearth")
 #' slice_ctdf(ctdf)
 #' cluster_segments(ctdf)
-#' stitch_cluster(ctdf)
+#' cluster_stitch(ctdf)
 
 #' data(pesa56511)
 #' ctdf  = as_ctdf(pesa56511, time = "locationDate", s_srs = 4326, t_srs = "+proj=eqearth")
 #' slice_ctdf(ctdf) 
 #' cluster_segments(ctdf)
-#' stitch_cluster(ctdf)
+#' cluster_stitch(ctdf)
 #' 
 #' data(lbdo66862)
 #' ctdf = as_ctdf(lbdo66862, time = "locationDate", s_srs = 4326, t_srs = "+proj=eqearth")
 #' slice_ctdf(ctdf)
 #' cluster_segments(ctdf)
-#' stitch_cluster(ctdf)
+#' cluster_stitch(ctdf)
 
 
 
-stitch_cluster <- function(ctdf,  overlap_threshold = 0.05) {
+cluster_stitch <- function(ctdf,  overlap_threshold = 0.05) {
   
   .check_ctdf(ctdf)
 
