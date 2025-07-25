@@ -12,21 +12,24 @@
 
   env = st_union(p) |>
     st_concave_hull(ratio = 0) |>
-    st_buffer(dist = sqrt(median(st_area(tess)) / pi))
+    st_buffer(dist = (sqrt(median(st_area(tess)) / pi) )*0.1)
 
   #'  plot(tess); plot(env, add = TRUE, border = 2, lwd = 2)
+  #'  plot(env); plot(tess, add = TRUE, border = 2, lwd = 0.5)
 
   tess = st_intersection(tess, env)
-  tess = st_cast(tess, "POLYGON")
-  
+
   st_set_geometry(p, st_geometry(tess) )
 
 }
 
 .isolate_clusters <- function(tess) {
+
+  #' tess = x$tesselation
   nb = poly2nb(tess, queen = TRUE) |> suppressWarnings()
   g = graph_from_adj_list(nb, mode = "all") |>  as_undirected()
   components(g)$membership
+
 }
 
 

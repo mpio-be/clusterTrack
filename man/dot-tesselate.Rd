@@ -4,7 +4,8 @@
 \alias{.tesselate}
 \title{ctdf = as_ctdf(toy_ctdf_k3,s_srs = 4326, t_srs = "+proj=eqearth") |> slice_ctdf()
 x = ctdf[.segment == 1]
- plot(tess); plot(env, add = TRUE, border = 2, lwd = 2)}
+ plot(tess); plot(env, add = TRUE, border = 2, lwd = 2)
+ plot(env); plot(tess, add = TRUE, border = 2, lwd = 0.5)}
 \usage{
 .tesselate(x)
 }
@@ -12,4 +13,5 @@ x = ctdf[.segment == 1]
 ctdf = as_ctdf(toy_ctdf_k3,s_srs = 4326, t_srs = "+proj=eqearth") |> slice_ctdf()
 x = ctdf[.segment == 1]
  plot(tess); plot(env, add = TRUE, border = 2, lwd = 2)
+ plot(env); plot(tess, add = TRUE, border = 2, lwd = 0.5)
 }

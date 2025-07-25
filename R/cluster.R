@@ -29,15 +29,31 @@
 #' tessellate_ctdf(ctdf )
 #' cluster_segments(ctdf)
 #' 
-cluster_segments <- function(ctdf, nmin = 3, threshold = 1, time_contiguity = FALSE) {
+cluster_segments <- function(ctdf, nmin = 3, threshold = 2, time_contiguity = FALSE) {
 
   # prune
     x = ctdf[!is.na(.segment), .(.id, .segment, tesselation)]
-    x[, A := st_area(tesselation)]
+    
+    #'   x = ctdf[.segment == 6]
+    
+    x[, A := st_sfc(tesselation) |> st_area()     |> as.numeric() ]
+    x[, P := st_sfc(tesselation) |> st_perimeter() |> as.numeric()]
+    x[, IR := P^2 / A] # shape‐only irregularity
+
+    x[, zA := scale(A) |> as.numeric(), by = .segment]
+    x[, IR := scale(IR) |> as.numeric(), by = .segment]
+
+    # decision index
+    # x[, ix := scale(zA + IR)|> as.numeric(), by = .segment]
+    x[, ix := scale(sqrt(zA^2 + IR^2)) |> as.numeric(), by = .segment]
+
+    x[, keep := ix < threshold]
+
+    #' ggplot()+geom_sf(data=x[, .(keep, tesselation)]|>st_as_sf(), aes(color = keep))
 
 
-    x[, logA := log(A) |> as.numeric()]
-    x[, keep := logA <= (mean(logA) + threshold * sd(logA)), by = .segment]
+    #' tinyplot(~ix|keep, data=x, type = type_histogram(breaks = 30))
+
 
     x = x[(keep)]
 
