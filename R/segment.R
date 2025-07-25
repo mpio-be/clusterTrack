@@ -2,16 +2,19 @@
 
 .has_clusters <- function(s ) {
 
+  N = 5
 
-  if (nrow(s) <= 3) {
+  if (nrow(s) <= N) {
     return(FALSE)
   }
 
-  MIN_PTS =  ceiling(sqrt(nrow(s)))
-
+  MIN_PTS = ceiling(sqrt(nrow(s)))
+  
   o = hdbscan(st_coordinates(s$location), minPts = MIN_PTS )
 
-  return(length(o$cluster_scores) > 1)
+  res = length(o$cluster_scores) > 1
+
+  return(res)
   
 
 }

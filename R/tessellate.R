@@ -12,7 +12,7 @@
 
   env = st_union(p) |>
     st_concave_hull(ratio = 0) |>
-    st_buffer(dist = (sqrt(median(st_area(tess)) / pi) )*0.1)
+    st_buffer(dist = (sqrt(median(st_area(tess)) / pi) ) )
 
   #'  plot(tess); plot(env, add = TRUE, border = 2, lwd = 2)
   #'  plot(env); plot(tess, add = TRUE, border = 2, lwd = 0.5)
