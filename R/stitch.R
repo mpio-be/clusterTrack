@@ -64,7 +64,7 @@
 
 
 
-cluster_stitch <- function(ctdf,  overlap_threshold = 0.05) {
+cluster_stitch <- function(ctdf,  overlap_threshold = 0.1) {
   
   .check_ctdf(ctdf)
 

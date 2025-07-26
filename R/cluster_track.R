@@ -68,7 +68,7 @@ plot.clusterTrack <- function(x) {
 #' 
 #' }
 
-cluster_track <- function(ctdf,deltaT = 1, nmin = 3, threshold = 1, 
+cluster_track <- function(ctdf,deltaT = 1, nmin = 5, threshold = 2, 
                   time_contiguity = FALSE, overlap_threshold = 0.1 ) {
 
   options(datatable.showProgress = FALSE)

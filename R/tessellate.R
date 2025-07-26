@@ -7,25 +7,25 @@
     st_make_valid()
 
   tess = st_combine(p) |>
-    st_voronoi(point_order = TRUE, dTolerance = 1e-6) |>
+    st_voronoi(point_order = TRUE, dTolerance = 1e-4) |>
     st_collection_extract("POLYGON")
 
   env = st_union(p) |>
-    st_concave_hull(ratio = 0) |>
+    st_concave_hull(ratio = 0.5) |>
     st_buffer(dist = (sqrt(median(st_area(tess)) / pi) ) )
 
   #'  plot(tess); plot(env, add = TRUE, border = 2, lwd = 2)
   #'  plot(env); plot(tess, add = TRUE, border = 2, lwd = 0.5)
 
   tess = st_intersection(tess, env)
+  tess = st_cast(tess, "MULTIPOLYGON") |> st_geometry()
 
-  st_set_geometry(p, st_geometry(tess) )
+  st_set_geometry(p, tess )
 
 }
 
 .isolate_clusters <- function(tess) {
 
-  #' tess = x$tesselation
   nb = poly2nb(tess, queen = TRUE) |> suppressWarnings()
   g = graph_from_adj_list(nb, mode = "all") |>  as_undirected()
   components(g)$membership
