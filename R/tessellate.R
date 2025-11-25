@@ -58,6 +58,6 @@ tessellate_ctdf <- function(ctdf) {
 
   o = merge(ctdf[, .(.id)], o[, .(.id, location)], by = ".id",  all.x = TRUE, sort = FALSE)
 
-  set(ctdf, j = "tesselation", value = o$location)
+  set(ctdf, j = ".tesselation", value = o$location)
   
 }

@@ -32,24 +32,24 @@
 cluster_segments <- function(ctdf, nmin = 3, threshold = 1, time_contiguity = FALSE) {
 
   # prune on log(Area)
-    x = ctdf[!is.na(.segment), .(.id, .segment, tesselation)]
+    x = ctdf[!is.na(.segment), .(.id, .segment, .tesselation)]
     
     #'   x = ctdf[.segment == 1]
     
-    x[, A := st_sfc(tesselation) |> st_area()     |> as.numeric() ]
+    x[, A := st_sfc(.tesselation) |> st_area()     |> as.numeric() ]
 
     x[, zA := scale(log(A)) |> as.numeric(), by = .segment]
  
     x[, keep := zA < threshold]
 
-    #' ggplot()+geom_sf(data=x[, .(keep, tesselation)]|>st_as_sf(), aes(color = keep))
+    #' ggplot()+geom_sf(data=x[, .(keep, .tesselation)]|>st_as_sf(), aes(color = keep))
     #' tinyplot(~ix|keep, data=x, type = type_histogram(breaks = 30))
 
     x = x[(keep)]
 
   # isolate clusters and assign clusters ID-s
 
-    x[, cluster := .isolate_clusters(tesselation), by = .segment]
+    x[, cluster := .isolate_clusters(.tesselation), by = .segment]
 
     x[, cluster := .GRP, by = .(.segment, cluster) ]
 

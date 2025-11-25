@@ -43,6 +43,6 @@ tessellate_ctdf(ctdf )
 cluster_segments(ctdf)
 
   x = ctdf[.segment == 1]
-ggplot()+geom_sf(data=x[, .(keep, tesselation)]|>st_as_sf(), aes(color = keep))
+ggplot()+geom_sf(data=x[, .(keep, .tesselation)]|>st_as_sf(), aes(color = keep))
 tinyplot(~ix|keep, data=x, type = type_histogram(breaks = 30))
 }

@@ -26,47 +26,45 @@
   # make segments
   segs =
     ctdf |>
-    as_ctdf_track() |>
+    as_ctdf_track(check = FALSE) |>
     mutate(len = st_length(track) |> set_units("km") |> as.numeric())
     
 
-  ints = st_crosses(segs) 
+  crosses = st_crosses(segs) 
 
   setDT(segs)
 
-  pruned_ints = lapply(seq_along(ints), function(i) {
-    j = ints[[i]]
+  pruned_crosses = lapply(seq_along(crosses), function(i) {
+    j = crosses[[i]]
 
     dfs = difftime(segs$start[j], segs$stop[i], units = "days") |> abs()
     j[dfs <= deltaT]
   })
   
-  segs[, n_ints  := lengths(pruned_ints) ]
-  segs[, cross   := n_ints > 0]
+  segs[, n_crosses  := lengths(pruned_crosses) ]
+  segs[, cross   := n_crosses > 0]
 
-  segs[, bout_id := rleid(cross)]
-  segs[, len     := sum(len), bout_id]
 
-  # slice
-  good_segs = segs[(!cross)] 
+  segs[, good_seg_id := rleid(cross)]
+  segs[(cross), good_seg_id := NA]
+  segs[!is.na(good_seg_id), good_seg_len := sum(len),  by = good_seg_id ]
 
-  if (nrow(good_segs) > 0) {
-    max_good_len = good_segs[, max(len)]
+  segs[, split_seg := max(good_seg_len, na.rm = TRUE) == good_seg_len]
 
-    split_range = segs[len == max_good_len, range(.id)]
+  segs[is.na(split_seg), split_seg := FALSE ]
 
-    x1 = ctdf[.id < split_range[1]]
-    x2 = ctdf[.id > split_range[2]]
+  segs[, split_seg_id := rleid(split_seg)]
 
-    o = list(x1, x2)
-  } else {
-    o = NULL
-  }
+  segs = segs[!(split_seg), .(.id, split_seg, split_seg_id)]
 
-  o
+
+  out = merge(ctdf, segs, by = ".id")[,split_seg := NULL]
+  out = split(out, by = 'split_seg_id')
+  
+  lapply(out, function(x) x[, split_seg_id := NULL])
+
 
 }
-
 
 #' Segment and filter a CTDF by temporal continuity and spatial clustering
 #'

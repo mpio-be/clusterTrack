@@ -4,10 +4,12 @@
 \alias{as_ctdf_track}
 \title{Convert a `ctdf` track to movement step segments as LINESTRINGs}
 \usage{
-as_ctdf_track(ctdf)
+as_ctdf_track(ctdf, check = TRUE)
 }
 \arguments{
 \item{ctdf}{A `ctdf` object (with ordered rows and a `"location"` geometry column).}
+
+\item{check}{check `ctdf` object class. Default to TRUE.}
 }
 \value{
 An `sf` object with LINESTRING geometry for each step.

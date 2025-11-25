@@ -1,4 +1,8 @@
 
+#' Reserved ctdf column names
+#' @keywords internal
+reserved_ctdf_nams = c( "cluster", ".segment", ".id",".tesselation")
+
 .check_ctdf <- function(x) {
   
   if (!inherits(x, "ctdf")) {
@@ -77,7 +81,7 @@ plot.ctdf <- function(x,y = NULL,  pch = 16) {
 as_ctdf <- function(x, coords = c("longitude", "latitude"), time = "time", s_srs = 4326, t_srs = "+proj=eqearth", ...) {
   
 
-  reserved = intersect(names(x), c(".segment", ".id", "cluster", "tesselation"))
+  reserved = intersect(names(x), reserved_ctdf_nams)
 
   if (length(reserved) > 0) {
     warning(
@@ -111,7 +115,7 @@ as_ctdf <- function(x, coords = c("longitude", "latitude"), time = "time", s_srs
   o[, .id := .I]
   o[, .segment := NA_integer_]
   o[, cluster := NA_integer_]
-  o[, tesselation := vector("list", .N)]
+  o[, .tesselation := vector("list", .N)]
 
   o = st_as_sf(o, coords = c("X", "Y"), crs = s_srs)
 
@@ -120,7 +124,7 @@ as_ctdf <- function(x, coords = c("longitude", "latitude"), time = "time", s_srs
   st_geometry(o) = "location"
 
   setDT(o)
-  setcolorder(o, c(".id", ".segment", "cluster", "location", "tesselation" , "timestamp"))
+  setcolorder(o, reserved_ctdf_nams, after = ncol(o))
 
   class(o) <- c("ctdf", class(o))
   o
@@ -135,6 +139,8 @@ as_ctdf <- function(x, coords = c("longitude", "latitude"), time = "time", s_srs
 #' ends at the position of the current row.
 #'
 #' @param ctdf A `ctdf` object (with ordered rows and a `"location"` geometry column).
+#' 
+#' @param check check `ctdf` object class. Default to TRUE.
 #'
 #' @return An `sf` object with LINESTRING geometry for each step.
 #'
@@ -148,9 +154,9 @@ as_ctdf <- function(x, coords = c("longitude", "latitude"), time = "time", s_srs
 #' plot(s['.id'])
 #'
 #' @export
-as_ctdf_track <- function(ctdf) {
+as_ctdf_track <- function(ctdf, check = TRUE) {
   
-  .check_ctdf(ctdf)
+  if(check) .check_ctdf(ctdf)
 
 
   o = ctdf |>

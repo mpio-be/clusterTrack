@@ -4,7 +4,7 @@
 \alias{cluster_stitch}
 \title{Stitch clusters by spatial overlap across segments}
 \usage{
-cluster_stitch(ctdf, overlap_threshold = 0.05)
+cluster_stitch(ctdf, overlap_threshold = 0.1)
 }
 \arguments{
 \item{ctdf}{A CTDF object. Must contain an updated `cluster` column.}
