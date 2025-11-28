@@ -16,7 +16,7 @@ endpoints to consider them continuous.}
 }
 \value{
 The input CTDF, updated (in-place) with an integer
-  \code{.segment} column indicating bout membership.
+  \code{.putative_cluster} column indicating bout membership.
 }
 \description{
 Recursively splits a CTDF into continuous bouts. The split stops when any bout  has one
@@ -25,9 +25,9 @@ cluster (via HDBSCAN).
 \examples{
 data(toy_ctdf_k3)
 ctdf = as_ctdf(toy_ctdf_k3, s_srs = 4326, t_srs = "+proj=eqearth")
-ctdf = slice_ctdf(ctdf)  
+ctdf = slice_ctdf(ctdf)
 
 data(pesa56511)
 ctdf = as_ctdf(pesa56511, time = "locationDate", s_srs = 4326, t_srs = "+proj=eqearth")
-slice_ctdf(ctdf )   
+slice_ctdf(ctdf )
 }

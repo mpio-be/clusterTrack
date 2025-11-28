@@ -8,11 +8,17 @@ Description: Clustering Animal Movements using DBSCAN and Related Algorithms.
 Depends:
     R (>= 4.1.0)
 Imports:
+    cli,
+    data.table,
     dbscan,
+    dplyr,
     forcats,
+    foreach,
+    glue,
     igraph,
     sf,
-    data.table
+    spdep,
+    units
 Suggests:
     ggplot2,
     roxygen2,

@@ -7,7 +7,7 @@
 cluster_segments(ctdf, nmin = 3, threshold = 1, time_contiguity = FALSE)
 }
 \arguments{
-\item{ctdf}{A `ctdf` object, must contain a `.segment` column; see [slice_ctdf()],.}
+\item{ctdf}{A `ctdf` object, must contain a `.putative_cluster` column; see [slice_ctdf()],.}
 
 \item{nmin}{Integer. Segments or tessellations with fewer than nmin points yield no clusters.
 Default to 3.}
@@ -42,7 +42,7 @@ slice_ctdf(ctdf)
 tessellate_ctdf(ctdf )
 cluster_segments(ctdf)
 
-  x = ctdf[.segment == 1]
+  x = ctdf[.putative_cluster == 1]
 ggplot()+geom_sf(data=x[, .(keep, .tesselation)]|>st_as_sf(), aes(color = keep))
 tinyplot(~ix|keep, data=x, type = type_histogram(breaks = 30))
 }

@@ -1,7 +1,4 @@
-
-
-.has_clusters <- function(s ) {
-
+.has_clusters <- function(s) {
   N = 5
 
   if (nrow(s) <= N) {
@@ -9,28 +6,22 @@
   }
 
   MIN_PTS = ceiling(sqrt(nrow(s)))
-  
-  o = hdbscan(st_coordinates(s$location), minPts = MIN_PTS )
+
+  o = hdbscan(st_coordinates(s$location), minPts = MIN_PTS)
 
   res = length(o$cluster_scores) > 1
 
   return(res)
-  
-
 }
 
 
-.split_by_maxlen <- function(ctdf, deltaT) {
-
-
-  # make segments
+.prepare_segs <- function(ctdf, deltaT) {
   segs =
     ctdf |>
     as_ctdf_track(check = FALSE) |>
     mutate(len = st_length(track) |> set_units("km") |> as.numeric())
-    
 
-  crosses = st_crosses(segs) 
+  crosses = st_crosses(segs)
 
   setDT(segs)
 
@@ -40,79 +31,83 @@
     dfs = difftime(segs$start[j], segs$stop[i], units = "days") |> abs()
     j[dfs <= deltaT]
   })
-  
-  segs[, n_crosses  := lengths(pruned_crosses) ]
-  segs[, cross   := n_crosses > 0]
 
+  segs[, n_crosses := lengths(pruned_crosses)]
+
+  segs[, cross := n_crosses > 0]
 
   segs[, good_seg_id := rleid(cross)]
+
   segs[(cross), good_seg_id := NA]
-  segs[!is.na(good_seg_id), good_seg_len := sum(len),  by = good_seg_id ]
+
+  segs[!is.na(good_seg_id), good_seg_len := sum(len), by = good_seg_id]
 
   segs[, split_seg := max(good_seg_len, na.rm = TRUE) == good_seg_len]
 
-  segs[is.na(split_seg), split_seg := FALSE ]
+  segs[is.na(split_seg), split_seg := FALSE]
 
   segs[, split_seg_id := rleid(split_seg)]
 
-  segs = segs[!(split_seg), .(.id, split_seg, split_seg_id)]
+  segs
+}
 
 
-  out = merge(ctdf, segs, by = ".id")[,split_seg := NULL]
+.split_by_maxlen <- function(segs, ctdf) {
+  out = segs[!(split_seg), .(.id, split_seg, split_seg_id)]
+
+  out = merge(ctdf, out, by = ".id")
+
   out = split(out, by = 'split_seg_id')
-  
-  lapply(out, function(x) x[, split_seg_id := NULL])
 
+  for (i in seq_along(out)) {
+    out[[i]][, let(split_seg_id = NULL, split_seg = NULL)]
+  }
 
+  out
 }
 
 #' Segment and filter a CTDF by temporal continuity and spatial clustering
 #'
 #' Recursively splits a CTDF into continuous bouts. The split stops when any bout  has one
 #' cluster (via HDBSCAN).
-#' 
+#'
 #' @param ctdf A CTDF object.
 #' @param deltaT Numeric; maximum allowable gap (in days) between segment
 #'   endpoints to consider them continuous.
 #' @param progress_bar Logical; whether to display a progress bar during execution. Defaults to `TRUE`.
 #' @return The input CTDF, updated (in-place) with an integer
-#'   \code{.segment} column indicating bout membership.
-#' 
+#'   \code{.putative_cluster} column indicating bout membership.
+#'
 #' @export
 #' @examples
 #' data(toy_ctdf_k3)
 #' ctdf = as_ctdf(toy_ctdf_k3, s_srs = 4326, t_srs = "+proj=eqearth")
-#' ctdf = slice_ctdf(ctdf)  
-#' 
+#' ctdf = slice_ctdf(ctdf)
+#'
 #' data(pesa56511)
 #' ctdf = as_ctdf(pesa56511, time = "locationDate", s_srs = 4326, t_srs = "+proj=eqearth")
-#' slice_ctdf(ctdf )   
-
-
-
+#' slice_ctdf(ctdf )
 
 slice_ctdf <- function(ctdf, deltaT = 1) {
-
   .check_ctdf(ctdf)
 
   X = copy(ctdf)
-  X[, .segment := NA]
+  X[, .putative_cluster := NA]
 
   # Initialize
   result = list()
-  queue = .split_by_maxlen(X, deltaT = deltaT)
-  
+  queue = .prepare_segs(X, deltaT = deltaT) |> .split_by_maxlen(ctdf = X)
+
   total_n = nrow(X)
   i = 1
   processed_n = 0
 
-
   while (i <= length(queue)) {
-
     current = queue[[i]]
 
     if (current |> .has_clusters()) {
-      new_chunks = .split_by_maxlen(current, deltaT = deltaT)
+      new_chunks = .prepare_segs(current, deltaT = deltaT) |>
+        .split_by_maxlen(ctdf = current)
       queue = c(queue, new_chunks)
     } else {
       result = c(result, list(current))
@@ -121,13 +116,12 @@ slice_ctdf <- function(ctdf, deltaT = 1) {
 
     i = i + 1
   }
-  
 
-  sids = 1:length(result)
-  for (i in sids) {
-    result[[i]][, .segment := i]
+  # assign segment id
+  for (i in seq_along(result)) {
+    result[[i]][, .putative_cluster := i]
   }
-  
+
   # remove all segments n < 4 (n = 4 == one possible intersection)
 
   n_by_seg = sapply(result, nrow)
@@ -136,9 +130,17 @@ slice_ctdf <- function(ctdf, deltaT = 1) {
   o = rbindlist(result)
 
   setorder(o, .id)
-  o[, .segment := factor(.segment) |> fct_inorder() |> as.numeric()]
-  o = merge(ctdf[, .(.id)], o[, .(.id, .segment)], all.x = TRUE, sort = FALSE)
+  o[,
+    .putative_cluster := factor(.putative_cluster) |>
+      fct_inorder() |>
+      as.numeric()
+  ]
+  o = merge(
+    ctdf[, .(.id)],
+    o[, .(.id, .putative_cluster)],
+    all.x = TRUE,
+    sort = FALSE
+  )
 
-  set(ctdf, j = ".segment", value = o$.segment)
-
+  set(ctdf, j = ".putative_cluster", value = o$.putative_cluster)
 }

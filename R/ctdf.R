@@ -1,27 +1,25 @@
-
 #' Reserved ctdf column names
 #' @keywords internal
-reserved_ctdf_nams = c( "cluster", ".segment", ".id",".tesselation")
+reserved_ctdf_nams = c("cluster", ".putative_cluster", ".id", ".tesselation")
 
 .check_ctdf <- function(x) {
-  
   if (!inherits(x, "ctdf")) {
-    stop("Not a 'ctdf' object!",call. = FALSE)
-    }
-
-  if(is.unsorted(x$timestamp)) {
-    stop("It seems this ctdf is not sorted anymore along timestamp!", call. = FALSE)
+    stop("Not a 'ctdf' object!", call. = FALSE)
   }
 
-  nams = c(".id", ".segment", "cluster", "location", "timestamp")
+  if (is.unsorted(x$timestamp)) {
+    stop(
+      "It seems this ctdf is not sorted anymore along timestamp!",
+      call. = FALSE
+    )
+  }
+
+  nams = c(".id", ".putative_cluster", "cluster", "location", "timestamp")
   nams_ok = nams %in% names(x)
-  
-  if(!all(nams_ok)) {
+
+  if (!all(nams_ok)) {
     stop("Some build in columns are missing", call. = FALSE)
   }
-
-
-
 }
 
 #' @export
@@ -35,18 +33,28 @@ as_ctdf.default <- function(x, ...) {
 }
 
 #' @export
-plot.ctdf <- function(x,y = NULL,  pch = 16) {
-  
+plot.ctdf <- function(x, y = NULL, pch = 16) {
   tr = as_ctdf_track(x)
-  xs = st_as_sf(x) 
+  xs = st_as_sf(x)
 
   plot(st_geometry(tr), col = "#706b6b")
 
+  plot(xs |> st_geometry(), pch = pch, add = TRUE)
 
-  plot(xs |>st_geometry(), pch = pch, add = TRUE)
-
-  plot(x[1, .(location)] |> st_as_sf(), col = "#1900ff", size = 3, pch = 16, add = TRUE)
-  plot(x[nrow(x), .(location)] |> st_as_sf(), col = "#ff0000", size = 3, pch = 16, add = TRUE)
+  plot(
+    x[1, .(location)] |> st_as_sf(),
+    col = "#1900ff",
+    size = 3,
+    pch = 16,
+    add = TRUE
+  )
+  plot(
+    x[nrow(x), .(location)] |> st_as_sf(),
+    col = "#ff0000",
+    size = 3,
+    pch = 16,
+    add = TRUE
+  )
 }
 
 #' Coerce an object to clusterTrack data format
@@ -58,7 +66,7 @@ plot.ctdf <- function(x,y = NULL,  pch = 16) {
 #' @param coords  Character vector of length 2 specifying the coordinate column names.
 #'                Defaults to `c("longitude", "latitude")`.
 #' @param time    Name of the time column. Will be renamed to `"timestamp"` internally.
-#' @param s_srs   Source spatial reference. Default is 4326. 
+#' @param s_srs   Source spatial reference. Default is 4326.
 #' @param t_srs  target spatial reference passed to `st_transform()`. Default is "+proj=eqearth".
 #'
 #' @param ...     Currently unused
@@ -78,9 +86,14 @@ plot.ctdf <- function(x,y = NULL,  pch = 16) {
 #'
 #' @export
 
-as_ctdf <- function(x, coords = c("longitude", "latitude"), time = "time", s_srs = 4326, t_srs = "+proj=eqearth", ...) {
-  
-
+as_ctdf <- function(
+  x,
+  coords = c("longitude", "latitude"),
+  time = "time",
+  s_srs = 4326,
+  t_srs = "+proj=eqearth",
+  ...
+) {
   reserved = intersect(names(x), reserved_ctdf_nams)
 
   if (length(reserved) > 0) {
@@ -93,7 +106,7 @@ as_ctdf <- function(x, coords = c("longitude", "latitude"), time = "time", s_srs
     )
   }
 
-  o =  as.data.table(x)
+  o = as.data.table(x)
   setnames(o, c(coords, time), c("X", "Y", "timestamp"))
 
   dups = which(duplicated(o[, .(Y, X, timestamp)]))
@@ -113,7 +126,7 @@ as_ctdf <- function(x, coords = c("longitude", "latitude"), time = "time", s_srs
   setorder(o, timestamp)
 
   o[, .id := .I]
-  o[, .segment := NA_integer_]
+  o[, .putative_cluster := NA_integer_]
   o[, cluster := NA_integer_]
   o[, .tesselation := vector("list", .N)]
 
@@ -139,7 +152,7 @@ as_ctdf <- function(x, coords = c("longitude", "latitude"), time = "time", s_srs
 #' ends at the position of the current row.
 #'
 #' @param ctdf A `ctdf` object (with ordered rows and a `"location"` geometry column).
-#' 
+#'
 #' @param check check `ctdf` object class. Default to TRUE.
 #'
 #' @return An `sf` object with LINESTRING geometry for each step.
@@ -155,16 +168,16 @@ as_ctdf <- function(x, coords = c("longitude", "latitude"), time = "time", s_srs
 #'
 #' @export
 as_ctdf_track <- function(ctdf, check = TRUE) {
-  
-  if(check) .check_ctdf(ctdf)
-
+  if (check) {
+    .check_ctdf(ctdf)
+  }
 
   o = ctdf |>
     st_as_sf() |>
     mutate(
-      location_prev  = lag(location),
-      start          = lag(timestamp), 
-      stop           = timestamp
+      location_prev = lag(location),
+      start = lag(timestamp),
+      stop = timestamp
     )
   this_crs = st_crs(o)
 
@@ -174,14 +187,14 @@ as_ctdf_track <- function(ctdf, check = TRUE) {
   o |>
     rowwise() |>
     mutate(
-      track = rbind(st_coordinates(location_prev), st_coordinates(location)) |> st_linestring()|>list()
+      track = rbind(st_coordinates(location_prev), st_coordinates(location)) |>
+        st_linestring() |>
+        list()
     ) |>
     ungroup() |>
     st_set_geometry("track") |>
-    select(.id, .segment, start, stop, track)|>
+    select(.id, .putative_cluster, start, stop, track) |>
     st_set_crs(this_crs)
-
-
 }
 
 
@@ -194,31 +207,34 @@ as_ctdf_track <- function(ctdf, check = TRUE) {
 #' @param ...  Currently ignored.
 #' @return A `data.table` (and `data.frame`) of class c("summary_ctdf","data.table","data.frame").
 #' @export
-#' @examples 
+#' @examples
 #' #' data(toy_ctdf_k3)
 #' ctdf = as_ctdf(toy_ctdf_k3)
 #' cluster_track(ctdf)
 #' summary(ctdf)
-#' 
-#' 
+#'
+#'
 summary.ctdf = function(ctdf, ...) {
-  
   .check_ctdf(ctdf)
 
-  # TODO: pre-cluster summary. 
+  # TODO: pre-cluster summary.
 
-  out = 
-  ctdf[cluster > 0, .(
-    start    = min(timestamp),
-    stop     = max(timestamp),
-    geometry = st_union(location) |> st_convex_hull() |> st_centroid(),
-    segments  = list(range(.segment, na.rm = TRUE)) ,
-    N        = .N
-  ), by = cluster]
+  out =
+    ctdf[
+      cluster > 0,
+      .(
+        start = min(timestamp),
+        stop = max(timestamp),
+        geometry = st_union(location) |> st_convex_hull() |> st_centroid(),
+        putative_clusters = list(range(.putative_cluster, na.rm = TRUE)),
+        N = .N
+      ),
+      by = cluster
+    ]
 
   out[, tenure := difftime(stop, start, units = "days")]
 
-  out[, next_geom := geometry[ shift(seq_len(.N), type = "lead") ] ]
+  out[, next_geom := geometry[shift(seq_len(.N), type = "lead")]]
 
   out[, dist_to_next := st_distance(geometry, next_geom, by_element = TRUE)]
 
