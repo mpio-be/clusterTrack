@@ -1,7 +1,7 @@
 
 .stitch <- function(ctdf,  overlap_threshold = 0) {
 
-  o = ctdf[cluster > 0, .(hull = st_union(location) |> st_convex_hull()), by = cluster] |> setDT()
+  o = ctdf[cluster > 0, .(hull = st_union(location) |> st_convex_hull()), by = cluster]  
   
   o[, next_hull := hull[c(2:.N, NA_integer_)] ]
   
@@ -71,6 +71,7 @@ cluster_stitch <- function(ctdf,  overlap_threshold = 0.1) {
     
   repeat {
     n_prev = max(ctdf$cluster)
+    if (max(ctdf$cluster) == n_prev) break
     .stitch(ctdf, overlap_threshold = overlap_threshold)
     if (max(ctdf$cluster) == n_prev) break
   }
