@@ -89,7 +89,13 @@ ssq = c(sq, sq2, sq3, sq4) |> sort()
 x[, datetime := ssq]
 x[, id := NULL]
 
-ctdf = as_ctdf(x, time = 'datetime', coords = c("X", "Y"), s_srs = 4326, t_srs = '+proj=eqearth')
+ctdf = as_ctdf(
+  x,
+  time = 'datetime',
+  coords = c("X", "Y"),
+  s_srs = 4326,
+  t_srs = '+proj=eqearth'
+)
 
 plot(ctdf, by = 'filter')
 

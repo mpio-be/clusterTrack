@@ -15,7 +15,13 @@
 
   o[, stitch_id := fcoalesce(stitch_id, shift(stitch_id))]
 
-  o[, grp_key := fifelse(!is.na(stitch_id), paste0("s", stitch_id), paste0("c", cluster))]
+  o[,
+    grp_key := fifelse(
+      !is.na(stitch_id),
+      paste0("s", stitch_id),
+      paste0("c", cluster)
+    )
+  ]
 
   o[, cluster_stitched := .GRP, by = grp_key]
 

@@ -1,7 +1,12 @@
 # TODO: deprecate before new major release!
 
 #' @export
-as_tdbscan <- function(x, coords = c("longitude", "latitude"), time = "time", crs = 4326) {
+as_tdbscan <- function(
+  x,
+  coords = c("longitude", "latitude"),
+  time = "time",
+  crs = 4326
+) {
   o = copy(x)
 
   setnames(o, time, "timestamp")
@@ -42,7 +47,14 @@ as_tdbscan <- function(x, coords = c("longitude", "latitude"), time = "time", cr
 #' ggplot(z ) +geom_sf(aes(color = factor(clustID) ))
 #'
 
-tdbscan <- function(track, eps, minPts = 5, borderPoints = FALSE, maxLag = 6, minTenure) {
+tdbscan <- function(
+  track,
+  eps,
+  minPts = 5,
+  borderPoints = FALSE,
+  maxLag = 6,
+  minTenure
+) {
   checkClust = clustID = id = iscore = n = ngb = tc = y = NULL # due to NSE notes in R CMD check
   `.` = function(...) NULL
 
@@ -101,7 +113,12 @@ tdbscan <- function(track, eps, minPts = 5, borderPoints = FALSE, maxLag = 6, mi
   # run dbscan on each cluster to check if they still hold
   o[
     !is.na(clustID),
-    checkClust := dbscan::dbscan(cbind(x, y), eps = eps, minPts = minPts)$cluster != 0,
+    checkClust := dbscan::dbscan(
+      cbind(x, y),
+      eps = eps,
+      minPts = minPts
+    )$cluster !=
+      0,
     by = clustID
   ]
   o[!(checkClust), clustID := NA]

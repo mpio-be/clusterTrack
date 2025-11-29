@@ -81,7 +81,12 @@ cluster_track <- function(
   cli_progress_update()
 
   cli_progress_output("Within-segment clustering...")
-  cluster_segments(ctdf, nmin = nmin, threshold = threshold, time_contiguity = time_contiguity)
+  cluster_segments(
+    ctdf,
+    nmin = nmin,
+    threshold = threshold,
+    time_contiguity = time_contiguity
+  )
   cli_progress_update()
 
   cli_progress_output("Cluster stitching ...")
