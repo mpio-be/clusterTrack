@@ -10,6 +10,7 @@
 
   env = st_union(p) |>
     st_concave_hull(ratio = 0.5) |>
+    # TODO: ratio = 0.5 should be documented
     st_buffer(dist = (sqrt(median(st_area(tess)) / pi)))
 
   #'  plot(tess); plot(env, add = TRUE, border = 2, lwd = 2)
@@ -30,7 +31,7 @@
 
 #' Tesselate a ctdf
 #'
-#' This function computes Dirichlet (Voronoi) polygons on each segment
+#' This function computes Dirichlet (Voronoi) polygons on each putative_cluster
 #' of a `ctdf` object
 #'
 #' @param ctdf A `ctdf` data frame.
@@ -48,15 +49,8 @@
 #' tessellate_ctdf(ctdf)
 #'
 tessellate_ctdf <- function(ctdf) {
-  o = ctdf[!is.na(.putative_cluster), .tesselate(.SD), .putative_cluster]
+  out = ctdf[!is.na(.putative_cluster), .tesselate(.SD), .putative_cluster]
+  setkey(out, .id)
 
-  o = merge(
-    ctdf[, .(.id)],
-    o[, .(.id, location)],
-    by = ".id",
-    all.x = TRUE,
-    sort = FALSE
-  )
-
-  set(ctdf, j = ".tesselation", value = o$location)
+  ctdf[out, .tesselation := i.location]
 }

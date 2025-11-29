@@ -13,7 +13,7 @@ tessellate_ctdf(ctdf)
 un updated ctdf object.
 }
 \description{
-This function computes Dirichlet (Voronoi) polygons on each segment
+This function computes Dirichlet (Voronoi) polygons on each putative_cluster
 of a `ctdf` object
 }
 \examples{

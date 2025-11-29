@@ -36,8 +36,8 @@ Clusters with overlap > threshold are combined.
 Passed to [cluster_stitch()]}
 }
 \value{
-NULL. 
-The function modifies `ctdf` by reference, adding or updating the column \code{cluster}, 
+NULL.
+The function modifies `ctdf` by reference, adding or updating the column \code{cluster},
 which assigns a cluster ID to each row (point).
 Clustering parameters are stored as an attribute: `attr(ctdf, "cluster_params")`.
 }

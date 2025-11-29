@@ -53,7 +53,10 @@ cluster_segments <- function(
 
   # isolate clusters and assign clusters ID-s
 
-  x[, cluster := .isolate_clusters(.tesselation), by = .putative_cluster]
+  x[,
+    cluster := .isolate_clusters(st_sfc(.tesselation)),
+    by = .putative_cluster
+  ]
 
   x[, cluster := .GRP, by = .(.putative_cluster, cluster)]
 

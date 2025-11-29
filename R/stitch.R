@@ -5,27 +5,30 @@
     by = cluster
   ]
 
-  o[, next_hull := hull[c(2:.N, NA_integer_)]]
-  o[, overlap := .st_area_overlap_ratio(hull, next_hull), by = cluster]
-  o[.N, overlap := 0]
-  o[, is_overlap := overlap > overlap_threshold]
+  if (nrow(o) > 1) {
+    # prevents error on datasets with almost no clusters.
+    o[, next_hull := hull[c(2:.N, NA_integer_)]]
+    o[, overlap := .st_area_overlap_ratio(hull, next_hull), by = cluster]
+    o[.N, overlap := 0]
+    o[, is_overlap := overlap > overlap_threshold]
 
-  o[, stitch_id := rleid(is_overlap)]
-  o[(!is_overlap), stitch_id := NA]
+    o[, stitch_id := rleid(is_overlap)]
+    o[(!is_overlap), stitch_id := NA]
 
-  o[, stitch_id := fcoalesce(stitch_id, shift(stitch_id))]
+    o[, stitch_id := fcoalesce(stitch_id, shift(stitch_id))]
 
-  o[,
-    grp_key := fifelse(
-      !is.na(stitch_id),
-      paste0("s", stitch_id),
-      paste0("c", cluster)
-    )
-  ]
+    o[,
+      grp_key := fifelse(
+        !is.na(stitch_id),
+        paste0("s", stitch_id),
+        paste0("c", cluster)
+      )
+    ]
 
-  o[, cluster_stitched := .GRP, by = grp_key]
+    o[, cluster_stitched := .GRP, by = grp_key]
 
-  ctdf[o, on = "cluster", cluster := cluster_stitched]
+    ctdf[o, on = "cluster", cluster := cluster_stitched]
+  }
 }
 
 #' Stitch clusters by spatial overlap across segments

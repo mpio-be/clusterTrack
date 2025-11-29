@@ -16,6 +16,8 @@
 
 
 .prepare_segs <- function(ctdf, deltaT) {
+  ctdf[, let(.move_seg = NA, .seg_id = NA)]
+
   segs =
     ctdf |>
     as_ctdf_track() |>
@@ -49,8 +51,6 @@
   segs[, seg_id := rleid(move_seg)]
 
   setkey(segs, .id)
-
-  ctdf[, let(.move_seg = NA, .seg_id = NA)]
 
   ctdf[segs, .move_seg := i.move_seg]
   ctdf[segs, .seg_id := i.seg_id]
@@ -88,12 +88,11 @@
 slice_ctdf <- function(ctdf, deltaT = 1) {
   .check_ctdf(ctdf)
 
-  X = copy(ctdf)
-  X[, .putative_cluster := NA]
+  ctdf[, .putative_cluster := NA]
 
   # Initialize
   result = list()
-  queue = .split_by_maxlen(ctdf = X, deltaT = deltaT)
+  queue = .split_by_maxlen(ctdf = ctdf, deltaT = deltaT)
 
   i = 1
 
@@ -108,7 +107,9 @@ slice_ctdf <- function(ctdf, deltaT = 1) {
       if (nrow(current) > 1) {
         .prepare_segs(ctdf = current, deltaT = deltaT)
         current = current[.move_seg == 0]
-        result = c(result, list(current))
+        if (nrow(current) > 1) {
+          result = c(result, list(current))
+        }
       }
     }
 
@@ -120,25 +121,28 @@ slice_ctdf <- function(ctdf, deltaT = 1) {
     result[[i]][, .putative_cluster := i]
   }
 
+  if (length(result) == 0) {
+    warning("No valid segments found; assigning all rows to cluster 0.")
+    set(ctdf, j = ".putative_cluster", value = 0)
+    return(invisible(ctdf))
+  }
+
   # TODO: x-check this: remove all .putative_cluster n < 4 (n = 4 == one possible intersection)
 
   n_by_seg = sapply(result, nrow)
+
   result = result[n_by_seg > 3]
 
-  o = rbindlist(result)
+  out = rbindlist(result)
 
-  setorder(o, .id)
-  o[,
-    .putative_cluster := factor(.putative_cluster) |>
+  setorder(out, .id)
+  out[,
+    putative_cluster := factor(.putative_cluster) |>
       fct_inorder() |>
       as.numeric()
   ]
-  o = merge(
-    ctdf[, .(.id)],
-    o[, .(.id, .putative_cluster)],
-    all.x = TRUE,
-    sort = FALSE
-  )
+  out = out[, .(.id, putative_cluster)]
+  setkey(out, .id)
 
-  set(ctdf, j = ".putative_cluster", value = o$.putative_cluster)
+  ctdf[out, .putative_cluster := i.putative_cluster]
 }

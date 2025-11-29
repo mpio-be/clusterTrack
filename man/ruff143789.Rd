@@ -14,8 +14,8 @@ A data.table with 2834 rows and 4 columns:
 }
 }
 \source{
-Kempenaers, Bart, et al. "Large-scale sampling of potential breeding sites in male ruffs." 
-         Proceedings B 292.2038 (2025): 20242225. 
+Kempenaers, Bart, et al. "Large-scale sampling of potential breeding sites in male ruffs."
+         Proceedings B 292.2038 (2025): 20242225.
          https://royalsocietypublishing.org/doi/full/10.1098/rspb.2024.2225.
 }
 \usage{

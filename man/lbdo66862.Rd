@@ -14,8 +14,8 @@ A data.table with 2501 rows and 4 columns:
 }
 }
 \source{
-Kwon, Eunbi, Mihai Valcu, and Bart Kempenaers. “Strong Wintering Site Fidelity Contrasts 
-         with Exploratory Breeding Site Sampling in a Socially Monogamous Shorebird.” 
+Kwon, Eunbi, Mihai Valcu, and Bart Kempenaers. “Strong Wintering Site Fidelity Contrasts
+         with Exploratory Breeding Site Sampling in a Socially Monogamous Shorebird.”
          Movement Ecology, vol. 13, no. 1, 2025, p. 49, https://doi.org/10.1186/s40462-025-00580-3.
 }
 \usage{
