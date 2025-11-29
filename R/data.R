@@ -31,7 +31,7 @@
 #'   \item{locationClass}{Character. ARGOS location quality class (e.g., B, 0, A).}
 #' }
 #'
-#' @source  Kempenaers, Bart, and Mihai Valcu. "Breeding site sampling across the Arctic 
+#' @source  Kempenaers, Bart, and Mihai Valcu. "Breeding site sampling across the Arctic
 #'          by individual males of a polygynous shorebird." Nature 541.7638 (2017): 528-531.
 #'
 #' @examples
@@ -51,8 +51,8 @@
 #'   \item{locationClass}{Character. ARGOS location quality class (e.g., B, 0, A).}
 #' }
 #'
-#' @source  Kwon, Eunbi, Mihai Valcu, and Bart Kempenaers. “Strong Wintering Site Fidelity Contrasts 
-#'          with Exploratory Breeding Site Sampling in a Socially Monogamous Shorebird.” 
+#' @source  Kwon, Eunbi, Mihai Valcu, and Bart Kempenaers. “Strong Wintering Site Fidelity Contrasts
+#'          with Exploratory Breeding Site Sampling in a Socially Monogamous Shorebird.”
 #'          Movement Ecology, vol. 13, no. 1, 2025, p. 49, https://doi.org/10.1186/s40462-025-00580-3.
 #'
 #' @examples
@@ -72,8 +72,8 @@
 #'   \item{locationClass}{Character. ARGOS location quality class (e.g., B, 0, A).}
 #' }
 #'
-#' @source  Kempenaers, Bart, et al. "Large-scale sampling of potential breeding sites in male ruffs." 
-#'          Proceedings B 292.2038 (2025): 20242225. 
+#' @source  Kempenaers, Bart, et al. "Large-scale sampling of potential breeding sites in male ruffs."
+#'          Proceedings B 292.2038 (2025): 20242225.
 #'          https://royalsocietypublishing.org/doi/full/10.1098/rspb.2024.2225.
 #'
 #' @examples

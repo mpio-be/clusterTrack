@@ -1,15 +1,8 @@
-
 #' @export
 print.clusterTrack <- function(x, ...) {
+  cat("<clusters:", uniqueN(x$cluster) - 1, ">\n\n")
 
-  cat("<clusters:", uniqueN(x$cluster)-1, ">\n\n")
-
-  NextMethod("print",
-    topn      = 3,
-    nrows     = 10,
-    print.keys= FALSE,
-    ...)
-
+  NextMethod("print", topn = 3, nrows = 10, print.keys = FALSE, ...)
 }
 
 #' @export
@@ -43,8 +36,8 @@ plot.clusterTrack <- function(x) {
 #'                          required to merge adjacent clusters. Default to 0.1.
 #'                          Clusters with overlap > threshold are combined.
 #'                          Passed to [cluster_stitch()]
-#' @return NULL. 
-#' The function modifies `ctdf` by reference, adding or updating the column \code{cluster}, 
+#' @return NULL.
+#' The function modifies `ctdf` by reference, adding or updating the column \code{cluster},
 #' which assigns a cluster ID to each row (point).
 #' Clustering parameters are stored as an attribute: `attr(ctdf, "cluster_params")`.
 #'
@@ -53,24 +46,29 @@ plot.clusterTrack <- function(x) {
 #' @examples
 #' data(toy_ctdf_k3)
 #' ctdf = as_ctdf(toy_ctdf_k3) |> cluster_track()
-#' 
+#'
 #' \dontrun{
 #' data(pesa56511)
 #' ctdf = as_ctdf(pesa56511, time = "locationDate") |> cluster_track()
 #'
-#' 
+#'
 #' data(ruff143789)
 #' ctdf = as_ctdf(ruff143789, time = "locationDate") |> cluster_track()
-#' 
+#'
 #' data(lbdo66862)
 #' ctdf = as_ctdf(lbdo66862, time = "locationDate") |> cluster_track()
-#' 
-#' 
+#'
+#'
 #' }
 
-cluster_track <- function(ctdf,deltaT = 1, nmin = 5, threshold = 2, 
-                  time_contiguity = FALSE, overlap_threshold = 0.1 ) {
-
+cluster_track <- function(
+  ctdf,
+  deltaT = 1,
+  nmin = 5,
+  threshold = 2,
+  time_contiguity = FALSE,
+  overlap_threshold = 0.1
+) {
   options(datatable.showProgress = FALSE)
   cli_progress_bar("", type = "tasks", total = 4)
 
@@ -83,33 +81,25 @@ cluster_track <- function(ctdf,deltaT = 1, nmin = 5, threshold = 2,
   cli_progress_update()
 
   cli_progress_output("Within-segment clustering...")
-  cluster_segments(ctdf,
-    nmin = nmin,
-    threshold = threshold,
-    time_contiguity = time_contiguity
-  )
+  cluster_segments(ctdf, nmin = nmin, threshold = threshold, time_contiguity = time_contiguity)
   cli_progress_update()
-    
+
   cli_progress_output("Cluster stitching ...")
-  cluster_stitch(ctdf,
-    overlap_threshold = overlap_threshold
-  )
+  cluster_stitch(ctdf, overlap_threshold = overlap_threshold)
   cli_progress_update()
 
   # collect parameters to save
   cluster_params = list(
-    deltaT            = deltaT,
-    nmin              = nmin,
-    threshold         = threshold,
-    time_contiguity   = time_contiguity,
+    deltaT = deltaT,
+    nmin = nmin,
+    threshold = threshold,
+    time_contiguity = time_contiguity,
     overlap_threshold = overlap_threshold
-    )
-  
+  )
+
   setattr(ctdf, "cluster_params", cluster_params)
 
   cli_progress_done()
 
   ctdf
-
-
 }

@@ -4,7 +4,7 @@
 \alias{as_ctdf_track}
 \title{Convert a `ctdf` track to movement step segments as LINESTRINGs}
 \usage{
-as_ctdf_track(ctdf, check = TRUE)
+as_ctdf_track(ctdf)
 }
 \arguments{
 \item{ctdf}{A `ctdf` object (with ordered rows and a `"location"` geometry column).}

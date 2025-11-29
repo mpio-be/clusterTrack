@@ -5,7 +5,7 @@
 \alias{reserved_ctdf_nams}
 \title{Reserved ctdf column names}
 \format{
-An object of class \code{character} of length 4.
+An object of class \code{character} of length 6.
 }
 \usage{
 reserved_ctdf_nams

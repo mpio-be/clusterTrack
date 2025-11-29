@@ -10,7 +10,7 @@ cluster_stitch(ctdf, overlap_threshold = 0.1)
 \item{ctdf}{A CTDF object. Must contain an updated `cluster` column.}
 
 \item{overlap_threshold}{Numeric between 0 and 1; minimum area‐overlap ratio
-                         required to merge adjacent clusters. 
+                         required to merge adjacent clusters.
                          Clusters with overlap > threshold are combined.
 #' @return The input CTDF, with an updated (in-place) cluster` column.}
 }
@@ -27,7 +27,7 @@ cluster_segments(ctdf)
 cluster_stitch(ctdf)
 data(pesa56511)
 ctdf  = as_ctdf(pesa56511, time = "locationDate", s_srs = 4326, t_srs = "+proj=eqearth")
-slice_ctdf(ctdf) 
+slice_ctdf(ctdf)
 cluster_segments(ctdf)
 cluster_stitch(ctdf)
 
