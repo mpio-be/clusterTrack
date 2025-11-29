@@ -1,6 +1,13 @@
 #' Reserved ctdf column names
 #' @keywords internal
-reserved_ctdf_nams = c("cluster", ".putative_cluster", ".id", ".tesselation")
+reserved_ctdf_nams = c(
+  "cluster",
+  ".id",
+  ".move_seg",
+  ".seg_id",
+  ".putative_cluster",
+  ".tesselation"
+)
 
 .check_ctdf <- function(x) {
   if (!inherits(x, "ctdf")) {
@@ -126,6 +133,9 @@ as_ctdf <- function(
   setorder(o, timestamp)
 
   o[, .id := .I]
+
+  o[, .seg_id := NA_integer_]
+  o[, .move_seg := NA_integer_]
   o[, .putative_cluster := NA_integer_]
   o[, cluster := NA_integer_]
   o[, .tesselation := vector("list", .N)]
@@ -137,6 +147,7 @@ as_ctdf <- function(
   st_geometry(o) = "location"
 
   setDT(o)
+  setkey(o, .id)
   setcolorder(o, reserved_ctdf_nams, after = ncol(o))
 
   class(o) <- c("ctdf", class(o))
@@ -167,11 +178,7 @@ as_ctdf <- function(
 #' plot(s['.id'])
 #'
 #' @export
-as_ctdf_track <- function(ctdf, check = TRUE) {
-  if (check) {
-    .check_ctdf(ctdf)
-  }
-
+as_ctdf_track <- function(ctdf) {
   o = ctdf |>
     st_as_sf() |>
     mutate(
@@ -184,7 +191,8 @@ as_ctdf_track <- function(ctdf, check = TRUE) {
   o = o |>
     dplyr::filter(!st_is_empty(location_prev))
 
-  o |>
+  o =
+    o |>
     rowwise() |>
     mutate(
       track = rbind(st_coordinates(location_prev), st_coordinates(location)) |>

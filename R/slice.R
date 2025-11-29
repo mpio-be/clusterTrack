@@ -18,7 +18,7 @@
 .prepare_segs <- function(ctdf, deltaT) {
   segs =
     ctdf |>
-    as_ctdf_track(check = FALSE) |>
+    as_ctdf_track() |>
     mutate(len = st_length(track) |> set_units("km") |> as.numeric())
 
   crosses = st_crosses(segs)
@@ -34,36 +34,33 @@
 
   segs[, n_crosses := lengths(pruned_crosses)]
 
-  segs[, cross := n_crosses > 0]
+  segs[, any_cross := n_crosses > 0]
 
-  segs[, good_seg_id := rleid(cross)]
+  segs[, good_seg_id := rleid(any_cross)]
 
-  segs[(cross), good_seg_id := NA]
+  segs[(any_cross), good_seg_id := NA]
 
   segs[!is.na(good_seg_id), good_seg_len := sum(len), by = good_seg_id]
 
-  segs[, split_seg := max(good_seg_len, na.rm = TRUE) == good_seg_len]
+  segs[, move_seg := max(good_seg_len, na.rm = TRUE) == good_seg_len]
 
-  segs[is.na(split_seg), split_seg := FALSE]
+  segs[is.na(move_seg), move_seg := FALSE]
 
-  segs[, split_seg_id := rleid(split_seg)]
+  segs[, seg_id := rleid(move_seg)]
 
-  segs
+  setkey(segs, .id)
+
+  ctdf[, let(.move_seg = NA, .seg_id = NA)]
+
+  ctdf[segs, .move_seg := i.move_seg]
+  ctdf[segs, .seg_id := i.seg_id]
 }
 
 
-.split_by_maxlen <- function(segs, ctdf) {
-  out = segs[!(split_seg), .(.id, split_seg, split_seg_id)]
+.split_by_maxlen <- function(ctdf, deltaT) {
+  .prepare_segs(ctdf, deltaT = deltaT)
 
-  out = merge(ctdf, out, by = ".id")
-
-  out = split(out, by = 'split_seg_id')
-
-  for (i in seq_along(out)) {
-    out[[i]][, let(split_seg_id = NULL, split_seg = NULL)]
-  }
-
-  out
+  split(ctdf[.move_seg == 0], by = ".seg_id")
 }
 
 #' Segment and filter a CTDF by temporal continuity and spatial clustering
@@ -96,22 +93,23 @@ slice_ctdf <- function(ctdf, deltaT = 1) {
 
   # Initialize
   result = list()
-  queue = .prepare_segs(X, deltaT = deltaT) |> .split_by_maxlen(ctdf = X)
+  queue = .split_by_maxlen(ctdf = X, deltaT = deltaT)
 
-  total_n = nrow(X)
   i = 1
-  processed_n = 0
 
   while (i <= length(queue)) {
     current = queue[[i]]
 
     if (current |> .has_clusters()) {
-      new_chunks = .prepare_segs(current, deltaT = deltaT) |>
-        .split_by_maxlen(ctdf = current)
+      new_chunks = .split_by_maxlen(ctdf = current, deltaT = deltaT)
       queue = c(queue, new_chunks)
     } else {
-      result = c(result, list(current))
-      processed_n = processed_n + nrow(current)
+      # We need .prepare_segs  to remove the longest residual movement bit
+      if (nrow(current) > 1) {
+        .prepare_segs(ctdf = current, deltaT = deltaT)
+        current = current[.move_seg == 0]
+        result = c(result, list(current))
+      }
     }
 
     i = i + 1
@@ -122,7 +120,7 @@ slice_ctdf <- function(ctdf, deltaT = 1) {
     result[[i]][, .putative_cluster := i]
   }
 
-  # remove all segments n < 4 (n = 4 == one possible intersection)
+  # TODO: x-check this: remove all .putative_cluster n < 4 (n = 4 == one possible intersection)
 
   n_by_seg = sapply(result, nrow)
   result = result[n_by_seg > 3]
