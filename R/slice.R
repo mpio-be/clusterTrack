@@ -1,17 +1,66 @@
-.has_clusters <- function(s) {
-  N = 5
+# .has_clusters <- function(ctdf) {
+#   N = 5
 
-  if (nrow(s) <= N) {
+#   if (nrow(ctdf) <= N) {
+#     return(FALSE)
+#   }
+
+#   MIN_PTS = ceiling(sqrt(nrow(ctdf)))
+
+#   o = hdbscan(st_coordinates(ctdf$location), minPts = MIN_PTS)
+
+#   res = length(o$cluster_scores) > 1
+
+#   return(res)
+# }
+
+.has_clusters <- function(ctdf, verbose = TRUE) {
+  MIN_N = 5
+  MIN_CLUSTERS = 2
+  if (nrow(ctdf) <= MIN_N) {
     return(FALSE)
   }
 
-  MIN_PTS = ceiling(sqrt(nrow(s)))
+  # Choose a reasonable minPts (log, log2, sqrt)
+  minPts = max(MIN_N, ceiling(log2(nrow(ctdf))))
 
-  o = hdbscan(st_coordinates(s$location), minPts = MIN_PTS)
+  xy = st_coordinates(ctdf$location)
 
-  res = length(o$cluster_scores) > 1
+  o = hdbscan(xy, minPts = minPts)
 
-  return(res)
+  # 1. If there is more than one cluster -> TRUE
+  cl_ids = unique(o$cluster)
+  cl_ids = cl_ids[cl_ids > 0]
+
+  if (length(cl_ids) > 1) {
+    if (verbose) {
+      message("1. multiple hdbscan clusters detected")
+    }
+    return(FALSE)
+  }
+
+  # 2. If only one large cluster exists -> FALSE
+  cl_sizes = table(o$cluster[o$cluster != 0])
+  large_clusters = sum(cl_sizes >= MIN_CLUSTERS)
+
+  if (large_clusters <= 1) {
+    if (verbose) {
+      message("2. only one meaningful cluster")
+    }
+    return(FALSE)
+  }
+
+  # 3. Check cluster stability
+  stable_clusters = which(o$cluster_scores > 0.01) # TODO threshold OK?
+
+  if (length(stable_clusters) <= 1) {
+    if (verbose) {
+      message("3. clusters not stable")
+    }
+    return(FALSE)
+  }
+
+  return(FALSE)
 }
 
 
@@ -100,6 +149,7 @@ slice_ctdf <- function(ctdf, deltaT = 1) {
     current = queue[[i]]
 
     if (current |> .has_clusters()) {
+      print(.has_clusters__(current))
       new_chunks = .split_by_maxlen(ctdf = current, deltaT = deltaT)
       queue = c(queue, new_chunks)
     } else {
