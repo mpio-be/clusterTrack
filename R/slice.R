@@ -1,14 +1,3 @@
-.has_clusters__ <- function(ctdf) {
-  N = 5
-  if (nrow(ctdf) <= N) {
-    return(FALSE)
-  }
-  MIN_PTS = ceiling(sqrt(nrow(ctdf)))
-  o = hdbscan(st_coordinates(ctdf$location), minPts = MIN_PTS)
-  res = length(o$cluster_scores) > 1
-  return(res)
-}
-
 .has_clusters <- function(ctdf, verbose = TRUE) {
   MIN_N = 5
   MIN_CLUSTERS = 2
