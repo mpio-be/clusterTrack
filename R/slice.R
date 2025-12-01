@@ -5,7 +5,7 @@
     return(FALSE)
   }
 
-  # Choose a reasonable minPts (log, log2, sqrt)
+  # Choose a reasonable minPts
   minPts = max(MIN_N, ceiling(sqrt(nrow(ctdf))))
 
   xy = st_coordinates(ctdf$location)

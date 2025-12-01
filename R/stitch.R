@@ -67,10 +67,14 @@ cluster_stitch <- function(ctdf, overlap_threshold = 0.1) {
   .check_ctdf(ctdf)
 
   repeat {
-    n_prev = max(ctdf$cluster)
-    if (max(ctdf$cluster) == n_prev) {
+    old = ctdf$cluster
+
+    .stitch(ctdf, overlap_threshold = overlap_threshold)
+
+    if (identical(ctdf$cluster, old)) {
       break
     }
-    .stitch(ctdf, overlap_threshold = overlap_threshold)
   }
+
+  #
 }

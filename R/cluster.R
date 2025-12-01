@@ -68,6 +68,7 @@ cluster_segments <- function(
 
   # update ctdf
 
+  # TODO: use join
   o = merge(
     ctdf[, .(.id)],
     x[, .(.id, cluster)],
@@ -76,6 +77,7 @@ cluster_segments <- function(
     sort = FALSE
   )
 
+  # TODO: move time_contiguity to stich or make it as a last function.
   if (time_contiguity) {
     o[,
       cluster := {
