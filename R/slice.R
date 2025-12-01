@@ -1,18 +1,13 @@
-# .has_clusters <- function(ctdf) {
-#   N = 5
-
-#   if (nrow(ctdf) <= N) {
-#     return(FALSE)
-#   }
-
-#   MIN_PTS = ceiling(sqrt(nrow(ctdf)))
-
-#   o = hdbscan(st_coordinates(ctdf$location), minPts = MIN_PTS)
-
-#   res = length(o$cluster_scores) > 1
-
-#   return(res)
-# }
+.has_clusters__ <- function(ctdf) {
+  N = 5
+  if (nrow(ctdf) <= N) {
+    return(FALSE)
+  }
+  MIN_PTS = ceiling(sqrt(nrow(ctdf)))
+  o = hdbscan(st_coordinates(ctdf$location), minPts = MIN_PTS)
+  res = length(o$cluster_scores) > 1
+  return(res)
+}
 
 .has_clusters <- function(ctdf, verbose = TRUE) {
   MIN_N = 5
@@ -22,7 +17,7 @@
   }
 
   # Choose a reasonable minPts (log, log2, sqrt)
-  minPts = max(MIN_N, ceiling(log2(nrow(ctdf))))
+  minPts = max(MIN_N, ceiling(sqrt(nrow(ctdf))))
 
   xy = st_coordinates(ctdf$location)
 
@@ -36,7 +31,7 @@
     if (verbose) {
       message("1. multiple hdbscan clusters detected")
     }
-    return(FALSE)
+    return(TRUE)
   }
 
   # 2. If only one large cluster exists -> FALSE
@@ -51,7 +46,7 @@
   }
 
   # 3. Check cluster stability
-  stable_clusters = which(o$cluster_scores > 0.01) # TODO threshold OK?
+  stable_clusters = which(o$cluster_scores > 0.5) # TODO threshold OK?
 
   if (length(stable_clusters) <= 1) {
     if (verbose) {
@@ -149,7 +144,6 @@ slice_ctdf <- function(ctdf, deltaT = 1) {
     current = queue[[i]]
 
     if (current |> .has_clusters()) {
-      print(.has_clusters__(current))
       new_chunks = .split_by_maxlen(ctdf = current, deltaT = deltaT)
       queue = c(queue, new_chunks)
     } else {
