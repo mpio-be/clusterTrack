@@ -1,3 +1,20 @@
+
+
+.time_contiguity <- function(ctdf) {}
+
+  ctdf[]
+  ctdf[,
+    cluster := {
+      f = nafill(cluster, type = "locf")
+      b = nafill(cluster, type = "nocb")
+      fifelse(f == b, f, cluster)
+    }
+  ]
+
+}
+
+
+
 #' @export
 print.clusterTrack <- function(x, ...) {
   cat("<clusters:", uniqueN(x$cluster) - 1, ">\n\n")

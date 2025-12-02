@@ -8,8 +8,6 @@
 #' @param nmin Integer. Segments or tessellations with fewer than nmin points yield no clusters.
 #'   Default to 3.
 #' @param threshold Numeric. The multiplier of the standard deviation on log‐areas used in pruning.
-#' @param time_contiguity Logical; if `TRUE`, missing cluster IDs are forward‐filled
-#'   and backward‐filled within each segment to enforce temporal continuity. Default to `FALSE`.
 #' @param progress_bar Logical; whether to display a progress bar during execution. Defaults to `TRUE`.
 #'
 #' @return Invisibly returns `NULL`. The input `ctdf` is modified by reference,
@@ -76,17 +74,6 @@ cluster_segments <- function(
     all.x = TRUE,
     sort = FALSE
   )
-
-  # TODO: move time_contiguity to stich or make it as a last function.
-  if (time_contiguity) {
-    o[,
-      cluster := {
-        f = nafill(cluster, type = "locf")
-        b = nafill(cluster, type = "nocb")
-        fifelse(f == b, f, cluster)
-      }
-    ]
-  }
 
   o[is.na(cluster), cluster := 0]
 
