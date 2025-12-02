@@ -1,8 +1,4 @@
-
-
-.time_contiguity <- function(ctdf) {}
-
-  ctdf[]
+.time_contiguity <- function(ctdf) {
   ctdf[,
     cluster := {
       f = nafill(cluster, type = "locf")
@@ -10,9 +6,7 @@
       fifelse(f == b, f, cluster)
     }
   ]
-
 }
-
 
 
 #' @export
@@ -109,6 +103,11 @@ cluster_track <- function(
   cli_progress_output("Cluster stitching ...")
   cluster_stitch(ctdf, overlap_threshold = overlap_threshold)
   cli_progress_update()
+
+  if (time_contiguity) {
+    .time_contiguity(ctdf)
+  }
+  ctdf[is.na(cluster), cluster := 0]
 
   # collect parameters to save
   cluster_params = list(

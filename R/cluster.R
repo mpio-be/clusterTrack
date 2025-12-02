@@ -75,7 +75,5 @@ cluster_segments <- function(
     sort = FALSE
   )
 
-  o[is.na(cluster), cluster := 0]
-
   set(ctdf, j = "cluster", value = o$cluster)
 }
