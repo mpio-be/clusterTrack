@@ -5,13 +5,9 @@
 \alias{ruff143789}
 \title{ARGOS satellite tracking data for an individual Ruff}
 \format{
-A data.table with 2834 rows and 4 columns:
-\describe{
-  \item{latitude}{Numeric. Latitude in decimal degrees (WGS84).}
-  \item{longitude}{Numeric. Longitude in decimal degrees (WGS84).}
-  \item{locationDate}{POSIXct. Timestamp of location fix (UTC).}
-  \item{locationClass}{Character. ARGOS location quality class (e.g., B, 0, A).}
-}
+For `ruff143789`: a data.table with 2834 rows and 4 columns.
+
+For `mini_ruff`: a data.table with 276 rows and the same columns.
 }
 \source{
 Kempenaers, Bart, et al. "Large-scale sampling of potential breeding sites in male ruffs."
@@ -24,8 +20,12 @@ ruff143789
 \description{
 A dataset containing ARGOS locations for an individual male Ruff.
 }
+\details{
+`ruff143789` is the full dataset; `mini_ruff` is a reduced subset used for examples and tests.
+}
 \examples{
 data(ruff143789)
-head(ruff143789)
+data(mini_ruff)
+head(mini_ruff)
 }
 \keyword{datasets}

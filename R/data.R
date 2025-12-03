@@ -14,9 +14,9 @@
 #' within and between three clusters. There is no associated individual or species.
 #'
 #' @examples
-#' data(toy_ctdf_k3)
-#' plot(toy_ctdf_k3$longitude, toy_ctdf_k3$latitude, type = "l")
-"toy_ctdf_k3"
+#' data(mini_ruff)
+#' plot(mini_ruff$longitude, mini_ruff$latitude, type = "l")
+"mini_ruff"
 
 
 #' ARGOS satellite tracking data for an individual Pectoral Sandpiper
@@ -64,13 +64,12 @@
 #'
 #' A dataset containing ARGOS locations for an individual male Ruff.
 #'
-#' @format A data.table with 2834 rows and 4 columns:
-#' \describe{
-#'   \item{latitude}{Numeric. Latitude in decimal degrees (WGS84).}
-#'   \item{longitude}{Numeric. Longitude in decimal degrees (WGS84).}
-#'   \item{locationDate}{POSIXct. Timestamp of location fix (UTC).}
-#'   \item{locationClass}{Character. ARGOS location quality class (e.g., B, 0, A).}
-#' }
+#' `ruff143789` is the full dataset; `mini_ruff` is a reduced subset used for examples and tests.
+#'
+#' @format For `ruff143789`: a data.table with 2834 rows and 4 columns.
+#'
+#' @format For `mini_ruff`: a data.table with 276 rows and the same columns.
+#'
 #'
 #' @source  Kempenaers, Bart, et al. "Large-scale sampling of potential breeding sites in male ruffs."
 #'          Proceedings B 292.2038 (2025): 20242225.
@@ -78,5 +77,7 @@
 #'
 #' @examples
 #' data(ruff143789)
-#' head(ruff143789)
+#' data(mini_ruff)
+#' head(mini_ruff)
 "ruff143789"
+"mini_ruff"

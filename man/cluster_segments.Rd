@@ -14,9 +14,6 @@ Default to 3.}
 
 \item{threshold}{Numeric. The multiplier of the standard deviation on log‐areas used in pruning.}
 
-\item{time_contiguity}{Logical; if `TRUE`, missing cluster IDs are forward‐filled
-and backward‐filled within each segment to enforce temporal continuity. Default to `FALSE`.}
-
 \item{progress_bar}{Logical; whether to display a progress bar during execution. Defaults to `TRUE`.}
 }
 \value{
@@ -36,8 +33,8 @@ For each unique segment in `ctdf`, points are tessellated via
   components.
 }
 \examples{
-data(toy_ctdf_k3)
-ctdf = as_ctdf(toy_ctdf_k3)
+data(mini_ruff)
+ctdf = as_ctdf(mini_ruff)
 slice_ctdf(ctdf)
 tessellate_ctdf(ctdf )
 cluster_segments(ctdf)

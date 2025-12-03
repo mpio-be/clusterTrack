@@ -40,8 +40,8 @@ and geometry column name (`"location"`). A colum `filter`, and with all values s
 This column will be updated by upstream methods.
 }
 \examples{
-data(toy_ctdf_k3)
-x = as_ctdf(toy_ctdf_k3)
+data(mini_ruff)
+x = as_ctdf(mini_ruff)
 plot(x)
 
 }

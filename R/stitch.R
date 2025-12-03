@@ -45,8 +45,8 @@
 #'
 #' @export
 #' @examples
-#' data(toy_ctdf_k3)
-#' ctdf = as_ctdf(toy_ctdf_k3, s_srs = 4326, t_srs = "+proj=eqearth")
+#' data(mini_ruff)
+#' ctdf = as_ctdf(mini_ruff, s_srs = 4326, t_srs = "+proj=eqearth")
 #' slice_ctdf(ctdf)
 #' cluster_segments(ctdf)
 #' cluster_stitch(ctdf)

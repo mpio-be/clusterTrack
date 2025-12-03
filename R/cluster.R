@@ -21,8 +21,8 @@
 #'
 #' @export
 #' @examples
-#' data(toy_ctdf_k3)
-#' ctdf = as_ctdf(toy_ctdf_k3)
+#' data(mini_ruff)
+#' ctdf = as_ctdf(mini_ruff)
 #' slice_ctdf(ctdf)
 #' tessellate_ctdf(ctdf )
 #' cluster_segments(ctdf)
@@ -65,15 +65,5 @@ cluster_segments <- function(
   x[, cluster := as.integer(cluster)]
 
   # update ctdf
-
-  # TODO: use join
-  o = merge(
-    ctdf[, .(.id)],
-    x[, .(.id, cluster)],
-    by = ".id",
-    all.x = TRUE,
-    sort = FALSE
-  )
-
-  set(ctdf, j = "cluster", value = o$cluster)
+  ctdf[x, cluster := i.cluster]
 }

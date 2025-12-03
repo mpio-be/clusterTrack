@@ -55,8 +55,8 @@ plot.clusterTrack <- function(x) {
 
 #' @export
 #' @examples
-#' data(toy_ctdf_k3)
-#' ctdf = as_ctdf(toy_ctdf_k3) |> cluster_track()
+#' data(mini_ruff)
+#' ctdf = as_ctdf(mini_ruff) |> cluster_track()
 #'
 #' \dontrun{
 #' data(pesa56511)

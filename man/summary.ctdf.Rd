@@ -19,8 +19,8 @@ Returns one row per `cluster` with start/stop times, tenure (days),
 convex‐hull centroid and row‐count.
 }
 \examples{
-#' data(toy_ctdf_k3)
-ctdf = as_ctdf(toy_ctdf_k3)
+#' data(mini_ruff)
+ctdf = as_ctdf(mini_ruff)
 cluster_track(ctdf)
 summary(ctdf)
 

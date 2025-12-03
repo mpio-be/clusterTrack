@@ -87,8 +87,8 @@ plot.ctdf <- function(x, y = NULL, pch = 16) {
 #' This column will be updated by upstream methods.
 #'
 #' @examples
-#' data(toy_ctdf_k3)
-#' x = as_ctdf(toy_ctdf_k3)
+#' data(mini_ruff)
+#' x = as_ctdf(mini_ruff)
 #' plot(x)
 #'
 #' @export
@@ -172,8 +172,8 @@ as_ctdf <- function(
 #'
 #'
 #' @examples
-#' data(toy_ctdf_k3)
-#' ctdf = as_ctdf(toy_ctdf_k3)
+#' data(mini_ruff)
+#' ctdf = as_ctdf(mini_ruff)
 #' s = as_ctdf_track(ctdf)
 #' plot(s['.id'])
 #'
@@ -216,8 +216,8 @@ as_ctdf_track <- function(ctdf) {
 #' @return A `data.table` (and `data.frame`) of class c("summary_ctdf","data.table","data.frame").
 #' @export
 #' @examples
-#' #' data(toy_ctdf_k3)
-#' ctdf = as_ctdf(toy_ctdf_k3)
+#' #' data(mini_ruff)
+#' ctdf = as_ctdf(mini_ruff)
 #' cluster_track(ctdf)
 #' summary(ctdf)
 #'

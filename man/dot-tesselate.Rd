@@ -2,7 +2,7 @@
 % Please edit documentation in R/tessellate.R
 \name{.tesselate}
 \alias{.tesselate}
-\title{ctdf = as_ctdf(toy_ctdf_k3,s_srs = 4326, t_srs = "+proj=eqearth") |> slice_ctdf()
+\title{ctdf = as_ctdf(mini_ruff,s_srs = 4326, t_srs = "+proj=eqearth") |> slice_ctdf()
 x = ctdf[.putative_cluster == 1]
  plot(tess); plot(env, add = TRUE, border = 2, lwd = 2)
  plot(env); plot(tess, add = TRUE, border = 2, lwd = 0.5)}
@@ -10,7 +10,7 @@ x = ctdf[.putative_cluster == 1]
 .tesselate(x)
 }
 \description{
-ctdf = as_ctdf(toy_ctdf_k3,s_srs = 4326, t_srs = "+proj=eqearth") |> slice_ctdf()
+ctdf = as_ctdf(mini_ruff,s_srs = 4326, t_srs = "+proj=eqearth") |> slice_ctdf()
 x = ctdf[.putative_cluster == 1]
  plot(tess); plot(env, add = TRUE, border = 2, lwd = 2)
  plot(env); plot(tess, add = TRUE, border = 2, lwd = 0.5)

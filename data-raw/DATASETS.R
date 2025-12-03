@@ -51,61 +51,10 @@ ruff143789 = d[, .(latitude, longitude, locationDate, locationClass)]
 usethis::use_data(ruff143789, overwrite = TRUE)
 
 
-# toy_ctdf_k3: 3 clusters, movement from a to b and back.
-require(leaflet)
-require(sf)
-require(data.table)
-require(mapedit)
-require(mapview)
-require(clusterTrack)
-mapviewOptions(fgb = FALSE)
+# ruff_test
+data(ruff143789)
+mini_ruff = ruff143789[1225:1500][, locationClass := NULL]
 
-drawn_points = drawFeatures(leaflet() |> addTiles())
-drawn_points$id = 1:nrow(drawn_points)
+setnames(mini_ruff, "locationDate", "time")
 
-x = data.table(st_coordinates(drawn_points), id = drawn_points$id)
-# cluster 1
-sq = seq(
-  from = as.POSIXct("2025-06-01 00:00:00", tz = "UTC"),
-  to = as.POSIXct("2025-06-02 00:00:00", tz = "UTC"),
-  length.out = 10
-) +
-  runif(10, min = -4 * 3600, max = 4 * 3600) |> sort()
-# move to cluster 2
-sq2 = seq(from = max(sq), by = "5 mins", length.out = 7) +
-  runif(1, min = -4 * 3600, max = 4 * 3600) |> sort()
-#cluster 2
-sq3 = seq(from = max(sq2), by = "3 hours", length.out = 8) +
-  runif(8, min = -10 * 3600, max = 10 * 3600) |> sort()
-# move back to cluster 1
-sq4 = seq(from = max(sq), by = "5 mins", length.out = 7) +
-  runif(1, min = -4 * 3600, max = 4 * 3600) |> sort()
-#cluster 1b
-sq4 = seq(from = max(sq2), by = "3 hours", length.out = 19) +
-  runif(19, min = -10 * 3600, max = 10 * 3600) |> sort()
-
-ssq = c(sq, sq2, sq3, sq4) |> sort()
-
-x[, datetime := ssq]
-x[, id := NULL]
-
-ctdf = as_ctdf(
-  x,
-  time = 'datetime',
-  coords = c("X", "Y"),
-  s_srs = 4326,
-  t_srs = '+proj=eqearth'
-)
-
-plot(ctdf, by = 'filter')
-
-o = cluster_segments(ctdf, sd = 1)
-
-cc = st_as_sf(o)
-tt = as_ctdf_track(ctdf)
-mapview(cc) + mapview(tt)
-
-toy_ctdf_k3 = x
-setnames(toy_ctdf_k3, c("longitude", "latitude", "time"))
-
-usethis::use_data(toy_ctdf_k3, overwrite = TRUE)
+usethis::use_data(mini_ruff, overwrite = TRUE)

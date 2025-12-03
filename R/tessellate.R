@@ -1,4 +1,4 @@
-#' ctdf = as_ctdf(toy_ctdf_k3,s_srs = 4326, t_srs = "+proj=eqearth") |> slice_ctdf()
+#' ctdf = as_ctdf(mini_ruff,s_srs = 4326, t_srs = "+proj=eqearth") |> slice_ctdf()
 #' x = ctdf[.putative_cluster == 1]
 .tesselate <- function(x) {
   p = st_as_sf(x[, .(.id, location)]) |>
@@ -44,8 +44,8 @@
 #' @export
 #' @examples
 #' library(clusterTrack)
-#' data(toy_ctdf_k3)
-#' ctdf = as_ctdf(toy_ctdf_k3,s_srs = 4326, t_srs = "+proj=eqearth") |> slice_ctdf()
+#' data(mini_ruff)
+#' ctdf = as_ctdf(mini_ruff,s_srs = 4326, t_srs = "+proj=eqearth") |> slice_ctdf()
 #' tessellate_ctdf(ctdf)
 #'
 tessellate_ctdf <- function(ctdf) {
