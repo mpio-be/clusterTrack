@@ -33,6 +33,11 @@ cluster_segments <- function(
   threshold = 1,
   time_contiguity = FALSE
 ) {
+  if (nrow(ctdf[!is.na(.putative_cluster)]) == 0) {
+    warning("No valid putative clusters found!")
+    return(NULL)
+  }
+
   # prune on log(Area)
   x = ctdf[!is.na(.putative_cluster), .(.id, .putative_cluster, .tesselation)]
 

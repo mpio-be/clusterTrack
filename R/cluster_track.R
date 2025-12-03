@@ -87,7 +87,7 @@ cluster_track <- function(
   slice_ctdf(ctdf, deltaT = deltaT)
   cli_progress_update()
 
-  cli_progress_output("Tessellating points by segment..")
+  cli_progress_output("Tessellating points by putative cluster regions..")
   tessellate_ctdf(ctdf)
   cli_progress_update()
 

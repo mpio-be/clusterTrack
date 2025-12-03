@@ -34,16 +34,6 @@
     return(FALSE)
   }
 
-  # 3. Check cluster stability
-  stable_clusters = which(o$cluster_scores > 0.5) # TODO threshold OK?
-
-  if (length(stable_clusters) <= 1) {
-    if (verbose) {
-      message("3. clusters not stable")
-    }
-    return(FALSE)
-  }
-
   return(FALSE)
 }
 
@@ -155,16 +145,10 @@ slice_ctdf <- function(ctdf, deltaT = 1) {
   }
 
   if (length(result) == 0) {
-    warning("No valid segments found; assigning all rows to cluster 0.")
-    set(ctdf, j = ".putative_cluster", value = 0)
+    warning("No valid putative clusters found!")
+    set(ctdf, j = ".putative_cluster", value = NA)
     return(invisible(ctdf))
   }
-
-  # TODO: x-check this: remove all .putative_cluster n < 4 (n = 4 == one possible intersection)
-
-  n_by_seg = sapply(result, nrow)
-
-  result = result[n_by_seg > 3]
 
   out = rbindlist(result)
 

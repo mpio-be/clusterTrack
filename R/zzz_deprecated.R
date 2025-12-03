@@ -1,4 +1,4 @@
-# TODO: deprecate before new major release!
+# TODO: properly deprecate before new major release!
 
 #' @export
 as_tdbscan <- function(

@@ -8,15 +8,15 @@
     st_voronoi(point_order = TRUE, dTolerance = 1e-4) |>
     st_collection_extract("POLYGON")
 
-  env = st_union(p) |>
-    st_concave_hull(ratio = 0.5) |>
-    # TODO: ratio = 0.5 should be documented
-    st_buffer(dist = (sqrt(median(st_area(tess)) / pi)))
+  # env = st_union(p) |>
+  #   st_concave_hull(ratio = 0.5) |>
+  #   # TODO: ratio = 0.5 should be documented
+  #   st_buffer(dist = (sqrt(median(st_area(tess)) / pi)))
 
-  #'  plot(tess); plot(env, add = TRUE, border = 2, lwd = 2)
-  #'  plot(env); plot(tess, add = TRUE, border = 2, lwd = 0.5)
+  # #'  plot(tess); plot(env, add = TRUE, border = 2, lwd = 2)
+  # #'  plot(env); plot(tess, add = TRUE, border = 2, lwd = 0.5)
 
-  tess = st_intersection(tess, env)
+  # tess = st_intersection(tess, env)
   tess = st_cast(tess, "MULTIPOLYGON") |> st_geometry()
 
   st_set_geometry(p, tess)
@@ -49,6 +49,11 @@
 #' tessellate_ctdf(ctdf)
 #'
 tessellate_ctdf <- function(ctdf) {
+  if (nrow(ctdf[!is.na(.putative_cluster)]) == 0) {
+    warning("No valid putative clusters found!")
+    return(NULL)
+  }
+
   out = ctdf[!is.na(.putative_cluster), .tesselate(.SD), .putative_cluster]
   setkey(out, .id)
 
