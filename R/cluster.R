@@ -30,8 +30,7 @@
 cluster_segments <- function(
   ctdf,
   nmin = 3,
-  threshold = 1,
-  time_contiguity = FALSE
+  threshold = 1
 ) {
   if (nrow(ctdf[!is.na(.putative_cluster)]) == 0) {
     warning("No valid putative clusters found!")
@@ -62,6 +61,38 @@ cluster_segments <- function(
   ]
 
   x[, cluster := .GRP, by = .(.putative_cluster, cluster)]
+
+  # subset by min-N
+  x[, n := .N, cluster]
+  x = x[n > nmin]
+  x[, cluster := .GRP, by = cluster] # re-asign id
+  x[, cluster := as.integer(cluster)]
+
+  # update ctdf
+  ctdf[x, cluster := i.cluster]
+}
+
+
+
+
+cluster_segments__ <- function(
+  ctdf,
+) {
+  if (nrow(ctdf[!is.na(.putative_cluster)]) == 0) {
+    warning("No valid putative clusters found!")
+    return(NULL)
+  }
+
+  x = ctdf[!is.na(.putative_cluster), .(.id, .putative_cluster, location)]
+
+  x[,  apcluster(negDistMat(r = 2), x[, st_coordinates(location)], q = 0.01) |>
+    labels(type = "enum"),
+  by = .putative_cluster
+  ]
+
+  x[, cluster := labels(o, type = "enum")]
+
+  x[, cluster := .GRP, by = .(.putative_cluster)]
 
   # subset by min-N
   x[, n := .N, cluster]

@@ -3,15 +3,11 @@
 \name{.tesselate}
 \alias{.tesselate}
 \title{ctdf = as_ctdf(mini_ruff,s_srs = 4326, t_srs = "+proj=eqearth") |> slice_ctdf()
-x = ctdf[.putative_cluster == 1]
- plot(tess); plot(env, add = TRUE, border = 2, lwd = 2)
- plot(env); plot(tess, add = TRUE, border = 2, lwd = 0.5)}
+x = ctdf[.putative_cluster == 1]}
 \usage{
 .tesselate(x)
 }
 \description{
 ctdf = as_ctdf(mini_ruff,s_srs = 4326, t_srs = "+proj=eqearth") |> slice_ctdf()
 x = ctdf[.putative_cluster == 1]
- plot(tess); plot(env, add = TRUE, border = 2, lwd = 2)
- plot(env); plot(tess, add = TRUE, border = 2, lwd = 0.5)
 }
